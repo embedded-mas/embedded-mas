@@ -1,0 +1,83 @@
+//apply plugin: 'java'
+//apply plugin: 'eclipse'
+//apply plugin: 'maven-publish'
+//apply plugin: 'maven'
+
+plugins{
+   id 'java'
+   id 'eclipse'
+   id 'maven'
+}
+
+repositories {
+    mavenCentral()
+    //maven { url "https://raw.github.com/maiquelb/embedded-mas/mvn-repo" }
+
+    maven { url "https://maven.pkg.github.com/maiquelb/embedded-mas" }
+    //maven { url 'https://www.jitpack.io' }  
+}
+
+/*
+publishing {
+    repositories {
+        maven {
+            name = 'myRepo'
+            //url = "https://maven.pkg.github.com/maiquelb/embedded-mas"
+            url = "https://maven.pkg.github.com/maiquelb/"
+            credentials {
+                username 'maiquelb'
+                password '490217806d5318a219deade93637c77690140f5b'
+                //username = System.getenv("GITHUB_ACTOR")
+        	    //password = System.getenv("GITHUB_TOKEN")
+            } 
+        }
+    }
+}*/
+
+
+
+repositories {
+        maven {
+            name = 'myRepo'
+            url = "https://maven.pkg.github.com/maiquelb/embedded-mas"
+            //url = "https://maven.pkg.github.com/maiquelb/"
+            credentials {
+                username 'maiquelb'
+                password '959a80bd7fbab0e3a8dee520f142372a6bd8ae81'
+                //username = System.getenv("GITHUB_ACTOR")
+        	    //password = System.getenv("GITHUB_TOKEN")
+            } 
+        }
+        
+        maven {
+            name = 'javard_repo'
+            url = "https://maven.pkg.github.com/maiquelb/javard"
+            //url = "https://maven.pkg.github.com/maiquelb/"
+            credentials {
+                username 'maiquelb'
+                password '959a80bd7fbab0e3a8dee520f142372a6bd8ae81'
+                //username = System.getenv("GITHUB_ACTOR")
+        	    //password = System.getenv("GITHUB_TOKEN")
+            } 
+        }
+    }
+    
+dependencies{
+   //implementation 'com.github.maiquelb:embedded-mas:-SNAPSHOT'
+   //implementation 'com.github.maiquelb:embedded-mas:0.0221'
+  
+   //compile 'com.github.maiquelb:embedded-mas:0.02-SNAPSHOT'
+   compile "embedded-mas:embedded-mas:0.0224-SNAPSHOT"
+   compile "javard:javard:0.01-SNAPSHOT"
+}
+
+
+task run(type: JavaExec) {
+  classpath = sourceSets.main.runtimeClasspath
+  standardInput = System.in
+  main = 'teste_embedded_mas.Run'
+
+  // arguments to pass to the application
+  //args 'appArg1'
+  args = []
+}
