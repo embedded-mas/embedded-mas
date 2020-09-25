@@ -43,7 +43,7 @@ repositories {
             //url = "https://maven.pkg.github.com/maiquelb/"
             credentials {
                 username 'maiquelb'
-                password '959a80bd7fbab0e3a8dee520f142372a6bd8ae81'
+                password 'b1d8f7c2b9cda8a5bf1879b7bc5aa417f997ae66'
                 //username = System.getenv("GITHUB_ACTOR")
         	    //password = System.getenv("GITHUB_TOKEN")
             } 
@@ -55,7 +55,7 @@ repositories {
             //url = "https://maven.pkg.github.com/maiquelb/"
             credentials {
                 username 'maiquelb'
-                password '959a80bd7fbab0e3a8dee520f142372a6bd8ae81'
+                password 'b1d8f7c2b9cda8a5bf1879b7bc5aa417f997ae66'
                 //username = System.getenv("GITHUB_ACTOR")
         	    //password = System.getenv("GITHUB_TOKEN")
             } 
