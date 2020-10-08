@@ -1,4 +1,4 @@
-package embedded.mas;
+package embedded.mas.comm.serial;
 
 import arduino.Arduino;
 
@@ -14,8 +14,6 @@ public class DefaultJava2Serial implements IJava2Serial {
 	
 	@Override
 	public void send(String message) {
-		//System.out.println("sending:: " + message);
-		//connection.serialWrite(message, 2000);
 		connection.serialWrite(message);
 
 	}
@@ -26,7 +24,6 @@ public class DefaultJava2Serial implements IJava2Serial {
 
 	@Override
 	public String receive() {
-		// TODO Auto-generated method stub
 		return "receiving";
 	}
 
