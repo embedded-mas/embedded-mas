@@ -8,7 +8,7 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
 
-public class DefaultSerialInternalAction extends DefaultInternalAction {
+public class default_serial_internal_action extends DefaultInternalAction {
 
 	/*
 	 * Params:
