@@ -1,0 +1,11 @@
+*** Example under development ***
+
+This example illustrates the reading of a serial port following a given protocol.
+Each message comming from the serial has the following format: <preamble><message length><start message symbol><message><end message symbol
+
+
+To run it:
+  (i) upload the Embedded_Protocol.ino in the arduino folder to an arduino device
+  (ii) assign permissions to read/write in the serial folder. In Unix systems, use sudo chmod a+rw /dev/ttyUSB0 (replacing "ttyUSB0" by the proper usb port)
+  (iii) set the proper usb port in SerialRead.java
+  (iv) in a terminal, type ./gradlew run <ENTER>

@@ -1,18 +1,25 @@
 package embedded.mas.bridges.javard;
 
-import com.fazecast.jSerialComm.SerialPort;
-
 import arduino.Arduino;
 
 public class Arduino4EmbeddedMas extends Arduino {
-	
-	private String preamble = "==";
-	private String startMessage = "::";
-	private String endMessage = "--";	
+
+
+
+	public Arduino4EmbeddedMas(String portDescription, int baud_rate) {
+		super(portDescription, baud_rate);
+	}
+
+
 
 	@Override
 	public String serialRead() {
+		return "hello world"; //-> comentar essa linha e descomentar o trecho abaixo
 		
+		/*String preamble = "==";
+		String startMessage = "::";
+		String endMessage = "--";
+
 		comPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 0, 0);
 		byte[] b = new byte[1];
 
@@ -50,7 +57,7 @@ public class Arduino4EmbeddedMas extends Arduino {
 		}
 		else {
 			return "Message conversation error";
-		}
+		}*/
 	}
 
 
