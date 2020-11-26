@@ -12,6 +12,7 @@ import jason.asSyntax.Literal;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.Trigger.TEOperator;
 import jason.asSyntax.Trigger.TEType;
+import jason.stdlib.sublist;
 
 public abstract class DefaultEmbeddedAgArch extends AgArch{
 	
@@ -26,10 +27,14 @@ public abstract class DefaultEmbeddedAgArch extends AgArch{
 
 	@Override
 	public Collection<Literal> perceive() {
-		if(this.sensors!=null)
-			updateSensor();
-
-		return super.perceive();
+		Collection<Literal> p = super.perceive(); //get the default perceptions
+		Collection<Literal> sensorData = updateSensor(); //get the sensor data
+		if(p!=null&&sensorData!=null) //attach the sensor data in the default perception list
+		   p.addAll(sensorData);
+		else
+			if(sensorData!=null)
+				p = sensorData;
+		return p;
 
 	}
 
@@ -44,24 +49,14 @@ public abstract class DefaultEmbeddedAgArch extends AgArch{
 
 	}
 
-	private final void updateSensor() {
+	
+	private final Collection<Literal> updateSensor() {
+		ArrayList<Literal> percepts = new ArrayList<Literal>();
 		for(ISensor s:this.sensors) { //for each sensor
-			Collection<Literal> percepts = s.getPercepts(); //get all the percepts from the current sensor
-			if(percepts!=null) {
-				for(Literal l:percepts) { //for each percept..
-					try {					
-						((EmbeddedAgent)getTS().getAg()).abolishByFunctorAndSource(l, getTS().getAg()); //remove the corresponding current belief
-						if(getTS().getAg().addBel(l)) {
-							Trigger te = new Trigger(TEOperator.add, TEType.belief, l.copy());
-							getTS().updateEvents(new Event(te, Intention.EmptyInt));
-						}
-
-					} catch (RevisionFailedException e) {
-						e.printStackTrace();
-					}
-				}
-			}
+			percepts.addAll(s.getPercepts()); //get all the sensor data
 		}
+		if(percepts.size()==0) return null;
+		return percepts;
 	}
 
 }
