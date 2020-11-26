@@ -49,9 +49,9 @@ repositories {
 }
 
 dependencies {
-    compile group: 'org.jacamo', name: 'jacamo', version: '0.9'
-    implementation files("lib/embedded-mas-0.0247-20201014.161743-1.jar")
-    implementation "javard:javard:0.014-SNAPSHOT"
+    implementation 'org.jacamo:jacamo:0.10-SNAPSHOT'
+    implementation "embedded-mas:embedded-mas:0.025-SNAPSHOT"
+    implementation "javard:javard:0.025-SNAPSHOT"
 }
 
 sourceSets {

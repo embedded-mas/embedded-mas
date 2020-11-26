@@ -6,6 +6,8 @@
 
 +current_second(S) <- .print("Current second: ", S).
 
++current_minute(M) <- .print("Current minute: ", M).
+
 { include("$jacamoJar/templates/common-cartago.asl") }
 { include("$jacamoJar/templates/common-moise.asl") }
 
