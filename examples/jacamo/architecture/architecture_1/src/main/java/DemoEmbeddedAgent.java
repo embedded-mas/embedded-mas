@@ -1,5 +1,5 @@
 import embedded.mas.bridges.jacamo.EmbeddedAgent;
-import embedded.mas.bridges.jacamo.DemoSensor;
+import embedded.mas.bridges.jacamo.DemoDevice;
 
 import jason.asSyntax.ASSyntax;
 import jason.asSyntax.Atom;
@@ -20,8 +20,8 @@ public class DemoEmbeddedAgent extends EmbeddedAgent {
 
 	@Override
 	protected void setupSensors() {
-		DemoSensor sensor = new DemoSensor(new Atom("my_sensor"));
-		this.addSensor(sensor);
+		DemoDevice device = new DemoDevice(new Atom("my_device"));
+		this.addSensor(device);
 		
 		
 		
