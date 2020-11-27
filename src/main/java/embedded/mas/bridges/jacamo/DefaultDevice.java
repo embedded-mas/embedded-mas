@@ -14,13 +14,13 @@ import jason.asSyntax.Literal;
  * 
  */
 
-public abstract class DefaultSensor implements ISensor {
+public abstract class DefaultDevice implements IDevice {
 	
 	protected Atom id;
 
 
 
-	public DefaultSensor(Atom id) {
+	public DefaultDevice(Atom id) {
 		super();
 		this.id = id;
 	}

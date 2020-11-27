@@ -17,9 +17,9 @@ import jason.asSyntax.Literal;
  * 
  */
 
-public class DemoSensor extends DefaultSensor  {
+public class DemoDevice extends DefaultDevice  {
 
-	public DemoSensor(Atom id) {
+	public DemoDevice(Atom id) {
 		super(id);
 		
 	}

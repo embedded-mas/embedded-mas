@@ -17,7 +17,7 @@ import jason.stdlib.sublist;
 public abstract class DefaultEmbeddedAgArch extends AgArch{
 	
 		
-	protected Collection <ISensor> sensors = null;
+	protected Collection <IDevice> devices = null;
 
 
 	public DefaultEmbeddedAgArch() {		
@@ -39,20 +39,20 @@ public abstract class DefaultEmbeddedAgArch extends AgArch{
 	}
 
 
-	public void setSensors(Collection<ISensor> sensors) {
-		this.sensors = sensors;
+	public void setDevices(Collection<IDevice> devices) {
+		this.devices = devices;
 	}
 
 
-	public Collection<ISensor> getSensors(){
-		return this.sensors;
+	public Collection<IDevice> getDevices(){
+		return this.devices;
 
 	}
 
 	
 	private final Collection<Literal> updateSensor() {
 		ArrayList<Literal> percepts = new ArrayList<Literal>();
-		for(ISensor s:this.sensors) { //for each sensor
+		for(IDevice s:this.devices) { //for each sensor
 			percepts.addAll(s.getPercepts()); //get all the sensor data
 		}
 		if(percepts.size()==0) return null;

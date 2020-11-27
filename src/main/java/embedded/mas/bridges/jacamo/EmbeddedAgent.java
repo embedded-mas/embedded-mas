@@ -8,12 +8,12 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.Literal;
 
 /*
- * An extension of the default Jason agent that gets percepts from sensors
+ * An extension of the default Jason agent that gets percepts from devices
  */
 
 public abstract class EmbeddedAgent extends Agent {
 
-	protected final List<ISensor> sensors = new ArrayList<ISensor>();
+	protected final List<IDevice> devices = new ArrayList<IDevice>();
 
 	@Override
 	public void initAg() {
@@ -40,44 +40,35 @@ public abstract class EmbeddedAgent extends Agent {
 
 
 	/*
-	 * Set up the sensors of the agent
+	 * Set up the devices of the agent
 	 */
 	protected abstract void setupSensors();
 
 
 
-	public void addSensor(ISensor sensor) {
-		sensors.add(sensor);
+	public void addSensor(IDevice device) {
+		devices.add(device);
 	}
 
-	public void removeSensor(ISensor sensor) {
-		sensors.remove(sensor);
+	public void removeSensor(IDevice device) {
+		devices.remove(device);
 	}
 
 	class checkSensor extends Thread{
 
+		@SuppressWarnings("deprecation")
 		@Override
 		public void run() {
 			while(true) {
 				synchronized (ts) {
 					if(getTS().getUserAgArch() instanceof DefaultEmbeddedAgArch) 
-					/* The architecture requres a list of sensors to handle the perceptions. 
+						/* The architecture requres a list of devices to handle the perceptions. 
 						   In some point after the agent creation, an architecture other than DefaultEmbeddedAgArch is set and the list of sensor is lost.
-						   This method update the list of sensors if it is null.
+						   This method update the list of devices if it is null.
 						   TODO: improve this */ 
-						if(((DefaultEmbeddedAgArch) getTS().getUserAgArch()).getSensors()==null) {
-							((DefaultEmbeddedAgArch) getTS().getUserAgArch()).setSensors(sensors);
+						if(((DefaultEmbeddedAgArch) getTS().getUserAgArch()).getDevices()==null) {
+							((DefaultEmbeddedAgArch) getTS().getUserAgArch()).setDevices(devices);
 						}
-
-					//if(getTS().getUserAgArch() instanceof StatArch) 
-						/* The architecture requres a list of sensors to handle the perceptions. 
-					   In some point after the agent creation, an architecture other than DefaultEmbeddedAgArch is set and the list of sensor is lost.
-					   This method update the list of sensors if it is null.
-					   TODO: improve this */ 
-					//	if(((StatArch) getTS().getAgArch()).getSensors()==null) {
-					//		((StatArch) getTS().getAgArch()).setSensors(sensors);
-					//	}
-
 				}
 			}
 
