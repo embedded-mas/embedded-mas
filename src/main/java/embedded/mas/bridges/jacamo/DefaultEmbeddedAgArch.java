@@ -3,6 +3,7 @@ package embedded.mas.bridges.jacamo;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import embedded.mas.exception.PerceivingException;
 import jason.RevisionFailedException;
 import jason.architecture.AgArch;
 import jason.asSemantics.Agent;
@@ -53,7 +54,9 @@ public abstract class DefaultEmbeddedAgArch extends AgArch{
 	private final Collection<Literal> updateSensor() {
 		ArrayList<Literal> percepts = new ArrayList<Literal>();
 		for(IDevice s:this.devices) { //for each sensor
-			percepts.addAll(s.getPercepts()); //get all the sensor data
+			try {
+				percepts.addAll(s.getPercepts());//get all the sensor data
+			} catch (PerceivingException e) {} //if it fails, do nothing 			
 		}
 		if(percepts.size()==0) return null;
 		return percepts;
