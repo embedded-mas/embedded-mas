@@ -41,6 +41,8 @@ dependencies {
     compile group: 'com.fazecast', name: 'jSerialComm', version: '1.3.10'
     compile "javard:javard:0.025-SNAPSHOT"
     compile group: 'org.jason' , name: 'jason'   , version: '2.6-SNAPSHOT'
+    compile group: 'javax.json', name: 'javax.json-api', version: '1.1.4'
+    compile group: 'org.glassfish', name: 'javax.json', version: '1.1.4'
     
 
     // This dependency is exported to consumers, that is to say found on their compile classpath.
@@ -58,7 +60,7 @@ publishing {
         myLibrary(MavenPublication) {
             groupId = 'embedded-mas'
             artifactId = 'embedded-mas'
-            version = '0.025-SNAPSHOT'
+            version = '0.02606-SNAPSHOT'
             
             from components.java
         }

@@ -2,6 +2,7 @@ package embedded.mas.bridges.jacamo;
 
 import java.util.Collection;
 
+import embedded.mas.exception.PerceivingException;
 import jason.asSyntax.Atom;
 import jason.asSyntax.Literal;
 
@@ -27,7 +28,7 @@ public abstract class DefaultDevice implements IDevice {
 
 
 	/* Returns a collection of percepts from the sensor */
-	public abstract Collection<Literal> getPercepts();
+	public abstract Collection<Literal> getPercepts() throws PerceivingException;;
 
 
 	public Atom getId() {
