@@ -1,3 +1,7 @@
+/**
+ * This class represents an interface with a microcontroller whose sensor data follow the JSON format. 
+ */
+
 package embedded.mas.bridges.jacamo;
 
 import java.io.ByteArrayInputStream;
@@ -13,23 +17,17 @@ import embedded.mas.exception.PerceivingException;
 import jason.asSyntax.Atom;
 import jason.asSyntax.Literal;
 
+public class JSONDevice extends DefaultDevice implements IDevice {
 
-/**
- * 
- * Exemplo de implementação de ArduinoDevice
- * 
- * @author maiquel
- *
- */
-public class DemoArduinoDevice extends ArduinoDevice {
-
-	public DemoArduinoDevice(Atom id, String portDescription, int baud_rate) {
-		super(id, portDescription, baud_rate);
+	
+	
+	public JSONDevice(Atom id, IPhysicalInterface microcontroller) {
+		super(id, microcontroller);	
 	}
 
 	@Override
 	public Collection<Literal> getPercepts() throws PerceivingException {
-		String json = arduino.serialRead(); //lê o arduino
+		String json = microcontroller.read();
 
 		if(json.equals("Message conversation error")) //if the message is not propealy read
 			throw new PerceivingException();
@@ -58,6 +56,5 @@ public class DemoArduinoDevice extends ArduinoDevice {
 			return percepts;
 		}
 	}
-	
-	
+
 }

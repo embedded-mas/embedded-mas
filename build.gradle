@@ -60,7 +60,7 @@ publishing {
         myLibrary(MavenPublication) {
             groupId = 'embedded-mas'
             artifactId = 'embedded-mas'
-            version = '0.02606-SNAPSHOT'
+            version = '0.0260744-SNAPSHOT'
             
             from components.java
         }

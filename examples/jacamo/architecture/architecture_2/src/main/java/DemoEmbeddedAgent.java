@@ -1,8 +1,7 @@
 import embedded.mas.bridges.jacamo.EmbeddedAgent;
-import embedded.mas.bridges.jacamo.DemoArduinoDevice;
-import embedded.mas.bridges.jacamo.DemoDevice;
+import embedded.mas.bridges.jacamo.JSONDevice;
+import embedded.mas.bridges.javard.Arduino4EmbeddedMas;
 
-import jason.asSyntax.ASSyntax;
 import jason.asSyntax.Atom;
 
 
@@ -14,15 +13,16 @@ public class DemoEmbeddedAgent extends EmbeddedAgent {
 	
 	@Override
 	public void initAg() {
-		
 		super.initAg();
-		System.out.println("starting EmbeddedAgent...");		
 	}
 
 	@Override
 	protected void setupSensors() {
-		DemoArduinoDevice device = new DemoArduinoDevice(new Atom("Arduino1"),"COM4",9600);
-		//DemoDevice device = new DemoDevice(new Atom("Arduino1"));
+
+		Arduino4EmbeddedMas arduino = new Arduino4EmbeddedMas("/dev/ttyUSB0",9600);
+		arduino.openConnection();
+		
+		JSONDevice device = new JSONDevice(new Atom("Arduino1"), arduino);
 		this.addSensor(device);
 		
 		

@@ -1,9 +1,18 @@
+/**
+ * This class is specialization of the Arduino classe from the Javard package.
+ * While the superclasse reads and writes in an Arduino device, this class decodes the read messages according to a predefined protocol that includes 
+ * the preamble of the message, as well as the symbols of starting and ending of the message. 
+ * 
+ */
+
 package embedded.mas.bridges.javard;
 
 import arduino.Arduino;
+import embedded.mas.bridges.jacamo.IPhysicalInterface;
+
 import com.fazecast.jSerialComm.*;
 
-public class Arduino4EmbeddedMas extends Arduino {
+public class Arduino4EmbeddedMas extends Arduino implements IPhysicalInterface{
 
 	private String preamble = "==";
 	private String startMessage = "::";
@@ -14,7 +23,28 @@ public class Arduino4EmbeddedMas extends Arduino {
 		super(portDescription, baud_rate);
 	}
 	
-
+	@Override
+	public String read() {       
+		return this.serialRead();
+	}
+	
+	
+	@Override
+	public boolean write(String s) {
+		try {
+			serialWrite(s);
+			return true;
+		}catch (Exception e) {
+			return false;
+		}		
+	}
+	
+	/**
+	 * While the superclasse reads and writes in an Arduino device, this class decodes the read messages according to a predefined protocol that includes 
+	 * the preamble of the message, as well as the symbols of starting and ending of the message. 
+	 * 
+	 * The result of the reading is the payload of the whole message gotten from the Arduino.	 
+	 */
 	@Override
 	public String serialRead() {
 		String s = "";

@@ -20,7 +20,7 @@ import jason.asSyntax.Literal;
 public class DemoDevice extends DefaultDevice  {
 
 	public DemoDevice(Atom id) {
-		super(id);
+		super(id,null);
 		
 	}
 
@@ -37,6 +37,7 @@ public class DemoDevice extends DefaultDevice  {
 		percepts.add(Literal.parseLiteral("current_day("+ today.getDayOfMonth() +")"));
 		percepts.add(Literal.parseLiteral("current_month("+ today.getMonth().toString().toLowerCase() +")"));
 		percepts.add(Literal.parseLiteral("current_year("+ today.getYear() +")"));
+		percepts.add(Literal.parseLiteral("msg(ola)"));
 		
 		return percepts;
 	}

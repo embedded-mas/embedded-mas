@@ -18,12 +18,13 @@ import jason.asSyntax.Literal;
 public abstract class DefaultDevice implements IDevice {
 	
 	protected Atom id;
+	protected IPhysicalInterface microcontroller;
+	
 
 
-
-	public DefaultDevice(Atom id) {
-		super();
+	public DefaultDevice(Atom id, IPhysicalInterface microcontroller) {
 		this.id = id;
+		this.microcontroller = microcontroller;
 	}
 
 
