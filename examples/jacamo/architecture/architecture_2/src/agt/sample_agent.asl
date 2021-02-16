@@ -4,7 +4,8 @@
 
 +!start : true <- .print("hello world.").
 
-+botao(Estado) <- .print("botao: ", Estado).
++botao(Numero) <- .print("botao: ", Numero).
++led(Estado)<- .print("led: ",Estado).
 
 { include("$jacamoJar/templates/common-cartago.asl") }
 { include("$jacamoJar/templates/common-moise.asl") }
