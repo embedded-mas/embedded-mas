@@ -1,0 +1,64 @@
+//apply plugin: 'java'
+//apply plugin: 'eclipse'
+//apply plugin: 'maven-publish'
+//apply plugin: 'maven'
+
+plugins{
+   id 'java'
+   id 'eclipse'
+   id 'maven'
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    maven { url "http://jacamo.sourceforge.net/maven2" }
+    maven { url "https://raw.github.com/jacamo-lang/mvn-repo/master" }
+    maven { url "https://repo.gradle.org/gradle/libs-releases-local" }
+
+    maven {
+            name = 'myRepo'
+            url = "https://maven.pkg.github.com/maiquelb/embedded-mas"
+            credentials {
+                username 'maiquelb'
+                password ''
+            }
+        }
+
+        maven {
+            name = 'javard_repo'
+            url = "https://maven.pkg.github.com/maiquelb/javard"
+            credentials {
+                username 'maiquelb'
+                password ''
+            }
+        }
+
+    //maven { url "https://jade.tilab.com/maven/" }
+
+    flatDir {
+       dirs 'lib'
+    }
+
+    mavenCentral()    
+}
+    
+dependencies{
+
+   implementation "embedded-mas:embedded-mas:0.0260802-SNAPSHOT"
+   implementation "javard:javard:0.014-SNAPSHOT"
+
+
+}
+
+
+task run(type: JavaExec) {
+  classpath = sourceSets.main.runtimeClasspath
+  standardInput = System.in
+  main = 'teste_embedded_mas.Run'
+
+  // arguments to pass to the application
+  //args 'appArg1'
+  args = []
+}
