@@ -22,4 +22,4 @@ It considers an environment setup with two leds, "a" and "b", plugged in the out
 		(e.g. sudo chmod a+rw /dev/ttyUSB0)
 
 1. Load the program [read_char](arduino/read_char/read_char.ino) to an Arduino
-1. In a terminal, type ```gradle run -q --console=plain ```
+1. In a terminal, type ```./gradlew run -q --console=plain ```
