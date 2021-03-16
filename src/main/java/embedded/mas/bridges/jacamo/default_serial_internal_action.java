@@ -1,8 +1,6 @@
 package embedded.mas.bridges.jacamo;
 
-import java.io.IOException;
-
-import embedded.mas.comm.serial.DefaultJava2Serial;
+import embedded.mas.bridges.javard.Arduino4EmbeddedMas;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
@@ -10,24 +8,28 @@ import jason.asSyntax.Term;
 
 public class default_serial_internal_action extends DefaultInternalAction {
 
+	private Arduino4EmbeddedMas serial = null;
+
 	/*
 	 * Params:
 	 * 0 - Serial port
 	 * 1 - Baudrate
-	 * 2 - Content to sendo to serial
+	 * 2 - Content to send to serial
 	 */
 	@Override
 	public Object execute( TransitionSystem ts, Unifier un, Term[] args ) throws Exception {
-
-		/*DefaultJava2Serial serial = new DefaultJava2Serial(args[0].toString(), Integer.parseInt(args[1].toString()));
+		String port = args[0].toString().replaceAll("^\"+|\"+$", "");
+		//System.out.println("[default_serial_internal_action] sending to serial : " + port + args[1].toString() + args[2].toString());
 		try {
-			serial.send(args[2].toString());
+			if(serial==null) {
+				serial = new Arduino4EmbeddedMas(port, Integer.parseInt(args[1].toString()));
+				serial.openConnection();
+			}
+			serial.write(args[2].toString());
 			return true;
 		} catch (Exception e) {
 			return false;
-		}*/
-		System.out.println("Defaulg serial internal action " + args[0] + ", " + args[1] + ", " + args[2]);
-		return true;
+		}		
 
 	}
 

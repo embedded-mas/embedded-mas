@@ -20,24 +20,26 @@ repositories {
     maven { url "http://jacamo.sourceforge.net/maven2" }
     maven { url "https://raw.github.com/jacamo-lang/mvn-repo/master" }
     maven { url "https://repo.gradle.org/gradle/libs-releases-local" }
-    maven {
-            name = 'myRepo'
-            url = "https://maven.pkg.github.com/maiquelb/embedded-mas"
-            credentials {
-                username 'maiquelb'
-                password ''
-            }
-        }
+    maven { url "https://maven.pkg.github.com/maiquelb/javard" }
+    maven { url "https://maven.pkg.github.com/maiquelb/embedded-mas" }
+    
+    //maven {
+    //        name = 'myRepo'
+    //        url = "https://maven.pkg.github.com/maiquelb/embedded-mas"
+    //        credentials {
+    //            username 'maiquelb'
+    //            password ''
+    //        }
+    //    }
 
-        maven {
-            name = 'javard_repo'
-            url = "https://maven.pkg.github.com/maiquelb/javard"
-            credentials {
-                username 'maiquelb'
-                password '
-            }
-        }
-
+        //maven {
+        //    name = 'javard_repo'
+        //    url = "https://maven.pkg.github.com/maiquelb/javard"
+        //    credentials {
+        //        username 'maiquelb'
+        //        //password ''
+        //    }
+        //}
     //maven { url "https://jade.tilab.com/maven/" }
 
     flatDir {
@@ -48,9 +50,8 @@ repositories {
 }
 
 dependencies {
-    compile group: 'org.jacamo', name: 'jacamo', version: '0.9'
-    //implementation "embedded-mas:embedded-mas:0.023-SNAPSHOT"
-    implementation files("embedded-mas-0.0236-20201008.184146-1.jar")
+    implementation 'org.jacamo:jacamo:0.10-SNAPSHOT' 
+    implementation "embedded-mas:embedded-mas:0.0260803-SNAPSHOT"
     implementation "javard:javard:0.014-SNAPSHOT"
 
 }

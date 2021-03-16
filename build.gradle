@@ -60,7 +60,7 @@ publishing {
         myLibrary(MavenPublication) {
             groupId = 'embedded-mas'
             artifactId = 'embedded-mas'
-            version = '0.0260744-SNAPSHOT'
+            version = '0.0260803-SNAPSHOT'
             
             from components.java
         }
@@ -70,7 +70,6 @@ publishing {
         maven {
             name = 'myRepo'
             url = "https://maven.pkg.github.com/maiquelb/embedded-mas"
-            //url = "https://maven.pkg.github.com/maiquelb/"
             credentials {
                 username 'maiquelb'
                 password ''
