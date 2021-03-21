@@ -57,6 +57,7 @@ public class JSONDiviceByRequest extends DefaultDevice implements IDevice {
 			return percepts;
 		}
 		*/
+		return new ArrayList<Literal>();
 	}
 	
 }
