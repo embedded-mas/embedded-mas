@@ -1,6 +1,6 @@
 /**
  * This class represents an interface with a microcontroller whose sensor data follow the JSON format. 
- JSONDiviceByRequest only receive data/beliefs when it sends a request to the microcontroller*/
+ JSONDeviceByRequest only receive data/beliefs when it sends a request to the microcontroller*/
 
 package embedded.mas.bridges.jacamo;
 
@@ -17,17 +17,19 @@ import embedded.mas.exception.PerceivingException;
 import jason.asSyntax.Atom;
 import jason.asSyntax.Literal;
 
-public class JSONDiviceByRequest extends DefaultDevice implements IDevice {
+public class JSONDeviceByRequest extends DefaultDevice implements IDevice {
 	
-	public JSONDiviceByRequest(Atom id, IPhysicalInterface microcontroller) {
+	public JSONDeviceByRequest(Atom id, IPhysicalInterface microcontroller) {
 		super(id, microcontroller);	
 	}
 
 	@Override
 	public Collection<Literal> getPercepts() throws PerceivingException {
 		
+		
 		microcontroller.write("b");
-		/*
+		System.out.println("sending b...");
+		
 		String json = microcontroller.read();
 
 		if(json.equals("Message conversation error")) //if the message is not propealy read
@@ -56,8 +58,7 @@ public class JSONDiviceByRequest extends DefaultDevice implements IDevice {
 
 			return percepts;
 		}
-		*/
-		return new ArrayList<Literal>();
+	
 	}
 	
 }
