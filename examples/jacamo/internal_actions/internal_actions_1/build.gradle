@@ -1,0 +1,81 @@
+defaultTasks 'run'
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+version '1.0'
+group   'org.jacamo'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8 
+
+repositories {
+    maven { url "http://jacamo.sourceforge.net/maven2" }
+    maven { url "https://raw.github.com/jacamo-lang/mvn-repo/master" }
+    maven { url "https://repo.gradle.org/gradle/libs-releases-local" }
+
+    maven {
+            name = 'myRepo'
+            url = "https://maven.pkg.github.com/maiquelb/embedded-mas"
+            credentials {
+                username 'maiquelb'
+                password ''
+            }
+        }
+
+        maven {
+            name = 'javard_repo'
+            url = "https://maven.pkg.github.com/maiquelb/javard"
+            credentials {
+                username 'maiquelb'
+                password ''
+            }
+        }
+
+
+    flatDir {
+       dirs 'lib'
+    }
+
+    mavenCentral()    
+}
+
+dependencies {
+    implementation 'org.jacamo:jacamo:0.10-SNAPSHOT'
+    implementation "embedded-mas:embedded-mas:0.0260939-SNAPSHOT"
+    implementation "javard:javard:0.027-SNAPSHOT"
+}
+
+sourceSets {
+    main {
+        java {
+           srcDir 'src/env'
+           srcDir 'src/agt'
+           srcDir 'src/org'
+           srcDir 'src/java'
+        }
+       resources {
+           srcDir 'src/resources'
+       }
+    }
+}
+
+
+task run (type: JavaExec, dependsOn: 'classes') {    
+    group       ' JaCaMo'
+    description 'runs the JaCaMo application'
+    doFirst {
+        mkdir 'log'
+    }
+    main 'jacamo.infra.JaCaMoLauncher'
+    args 'demo_embedded_actions.jcm'
+    classpath sourceSets.main.runtimeClasspath
+    
+}
+
+
+clean {
+    delete 'bin'
+    delete 'build'
+    delete 'log'
+}

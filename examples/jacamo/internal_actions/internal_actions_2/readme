@@ -1,0 +1,15 @@
+This example illustrates the defaultEmbeddedInternalAction internal action. 
+
+The agent called sample_agent is of the class DemoEmbeddedAgent, which is is set up in the clsse /src/main/java/DemoEmbeddedAgent. It simulates an agent that controls two microcontrollers: 
+   - The microcontroller1 simulates a real device. It enables the action "print" that simply prints a message on the screen;
+   - The microcontroller2 is a microcontroller connected to the serial port. It enables two actions, called lightA and lightB, that are meant to turn two real lights on. These lights are connected to digital outputs of an Arduino.
+
+
+The sample_agent continuously acts upon both the microcontrollers, printing messages through the simulated microcontroller1 and managing lights through the microcontroller2. 
+
+
+To run it:
+  (i) upload the blink.ino in the /arduino/blink folder to an arduino device
+  (ii) assign permissions to read/write in the serial folder. In Unix systems, use sudo chmod a+rw /dev/ttyUSB0 (replacing "ttyUSB0" by the proper usb port)
+  (iii) set the proper usb port in /src/main/java/DemoEmbeddedAgent
+  (iv) in a terminal, type ./gradlew run <ENTER>

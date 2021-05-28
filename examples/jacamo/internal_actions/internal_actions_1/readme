@@ -1,0 +1,7 @@
+This example illustrates the defaultEmbeddedInternalAction internal action. 
+
+The agent called sample_agent is of the class DemoEmbeddedAgent. It simulates an agent that controls two identical microcontrollers, called microcontroller1 and microcontroller2. They are set up in the class /src/main/java/DemoEmbeddedAgent. These microcontrollers enable the action "print" that simply prints a message on the screen. Thus, the repertory of actions of the sample_agent includes the actions "print" upon the microcontroller1 and microcontroller2. The agent executes these actions as soon it starts.
+
+
+
+To run it, go to a terminal and type ./gradlew run <ENTER>
