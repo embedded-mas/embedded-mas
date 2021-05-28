@@ -15,6 +15,8 @@ import jason.asSyntax.Literal;
  * 
  * The getPercept method simply produces a collection of literals without any relation with a real sensor. 
  * 
+ * This agent enables an action called "print" that just prints a message.
+ * 
  */
 
 public class DemoDevice extends DefaultDevice  {
@@ -40,6 +42,18 @@ public class DemoDevice extends DefaultDevice  {
 		percepts.add(Literal.parseLiteral("msg(ola)"));
 		
 		return percepts;
+	}
+
+	@Override
+	public boolean execEmbeddedAction(String actionName, Object[] args) {
+		if(actionName.equals("print"))
+			return doEmbeddedPrint(args[0].toString());
+		return false;
+	}
+	
+	private boolean doEmbeddedPrint(String text) {
+		System.out.println("[" + this.id +" - print] " + text);
+		return true;
 	}
 
 }

@@ -39,6 +39,16 @@ public abstract class DefaultDevice implements IDevice {
 	public void setId(Atom id) {
 		this.id = id;
 	}
+	
+	/**
+	 *  Each device is supposed to enabled a set of actions (to be imposed on the actuators).
+	 *  From this method, the device is supposed to properly trigger the action identified by the actionName.
+	 *  Returns true for success and false for fail
+	 * 
+	 * @param actionName
+	 * @return
+	 */
+	public abstract boolean execEmbeddedAction(String actionName, Object[] args);
 
 
 }
