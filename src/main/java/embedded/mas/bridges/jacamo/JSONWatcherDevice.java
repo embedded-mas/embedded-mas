@@ -44,6 +44,12 @@ public class JSONWatcherDevice extends DefaultDevice implements IDevice {
 		try {Thread.sleep((long)(Math.random() * 1000)); } catch (InterruptedException e) { } //espera um tempo aleatório antes de continuar
 	return percepts;
 	}
+
+	@Override
+	public boolean execEmbeddedAction(String actionName, Object[] args) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 	
 	
 }

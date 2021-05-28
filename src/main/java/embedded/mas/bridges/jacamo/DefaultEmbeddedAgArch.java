@@ -18,7 +18,7 @@ import jason.stdlib.sublist;
 public abstract class DefaultEmbeddedAgArch extends AgArch{
 	
 		
-	protected Collection <IDevice> devices = null;
+	protected Collection <DefaultDevice> devices = null;
 
 
 	public DefaultEmbeddedAgArch() {		
@@ -40,18 +40,27 @@ public abstract class DefaultEmbeddedAgArch extends AgArch{
 	}
 
 
-	public void setDevices(Collection<IDevice> devices) {
+	public void setDevices(Collection<DefaultDevice> devices) {
 		this.devices = devices;
 	}
 
 
-	public Collection<IDevice> getDevices(){
+	public Collection<DefaultDevice> getDevices(){
 		return this.devices;
 
 	}
 
 	
 	private final Collection<Literal> updateSensor() {
+		/* Same comment as in EmbeddeAgent.checkSensor
+		 * The architecture requres a list of devices to handle the perceptions. 
+		   In some point after the agent creation, an architecture other than DefaultEmbeddedAgArch is set and the list of sensor is lost.
+		   This method update the list of devices if it is null.
+		   TODO: improve this */
+		if(this.devices==null) return null;
+		//*******************
+		
+		
 		ArrayList<Literal> percepts = new ArrayList<Literal>();
 		for(IDevice s:this.devices) { //for each sensor
 			try {

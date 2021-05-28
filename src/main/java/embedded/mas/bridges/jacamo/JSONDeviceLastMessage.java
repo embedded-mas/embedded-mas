@@ -27,7 +27,7 @@ public class JSONDeviceLastMessage extends DefaultDevice implements IDevice {
 
 	public void watchingMicrocontroller() throws PerceivingException{
 	while (true){
-		if(true)// getPercepts não for diparado
+		if(true)// getPercepts nï¿½o for diparado
 			this.Decode();
 		else
 			//executa getPercepts();
@@ -75,6 +75,12 @@ public class JSONDeviceLastMessage extends DefaultDevice implements IDevice {
 			this.listOfBeliefs.add(percepts);
 			//return percepts;
 		}
+	}
+
+	@Override
+	public boolean execEmbeddedAction(String actionName, Object[] args) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 	
 	

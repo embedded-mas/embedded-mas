@@ -13,7 +13,9 @@ import jason.asSyntax.Literal;
 
 public abstract class EmbeddedAgent extends Agent {
 
-	protected final List<IDevice> devices = new ArrayList<IDevice>();
+	protected final List<DefaultDevice> devices = new ArrayList<DefaultDevice>();
+
+
 
 	@Override
 	public void initAg() {
@@ -46,12 +48,16 @@ public abstract class EmbeddedAgent extends Agent {
 
 
 
-	public void addSensor(IDevice device) {
+	public void addSensor(DefaultDevice device) {
 		devices.add(device);
 	}
 
-	public void removeSensor(IDevice device) {
+	public void removeSensor(DefaultDevice device) {
 		devices.remove(device);
+	}
+
+	public List<DefaultDevice> getDevices(){
+		return this.devices;
 	}
 
 	class checkSensor extends Thread{
@@ -60,16 +66,18 @@ public abstract class EmbeddedAgent extends Agent {
 		@Override
 		public void run() {
 			while(true) {
-				synchronized (ts) {
-					if(getTS().getUserAgArch() instanceof DefaultEmbeddedAgArch) 
-						/* The architecture requres a list of devices to handle the perceptions. 
+				
+				
+				if(getTS().getUserAgArch() instanceof DefaultEmbeddedAgArch) 
+					/* The architecture requres a list of devices to handle the perceptions. 
 						   In some point after the agent creation, an architecture other than DefaultEmbeddedAgArch is set and the list of sensor is lost.
 						   This method update the list of devices if it is null.
-						   TODO: improve this */ 
+						   TODO: improve this */
+					synchronized (ts) {
 						if(((DefaultEmbeddedAgArch) getTS().getUserAgArch()).getDevices()==null) {
 							((DefaultEmbeddedAgArch) getTS().getUserAgArch()).setDevices(devices);
 						}
-				}
+					}
 			}
 
 		}

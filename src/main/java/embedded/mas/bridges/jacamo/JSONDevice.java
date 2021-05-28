@@ -57,4 +57,10 @@ public class JSONDevice extends DefaultDevice implements IDevice {
 		}
 	}
 
+	@Override
+	public boolean execEmbeddedAction(String actionName, Object[] args) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

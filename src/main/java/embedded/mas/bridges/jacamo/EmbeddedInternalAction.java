@@ -1,5 +1,7 @@
 package embedded.mas.bridges.jacamo;
 
-public abstract class EmbeddedInternalAction {
+import jason.asSemantics.DefaultInternalAction;
+
+public abstract class EmbeddedInternalAction extends DefaultInternalAction{
 
 }
