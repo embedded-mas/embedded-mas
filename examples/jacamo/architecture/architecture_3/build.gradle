@@ -50,7 +50,7 @@ repositories {
 
 dependencies {
     implementation 'org.jacamo:jacamo:0.10-SNAPSHOT'
-    implementation "embedded-mas:embedded-mas:0.0260801-SNAPSHOT"
+    implementation "embedded-mas:embedded-mas:0.0260939-SNAPSHOT"
     implementation "javard:javard:0.027-SNAPSHOT"
     
    // implementation "org.glassfish:javax.json:1.1.4"
