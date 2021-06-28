@@ -44,6 +44,9 @@ dependencies {
     implementation group: 'javax.json', name: 'javax.json-api', version: '1.1.4'
     implementation group: 'org.glassfish', name: 'javax.json', version: '1.1.4'
     
+	// https://mvnrepository.com/artifact/org.rxtx/rxtx
+	implementation group: 'org.rxtx', name: 'rxtx', version: '2.1.7'
+
 
     // This dependency is exported to consumers, that is to say found on their compile classpath.
     api 'org.apache.commons:commons-math3:3.6.1'
@@ -60,7 +63,7 @@ publishing {
         myLibrary(MavenPublication) {
             groupId = 'embedded-mas'
             artifactId = 'embedded-mas'
-            version = '0.0260940-SNAPSHOT'
+            version = '0.0270601-SNAPSHOT'
             
             from components.java
         }
