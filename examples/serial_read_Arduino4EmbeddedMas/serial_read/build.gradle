@@ -20,19 +20,15 @@ repositories {
     jcenter()
 
     maven { url "https://raw.github.com/jacamo-lang/mvn-repo/master" }
-    maven {
-            name = 'myRepo'
-            url = "https://maven.pkg.github.com/maiquelb/embedded-mas"
-            credentials {
-                username 'maiquelb'
-                password ''
-            } 
-        }
+    maven { url "https://raw.github.com/embedded-mas/mvn-repo/master" }
+    
 }
 
 dependencies {
 
-    implementation "embedded-mas:embedded-mas:0.025-SNAPSHOT"
+    implementation "embedded-mas:embedded-mas:0.0270603"
+    implementation group: 'com.fazecast', name: 'jSerialComm', version: '1.3.10'
+    implementation "javard:javard:0.027-SNAPSHOT"
 
     // This dependency is used by the application.
     implementation 'com.google.guava:guava:29.0-jre'
