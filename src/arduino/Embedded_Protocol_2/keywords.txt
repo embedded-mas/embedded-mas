@@ -1,0 +1,7 @@
+Communication		KEYWORD1
+startBelief		KEYWORD2
+beliefAdd		KEYWORD2
+beliefAdd		KEYWORD2
+beliefAdd		KEYWORD2
+endBelief		KEYWORD2
+sendMessage		KEYWORD2
