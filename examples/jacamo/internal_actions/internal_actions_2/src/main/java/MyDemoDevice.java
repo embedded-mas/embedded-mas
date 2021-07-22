@@ -1,6 +1,9 @@
-import embedded.mas.bridges.jacamo.DemoDevice;
+import java.util.Collection;
+
+import embedded.mas.bridges.jacamo.DefaultDevice;
 import embedded.mas.bridges.jacamo.IPhysicalInterface;
 import jason.asSyntax.Atom;
+import jason.asSyntax.Literal;
 
 
 /**
@@ -14,10 +17,16 @@ import jason.asSyntax.Atom;
  *
  */
 
-public class MyDemoDevice extends DemoDevice {
+public class MyDemoDevice extends DefaultDevice {
 
 	public MyDemoDevice(Atom id, IPhysicalInterface microcontroller) {
 		super(id, microcontroller);
+	}
+
+
+	@Override
+	public Collection<Literal> getPercepts() {
+		return null; //there is not perception in this version of the example
 	}
 
 	@Override
@@ -25,9 +34,10 @@ public class MyDemoDevice extends DemoDevice {
 		if(actionName.equals("lightA")) 
 			return doLightA();
 		else 
-		if(actionName.equals("lightB"))
-			return doLightB();
-		else return super.execEmbeddedAction(actionName, args);
+			if(actionName.equals("lightB"))
+				return doLightB();
+			//else return super.execEmbeddedAction(actionName, args);
+		return false;
 	}
 	
 	public boolean doLightA() {

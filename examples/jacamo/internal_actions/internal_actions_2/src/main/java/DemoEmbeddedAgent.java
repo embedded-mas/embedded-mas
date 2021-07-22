@@ -2,6 +2,7 @@
 import embedded.mas.bridges.jacamo.EmbeddedAgent;
 import embedded.mas.bridges.javard.Arduino4EmbeddedMas;
 import embedded.mas.bridges.jacamo.DemoDevice;
+import embedded.mas.bridges.jacamo.DefaultDevice;
 import jason.asSyntax.Atom;
 
 
@@ -23,7 +24,7 @@ public class DemoEmbeddedAgent extends EmbeddedAgent {
 		DemoDevice microcontroller1 = new DemoDevice(new Atom("microcontroller1"));			
 		this.addSensor(microcontroller1);
 				
-		DemoDevice microcontroller2= new MyDemoDevice(new Atom("microcontroller2"),arduino);
+		DefaultDevice microcontroller2= new MyDemoDevice(new Atom("microcontroller2"),arduino);
 		this.addSensor(microcontroller2);
 		
 		
