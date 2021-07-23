@@ -15,6 +15,9 @@ plugins {
     id 'maven-publish'
 }
 
+
+version = '0.027060704-SNAPSHOT'
+
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
@@ -24,15 +27,9 @@ repositories {
     // You can declare any Maven/Ivy/file repository here.
     jcenter()
     
-    maven {
-            name = 'javard_repo'
-            url = "https://maven.pkg.github.com/maiquelb/javard"
-            credentials {
-                username 'maiquelb'
-                password ''
-            } 
-    }
+    
      maven { url "https://raw.github.com/jacamo-lang/mvn-repo/master" }
+     maven { url "https://raw.github.com/embedded-mas/embedded-mas-mvn-repo/master" }
 }
 
 dependencies {
@@ -60,24 +57,41 @@ dependencies {
 
 publishing {
     publications {
-        myLibrary(MavenPublication) {
+        maven(MavenPublication) {
+            from components.java            
             groupId = 'embedded-mas'
             artifactId = 'embedded-mas'
-            version = '0.0270606-SNAPSHOT'
             
-            from components.java
+            
         }
     }
+}
 
-    repositories {
-        maven {
-            name = 'myRepo'
-            url = "https://raw.github.com/embedded-mas/mvn-repo/master"
-            credentials {
-                username 'maiquelb'
-                password ''
-            } 
-        }
-        
+task publishMavenGitHub(dependsOn: [ 'build', 'publishToMavenLocal']) {
+  doLast {
+    def wdir = System.getProperty("user.home")+'/.m2/repository/embedded-mas/embedded-mas'
+    def rdir = '../embedded-mas-mvn-repo/'    
+    exec {
+        commandLine 'git', 'pull'
+        workingDir rdir
     }
+   copy {
+        from wdir
+        include project.version+'/**'
+        into rdir+'/embedded-mas/embedded-mas'         
+    }
+    exec {
+        commandLine 'git', 'add', '*'
+        workingDir rdir
+    }
+    exec {
+        commandLine 'git', 'commit', '-a', '-m', 'embedded-mas new version ' + project.version
+        workingDir rdir
+    }
+    exec {
+        commandLine 'git', 'push'
+        workingDir rdir
+    }
+  }
+    
 }

@@ -21,14 +21,7 @@ repositories {
     maven { url "https://repo.gradle.org/gradle/libs-releases-local" }
     maven { url "https://raw.github.com/embedded-mas/embedded-mas-mvn-repo/master" }
 
-    maven {
-            name = 'myRepo'
-            url = "https://maven.pkg.github.com/maiquelb/embedded-mas"
-            credentials {
-                username 'maiquelb'
-                password ''
-            }
-        }
+    
 
     flatDir {
        dirs 'lib'
@@ -39,7 +32,7 @@ repositories {
 
 dependencies {
     implementation 'org.jacamo:jacamo:0.10-SNAPSHOT'
-    implementation "embedded-mas:embedded-mas:0.0260744-SNAPSHOT"
+    implementation "embedded-mas:embedded-mas:0.027060701-SNAPSHOT"
     implementation "javard:javard:0.032-SNAPSHOT"
 }
 
