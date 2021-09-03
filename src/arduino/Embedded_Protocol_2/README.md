@@ -9,3 +9,4 @@ Para utilizar a biblioteca é necessário conhecer basicamente 4 funções, são
 
 - sendMessage(): envia o conjunto de crenças que criamos através das funções acima. Depois de invocada essa função limpa todas as crenças que estão armazenadas no buffer. 
 
+Um exemplo pode ser encontrado em https://github.com/embedded-mas/embedded-mas/tree/master/src/arduino/Embedded_Protocol_2/examples/Embedded_Protocol_2
