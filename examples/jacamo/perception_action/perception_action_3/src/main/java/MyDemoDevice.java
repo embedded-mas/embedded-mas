@@ -1,3 +1,5 @@
+package src.main.java;
+
 import java.util.Collection;
 
 import embedded.mas.bridges.jacamo.JSONWatcherDevice;
@@ -36,7 +38,5 @@ public class MyDemoDevice extends JSONWatcherDevice {
 		return true;
 	}
 
-	//#Ligar_Atuador_1
 	
-	//#Desligar_Atuador_1
 }

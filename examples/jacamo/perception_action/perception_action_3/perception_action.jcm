@@ -15,8 +15,8 @@
 mas architecture_1 {
 
     agent sample_agent{
-      ag-class: DemoEmbeddedAgent
-      ag-arch: DemoEmbeddedAgentArch
+      ag-class:  src.main.java.DemoEmbeddedAgent
+      ag-arch:  src.main.java.DemoEmbeddedAgentArch
       //ag-arch: embedded.mas.bridges.jacamo.StatArch
     }
 
