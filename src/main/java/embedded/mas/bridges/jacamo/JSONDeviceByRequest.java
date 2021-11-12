@@ -27,9 +27,6 @@ public class JSONDeviceByRequest extends DefaultDevice implements IDevice {
 	public Collection<Literal> getPercepts() throws PerceivingException {
 		
 		
-		microcontroller.write("b");
-		System.out.println("sending b...");
-		
 		String json = microcontroller.read();
 
 		if(json.equals("Message conversation error")) //if the message is not propealy read
