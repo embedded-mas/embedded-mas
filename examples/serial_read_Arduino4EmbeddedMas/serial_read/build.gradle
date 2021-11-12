@@ -15,27 +15,24 @@ plugins {
 }
 
 repositories {
-    // Use jcenter for resolving dependencies.
-    // You can declare any Maven/Ivy/file repository here.
-    jcenter()
 
-    maven { url "https://raw.github.com/jacamo-lang/mvn-repo/master" }
-    maven { url "https://raw.github.com/embedded-mas/embedded-mas-mvn-repo/master" }
-    maven { url "https://raw.github.com/embedded-mas/mvn-repo/master" } //excluir depois de mover o repositório para embedded-mas-mvn-repo/master
+   maven { url "https://raw.github.com/jacamo-lang/mvn-repo/master" } 
+   maven { url "https://raw.github.com/embedded-mas/embedded-mas-mvn-repo/master" }
+
+    flatDir {
+       dirs 'lib'
+    }
+
+    mavenCentral()
     
 }
 
 dependencies {
 
-    implementation "embedded-mas:embedded-mas:0.0270603"
+    implementation "embedded-mas:embedded-mas:0.0270607-SNAPSHOT"
     implementation group: 'com.fazecast', name: 'jSerialComm', version: '1.3.10'
     implementation "javard:javard:0.032-SNAPSHOT"
 
-    // This dependency is used by the application.
-    implementation 'com.google.guava:guava:29.0-jre'
-
-    // Use JUnit test framework
-    testImplementation 'junit:junit:4.13'
 }
 
 application {

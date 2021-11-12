@@ -13,6 +13,6 @@ void setup() {
 }
 
 void loop() {
-  communication.send_message("Hello Worldx");
+  communication.send_message("Hello World");
   Serial.println();
 }

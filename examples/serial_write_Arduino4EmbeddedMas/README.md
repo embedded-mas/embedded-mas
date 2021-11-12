@@ -21,5 +21,6 @@ It considers an environment setup with two leds, "a" and "b", plugged in the out
 		
 		(e.g. sudo chmod a+rw /dev/ttyUSB0)
 
+1. Set the proper serial port in the src/main/java/teste_embedded_mas/Run.java
 1. Load the program [read_char](arduino/read_char/read_char.ino) to an Arduino
 1. In a terminal, type ```./gradlew run -q --console=plain ```
