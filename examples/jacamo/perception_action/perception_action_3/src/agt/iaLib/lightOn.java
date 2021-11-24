@@ -12,8 +12,7 @@ public class lightOn extends DefaultInternalAction {
 	public Object execute( TransitionSystem ts,Unifier un,Term[] args ) throws Exception {
 	
 	try {
-		((DemoEmbeddedAgent)ts.getAg()).lightOn();
-		return null;
+		return ((DemoEmbeddedAgent)ts.getAg()).lightOn();
 	}
 	catch (ArrayIndexOutOfBoundsException e) {
 		throw new JasonException("The internal action" +
