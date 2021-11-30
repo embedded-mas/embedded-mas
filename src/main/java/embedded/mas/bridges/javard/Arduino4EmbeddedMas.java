@@ -17,10 +17,12 @@ public class Arduino4EmbeddedMas extends Arduino implements IPhysicalInterface{
 	private String preamble = "==";
 	private String startMessage = "::";
 	private String endMessage = "--";
+	private boolean connected = false;
 
 
 	public Arduino4EmbeddedMas(String portDescription, int baud_rate) {
 		super(portDescription, baud_rate);
+		this.openConnection();
 	}
 	
 	@Override
@@ -39,6 +41,19 @@ public class Arduino4EmbeddedMas extends Arduino implements IPhysicalInterface{
 		}		
 	}
 	
+	@Override
+	public void closeConnection() {
+		super.closeConnection();
+		this.connected = false;
+	}
+
+	@Override
+	public boolean openConnection() {
+		if(!connected)
+		   this.connected  =  super.openConnection();
+		return this.connected;
+	}
+
 	/**
 	 * While the superclasse reads and writes in an Arduino device, this class decodes the read messages according to a predefined protocol that includes 
 	 * the preamble of the message, as well as the symbols of starting and ending of the message. 

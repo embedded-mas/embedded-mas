@@ -11,15 +11,15 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Scanner;
 
+import embedded.mas.bridges.jacamo.IPhysicalInterface;
 import embedded.mas.bridges.javard.Arduino4EmbeddedMas;
 
 
 public class Run {
 
-	public static void main(String[] args) {		
+	public static void main(String[] args) {
 		System.out.println("testing embedded-mas libraries");
-		Arduino4EmbeddedMas d = new Arduino4EmbeddedMas("/dev/ttyUSB0", 9600);
-                d.openConnection();
+                IPhysicalInterface d = new Arduino4EmbeddedMas("/dev/ttyUSB0", 9600); //Arduino4EmbeddedMas can be replaced by any IPhysicalInterface to be tested
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		while(true) {
 			System.out.print("Type <a> or <b>: ");

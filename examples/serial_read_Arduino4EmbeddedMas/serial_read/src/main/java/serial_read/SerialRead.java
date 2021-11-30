@@ -3,21 +3,16 @@
  */
 package serial_read;
 
-import arduino.Arduino;
 import embedded.mas.bridges.javard.Arduino4EmbeddedMas;
-
-import com.fazecast.jSerialComm.*;
+import embedded.mas.bridges.jacamo.IPhysicalInterface;
 
 public class SerialRead {
    
     public static void main(String[] args) {
         
-        Arduino a = new Arduino4EmbeddedMas("/dev/ttyUSB0", 9600);      
-        a.openConnection();
-        
-        String s = a.serialRead(); //read from serial until getting a linebreak (\n)
-        System.out.println(s);
-        
-        
+        IPhysicalInterface a = new Arduino4EmbeddedMas("/dev/ttyUSB0", 9600); //Arduino4EmbeddedMas can be replaced by any IPhysicalInterface to be tested
+
+        String s = a.read(); //read from serial until getting a linebreak (\n)
+        System.out.println(s);                
     }
 }
