@@ -12,6 +12,7 @@ import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
+import javax.json.stream.JsonParsingException;
 
 import embedded.mas.exception.PerceivingException;
 import jason.asSyntax.Atom;
@@ -44,6 +45,7 @@ public class MicrocontrollerMonitor extends Thread {
 			try {
 				this.decode();
 			} catch (PerceivingException e1) {
+				if(e1.getMessage()!=null) System.err.println(e1.getMessage());
 				e1.printStackTrace();
 			}
 			
@@ -58,12 +60,18 @@ public class MicrocontrollerMonitor extends Thread {
 	
 public void decode() throws PerceivingException {
 		String json = microcontroller.read();
-		if(json.equals("Message conversation error")) //if the message is not propealy read
-			throw new PerceivingException();
+		if(json.equals("Message conversation error")) { //if the message is not propealy read
+			throw new PerceivingException();		
+		}
 		else{
 			ArrayList<Literal> percepts = new ArrayList<Literal>(); //adicionar os valores lidos arduino na lista percepts (dúvidas - olhar DemoDevice)
-			JsonReader reader = Json.createReader(new ByteArrayInputStream(json.getBytes()));
-			JsonObject jsonObject = reader.readObject(); //transformar a string em um "objeto JSON"
+			JsonReader reader = Json.createReader(new ByteArrayInputStream(json.getBytes()));			
+			JsonObject jsonObject;
+			try {
+				jsonObject = reader.readObject();
+			} catch (JsonParsingException e) {
+				throw new PerceivingException("Invalid JSON: " + json);	
+			}
 			for(String key: jsonObject.keySet()) { //iterar sobre todos os elementos do JsonObject - a variável "key" armazena cada chave do objeto json    		
 				Object value = jsonObject.get(key); //obtém o valor associado à chave "key"
 				String belief = key +"(";
