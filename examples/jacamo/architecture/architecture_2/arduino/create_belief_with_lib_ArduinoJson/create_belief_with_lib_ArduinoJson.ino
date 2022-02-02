@@ -1,4 +1,4 @@
-#include<Embedded_Protocol.h>
+#include<Embedded_Protocol_2.h>
 #include<ArduinoJson.h>
 
 Communication communication;
@@ -11,15 +11,36 @@ void setup() {
 }
 
 void loop() {
-  doc["value"] = num;
-  doc["lat"] = 48.748010;
-  doc["lon"] = 2.293491;
-  doc["teste"] = "ola";
-  doc["vetor"] = serialized("[1,2,\"ola\",\"teste\"]");
+
+   /*doc["value"] = num;
+   doc["lat"] = 48.748010;
+   doc["lon"] = 2.293491;
+   doc["teste"] = "ola";
+   doc["vetor"] = serialized("[1,2,\"ola\",\"teste\"]");
+   */
+
+   communication.startBelief("value");
+   communication.beliefAdd(num);
+   communication.endBelief();
+
+   communication.startBelief("value");
+   communication.beliefAdd(num);
+   communication.endBelief();
+
+   communication.startBelief("lat");
+   communication.beliefAdd(48.748010);
+   communication.endBelief();
+
+   communication.startBelief("lon");
+   communication.beliefAdd(2.293491);
+   communication.endBelief();
+
+   communication.startBelief("teste");
+   communication.beliefAdd("ola");
+   communication.endBelief();
+   
   
-  String output = doc.as<String>();
-  communication.create_belief(output);
-  Serial.println();
-  delay(500); 
-  num++;
+   communication.sendMessage();
+   delay(500); 
+   num++;
 }
