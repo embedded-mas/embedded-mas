@@ -39,9 +39,7 @@ void Communication::beliefAdd(int Int){
 }
 
 void Communication::beliefAdd(float Float){
-	char result[8];
-	dtostrf(Float, 6, 3, result);
-	_beliefBuffer.concat(result);
+        _beliefBuffer.concat(String(Float, 3));
 	_beliefBuffer.concat(',');
 }
 
