@@ -42,14 +42,15 @@ void loop()
    //Crenças----------------------------------------------------------------------------------------------------------
     distancia = ultrassom.Ranging(CM);// ultrassom.Ranging(CM) retorna a distancia em
                                       // centímetros(CM) ou polegadas(INC)
+
     com.startBelief("distance");
     com.beliefAdd(distancia);
     com.endBelief();
-
+    
     com.startBelief("light_state");
     com.beliefAdd(light_state);
     com.endBelief();
 
     com.sendMessage();
-     delay(500);
+     delay(2000);
 }
