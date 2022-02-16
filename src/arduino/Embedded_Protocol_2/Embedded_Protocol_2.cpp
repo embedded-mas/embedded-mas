@@ -39,16 +39,12 @@ void Communication::beliefAdd(int Int){
 }
 
 void Communication::beliefAdd(float Float){
-	char result[8];
-	dtostrf(Float, 6, 3, result);
-	_beliefBuffer.concat(result);
+        _beliefBuffer.concat(String(Float, 3));
 	_beliefBuffer.concat(',');
 }
 
 void Communication::beliefAdd(double Double){ // adiciona um parametro do tipo double a crença.
-     char result[16];
-     dtostrf(Double, 6, 5, result);
-     _beliefBuffer.concat(result);
+     _beliefBuffer.concat(String(Double, 5));
      _beliefBuffer.concat(',');
   }
 
