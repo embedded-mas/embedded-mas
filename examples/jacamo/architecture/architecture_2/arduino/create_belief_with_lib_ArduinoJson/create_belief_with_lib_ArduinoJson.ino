@@ -23,10 +23,6 @@ void loop() {
    communication.beliefAdd(num);
    communication.endBelief();
 
-   communication.startBelief("value");
-   communication.beliefAdd(num);
-   communication.endBelief();
-
    communication.startBelief("lat");
    communication.beliefAdd(48.748010);
    communication.endBelief();

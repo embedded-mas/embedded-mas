@@ -4,6 +4,10 @@
 
 +!start : true <- .print("hello world.").
 
+//********** Crenças provenientes de create_belief_with_lib_ArduinoJson.ino *********/
++value(Numero) <- .print("valor: ", Numero).
+
+//********** Crenças provenientes de teste_crencas_por_sensores.ino *********/
 +botao(Numero) <- .print("botao: ", Numero).
 +led(Estado)<- .print("led: ",Estado).
 
