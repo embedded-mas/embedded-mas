@@ -3,6 +3,7 @@ package embedded.mas.bridges.jacamo;
 import java.util.ArrayList;
 import java.util.List;
 
+import jason.architecture.AgArch;
 import jason.asSemantics.Agent;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Literal;
@@ -13,8 +14,7 @@ import jason.asSyntax.Literal;
 
 public abstract class EmbeddedAgent extends Agent {
 
-	protected final List<DefaultDevice> devices = new ArrayList<DefaultDevice>();
-
+	private final List<DefaultDevice> devices = new ArrayList<DefaultDevice>();
 
 
 	@Override
@@ -59,6 +59,19 @@ public abstract class EmbeddedAgent extends Agent {
 	public List<DefaultDevice> getDevices(){
 		return this.devices;
 	}
+	
+	
+	private DefaultEmbeddedAgArch getEmbeddedArch() {
+        AgArch arch = getTS().getAgArch().getFirstAgArch();
+        while (arch != null) {
+            if (arch instanceof DefaultEmbeddedAgArch) {
+                return (DefaultEmbeddedAgArch)arch;
+            }
+            arch = arch.getNextAgArch();
+        }
+        return null;
+    }
+
 
 	class checkSensor extends Thread{
 
@@ -68,14 +81,15 @@ public abstract class EmbeddedAgent extends Agent {
 			while(true) {
 				
 				
-				if(getTS().getUserAgArch() instanceof DefaultEmbeddedAgArch) 
+				if(getTS().getAgArch() instanceof DefaultEmbeddedAgArch) 
 					/* The architecture requres a list of devices to handle the perceptions. 
 						   In some point after the agent creation, an architecture other than DefaultEmbeddedAgArch is set and the list of sensor is lost.
 						   This method update the list of devices if it is null.
 						   TODO: improve this */
-					synchronized (ts) {
-						if(((DefaultEmbeddedAgArch) getTS().getUserAgArch()).getDevices()==null) {
-							((DefaultEmbeddedAgArch) getTS().getUserAgArch()).setDevices(devices);
+					synchronized (ts) {												
+						DefaultEmbeddedAgArch arch =  getEmbeddedArch();
+						if(arch.getDevices()==null) {
+							arch.setDevices(devices);
 						}
 					}
 			}
