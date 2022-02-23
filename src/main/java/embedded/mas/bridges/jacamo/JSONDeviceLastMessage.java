@@ -49,31 +49,34 @@ public class JSONDeviceLastMessage extends DefaultDevice implements IDevice {
 		
 		String json = microcontroller.read();
 
-		if(json.equals("Message conversation error")) //if the message is not propealy read
-			throw new PerceivingException();
-		else
-		{
-			ArrayList<Literal> percepts = new ArrayList<Literal>(); //adicionar os valores lidos arduino na lista percepts (dúvidas - olhar DemoDevice)
+		if(!json.equals("")) { //if reads an non empty string from the microcontroller
 
-			JsonReader reader = Json.createReader(new ByteArrayInputStream(json.getBytes()));
+			if(json.equals("Message conversation error")) //if the message is not propealy read
+				throw new PerceivingException();
+			else
+			{
+				ArrayList<Literal> percepts = new ArrayList<Literal>(); //adicionar os valores lidos arduino na lista percepts (dúvidas - olhar DemoDevice)
 
-			JsonObject jsonObject = reader.readObject(); //transformar a string em um "objeto JSON"
+				JsonReader reader = Json.createReader(new ByteArrayInputStream(json.getBytes()));
 
-			for(String key: jsonObject.keySet()) { //iterar sobre todos os elementos do JsonObject - a variável "key" armazena cada chave do objeto json    		
-				Object value = jsonObject.get(key); //obtém o valor associado à chave "key"
-				String belief = key +"(";
-				if(!(value instanceof JsonArray)) //se o valor não for um vetor (ou seja, se for uma belief com apenas um valor)
-					belief = belief + value;
-				else { //se for um vetor [v1,v2,...,vn], monta uma belief key(v1,v2,...,vn)    			
-					belief = belief + value.toString().replace("[","").replace("]", "");	 	
+				JsonObject jsonObject = reader.readObject(); //transformar a string em um "objeto JSON"
+
+				for(String key: jsonObject.keySet()) { //iterar sobre todos os elementos do JsonObject - a variável "key" armazena cada chave do objeto json    		
+					Object value = jsonObject.get(key); //obtém o valor associado à chave "key"
+					String belief = key +"(";
+					if(!(value instanceof JsonArray)) //se o valor não for um vetor (ou seja, se for uma belief com apenas um valor)
+						belief = belief + value;
+					else { //se for um vetor [v1,v2,...,vn], monta uma belief key(v1,v2,...,vn)    			
+						belief = belief + value.toString().replace("[","").replace("]", "");	 	
+					}
+					belief = belief + ")";
+
+					//System.out.println(belief);
+					percepts.add(Literal.parseLiteral(belief));
 				}
-				belief = belief + ")";
-
-				//System.out.println(belief);
-				percepts.add(Literal.parseLiteral(belief));
+				this.listOfBeliefs.add(percepts);
+				//return percepts;
 			}
-			this.listOfBeliefs.add(percepts);
-			//return percepts;
 		}
 	}
 
@@ -82,6 +85,6 @@ public class JSONDeviceLastMessage extends DefaultDevice implements IDevice {
 		// TODO Auto-generated method stub
 		return false;
 	}
-	
-	
+
+
 }

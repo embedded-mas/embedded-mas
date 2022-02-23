@@ -62,6 +62,7 @@ public class Arduino4EmbeddedMas extends Arduino implements IPhysicalInterface{
 	 */
 	@Override
 	public String serialRead() {
+		if(comPort.bytesAvailable()==0 ) return "";
 		String s = "";
 		String start = "";
 		String end = "";

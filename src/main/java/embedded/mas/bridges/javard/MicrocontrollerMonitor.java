@@ -60,34 +60,35 @@ public class MicrocontrollerMonitor extends Thread {
 	
 public void decode() throws PerceivingException {
 		String json = microcontroller.read();
-		if(json.equals("Message conversation error")) { //if the message is not propealy read
-			throw new PerceivingException();		
-		}
-		else{
-			ArrayList<Literal> percepts = new ArrayList<Literal>(); //adicionar os valores lidos arduino na lista percepts (dúvidas - olhar DemoDevice)
-			JsonReader reader = Json.createReader(new ByteArrayInputStream(json.getBytes()));			
-			JsonObject jsonObject;
-			try {
-				jsonObject = reader.readObject();
-			} catch (JsonParsingException e) {
-				throw new PerceivingException("Invalid JSON: " + json);	
+		if(!json.equals("")) { //if reads an non empty string from the microcontroller
+			if(json.equals("Message conversation error")) { //if the message is not propealy read
+				throw new PerceivingException();		
 			}
-			for(String key: jsonObject.keySet()) { //iterar sobre todos os elementos do JsonObject - a variável "key" armazena cada chave do objeto json    		
-				Object value = jsonObject.get(key); //obtém o valor associado à chave "key"
-				String belief = key +"(";
-				if(!(value instanceof JsonArray)) //se o valor não for um vetor (ou seja, se for uma belief com apenas um valor)
-					belief = belief + value;
-				else { //se for um vetor [v1,v2,...,vn], monta uma belief key(v1,v2,...,vn)    			
-					belief = belief + value.toString().replace("[","").replace("]", "");	 	
+			else{
+				ArrayList<Literal> percepts = new ArrayList<Literal>(); //adicionar os valores lidos arduino na lista percepts (dúvidas - olhar DemoDevice)
+				JsonReader reader = Json.createReader(new ByteArrayInputStream(json.getBytes()));			
+				JsonObject jsonObject;
+				try {
+					jsonObject = reader.readObject();
+				} catch (JsonParsingException e) {
+					throw new PerceivingException("Invalid JSON: " + json);	
 				}
-				belief = belief + ")";
+				for(String key: jsonObject.keySet()) { //iterar sobre todos os elementos do JsonObject - a variável "key" armazena cada chave do objeto json    		
+					Object value = jsonObject.get(key); //obtém o valor associado à chave "key"
+					String belief = key +"(";
+					if(!(value instanceof JsonArray)) //se o valor não for um vetor (ou seja, se for uma belief com apenas um valor)
+						belief = belief + value;
+					else { //se for um vetor [v1,v2,...,vn], monta uma belief key(v1,v2,...,vn)    			
+						belief = belief + value.toString().replace("[","").replace("]", "");	 	
+					}
+					belief = belief + ")";
 
-				//System.out.println(belief);
-				percepts.add(Literal.parseLiteral(belief));
+					//System.out.println(belief);
+					percepts.add(Literal.parseLiteral(belief));
+				}
+				this.lista.add(percepts);
 			}
-			this.lista.add(percepts);
 		}
 	}
-
 
 }

@@ -28,6 +28,9 @@ public class JSONDeviceByRequest extends DefaultDevice implements IDevice {
 		
 		
 		String json = microcontroller.read();
+		
+		if(json.equals("")) return null; //if reads an empty string from the microcontroller
+		
 
 		if(json.equals("Message conversation error")) //if the message is not propealy read
 			throw new PerceivingException();
