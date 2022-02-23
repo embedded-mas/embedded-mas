@@ -1,4 +1,4 @@
-#include<Embedded_Protocol.h>
+#include<Embedded_Protocol_2.h>
 #include<ArduinoJson.h>
 
 #define botaoOnOff 2
@@ -42,16 +42,20 @@ void loop()
    interrupt3 = 0;
    delay(10);
  }
- 
-if(digitalRead(ledAzul))
-   doc["led"] = "ligado";
-else
-   doc["led"] = "desligado";
 
-  doc["botao"] = cont;
-  String output = doc.as<String>();
-  communication.create_belief(output);
-  Serial.println();
+communication.startBelief("led");
+if(digitalRead(ledAzul))
+   communication.beliefAdd("ligado");
+else
+   communication.beliefAdd("desligado");  
+communication.endBelief();   
+
+communication.startBelief("botao");
+communication.beliefAdd(cont);  
+communication.endBelief();  
+
+communication.sendMessage();
+
   delay(500); 
  
  /* teste de circuito no arduino
