@@ -15,13 +15,13 @@ import jason.asSyntax.Literal;
 public abstract class EmbeddedAgent extends Agent {
 
 	private final List<DefaultDevice> devices = new ArrayList<DefaultDevice>();
+	private DefaultEmbeddedAgArch arch = null;
 
 
 	@Override
 	public void initAg() {
 		setupSensors();
-		super.initAg();
-		//TODO: find a better way to set the JavinoAgentArch to the JavinoAgent. It is needed to check when/where the agent architecture is set. 
+		super.initAg(); 
 		checkSensor c = new checkSensor();
 		c.start();
 
@@ -75,25 +75,11 @@ public abstract class EmbeddedAgent extends Agent {
 
 	class checkSensor extends Thread{
 
-		@SuppressWarnings("deprecation")
 		@Override
-		public void run() {
-			while(true) {
-				
-				
-				if(getTS().getAgArch() instanceof DefaultEmbeddedAgArch) 
-					/* The architecture requres a list of devices to handle the perceptions. 
-						   In some point after the agent creation, an architecture other than DefaultEmbeddedAgArch is set and the list of sensor is lost.
-						   This method update the list of devices if it is null.
-						   TODO: improve this */
-					synchronized (ts) {												
-						DefaultEmbeddedAgArch arch =  getEmbeddedArch();
-						if(arch.getDevices()==null) {
-							arch.setDevices(devices);
-						}
-					}
-			}
-
+		public void run() {			
+			while(arch==null)  
+				arch = getEmbeddedArch();			
+			arch.setDevices(devices);
 		}
 	}
 }
