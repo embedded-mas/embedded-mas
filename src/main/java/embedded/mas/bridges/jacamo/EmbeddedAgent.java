@@ -80,6 +80,7 @@ public abstract class EmbeddedAgent extends Agent {
 			while(arch==null)  
 				arch = getEmbeddedArch();			
 			arch.setDevices(devices);
+			return;
 		}
 	}
 }
