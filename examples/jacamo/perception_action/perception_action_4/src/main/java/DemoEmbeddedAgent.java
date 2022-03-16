@@ -25,16 +25,17 @@ public class DemoEmbeddedAgent extends EmbeddedAgent {
 	}
 	
 	
-	// #Acoes que o agente é capaz de realizar
+	// #Acoes que o agente eh capaz de realizar
 	public boolean lightOn() {
 		System.out.println("Acendendo Led...");
-		MyDemoDevice device = (MyDemoDevice)this.devices.get(0);
+		//MyDemoDevice device = (MyDemoDevice)this.devices.get(0);
+                MyDemoDevice device = (MyDemoDevice)this.getDevices().get(0);
 		device.doLightOn();
 		return true;
 	}
 	public boolean lightOff() {
 		System.out.println("Apagando Led...");
-		MyDemoDevice device =(MyDemoDevice)this.devices.get(0);
+		MyDemoDevice device =(MyDemoDevice)this.getDevices().get(0);
 		device.doLightOff();
 		return true;
 	}
