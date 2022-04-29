@@ -1,4 +1,4 @@
-package ros;
+package embedded.mas.bridges.ros.ros;
 
 /**
  * A wrapper class for streamlining ROS Topic publishing. Note that the {@link #advertise()} never *needs* to be explicitly

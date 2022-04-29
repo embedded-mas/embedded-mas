@@ -1,19 +1,18 @@
-// roscore
-// roslaunch rosbridge_server rosbridge_websocket.launch
-// rostopic pub ros_to_java std_msgs/String "Ligar"
-// rostopic pub ros_to_java std_msgs/String "Desligar"
+// Inicializa o ROS: roscore
+// Inicializa a ponte de comunicação entre ROS e JAVA: roslaunch rosbridge_server rosbridge_websocket.launch
 
-package comunicaArduino.InterfaceJavaROS;
+package embedded.mas.bridges.ros;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import embedded.mas.bridges.jacamo.IPhysicalInterface;
 
-import ros.Publisher;
-import ros.RosBridge;
+import embedded.mas.bridges.ros.ros.RosBridge;
 //import ros.RosBridge.RosBridgeSubscriber;
-import ros.RosListenDelegate;
+import embedded.mas.bridges.ros.ros.RosListenDelegate;
+import embedded.mas.bridges.ros.ros.Publisher;
 //import ros.SubscriptionRequestMsg;
-import ros.msgs.std_msgs.PrimitiveMsg;
-import ros.tools.MessageUnpacker;
+import embedded.mas.bridges.ros.ros.msgs.std_msgs.PrimitiveMsg;
+import embedded.mas.bridges.ros.ros.tools.MessageUnpacker;
 //import ros.tools.PeriodicPublisher;
 import java.util.*;
 //import comunicaArduino.Arduino_Java;
