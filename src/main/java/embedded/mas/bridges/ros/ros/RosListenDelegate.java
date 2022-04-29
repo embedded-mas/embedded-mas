@@ -1,4 +1,4 @@
-package ros;
+package embedded.mas.bridges.ros.ros;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParseException;
