@@ -10,9 +10,8 @@ const int ECHO_DIR = 2;
 const int TRIG_DIR = 3;
 const int ECHO_ESQ = 10;
 const int TRIG_ESQ = 11;
-const int ECHO_FRENTE = 8;
-const int TRIG_FRENTE = 9;
-
+const int TRIG_FRENTE = 8;
+const int ECHO_FRENTE = 9;
 
 const int LIGHT = 13;
 
@@ -26,7 +25,6 @@ Ultrasonic sensorDir(TRIG_DIR, ECHO_DIR);
 
 // Crenças
 int lightState = 0;
-String carState = "parado";
 float distanciaFrente = 0;
 float distanciaEsq = 0;
 float distanciaDir = 0;
@@ -85,24 +83,30 @@ void loop()
   while (Serial.available() > 0) { //check whether there is some information from the serial (possibly from the agent)
     char c = Serial.read();
     switch (c) {
-      case 'A':
-          Motor1.Horario(); // Comando para o carrro ir para frente
+      case 'A': // Comando para o motor 1 girar para frente
+          Motor1.Antihorario(); 
         break;
-      case 'B':
-          Motor1.Antihorario(); // Comando para o carro ir para trás
+      case 'B': // Comando para o motor 1 girar para trás
+          Motor1.Horario(); 
         break;
       case 'C':
-          Motor1.Para(); // Comando para o carro parar
+          Motor1.Para(); // Comando para o motor 1 parar
         break;
-      case 'D':
-          Motor2.Horario(); // Comando para o carrro ir para frente
+      case 'D': // Comando para o motor 2 girar para frente
+          Motor2.Antihorario(); 
         break;
-      case 'E':
-          Motor2.Antihorario(); // Comando para o carrro ir para frente
+      case 'E': // Comando para o motor 2 girar para trás
+          Motor2.Horario(); 
         break;
-      case 'F':
-          Motor2.Para(); // Comando para o carrro ir para frente
-        break;    
+      case 'F': // Comando para o motor 2 parar
+          Motor2.Para(); 
+        break; 
+      case 'G': // Comando para acender o led de controle
+          digitalWrite(LIGHT, HIGH);
+        break;
+      case 'H': // Comando para apagar o led de controle
+          digitalWrite(LIGHT, LOW);
+        break;   
       default:
         // comando(s)
         break;
@@ -118,9 +122,11 @@ void loop()
   com.startBelief("distanciaFrente");
   com.beliefAdd(distanciaFrente);
   com.endBelief();
+  
   com.startBelief("distanciaEsquerda");
   com.beliefAdd(distanciaEsq);
   com.endBelief();
+  
   com.startBelief("distanciaDireita");
   com.beliefAdd(distanciaDir);
   com.endBelief();
@@ -129,10 +135,15 @@ void loop()
   com.beliefAdd(lightState);
   com.endBelief();
 
-  com.startBelief("carState");
-  com.beliefAdd(carState);
-  com.endBelief();
-
   com.sendMessage();
-  delay(1000);
+  //---------------------------------------------------------------------------------------------------------------------------
+
+  //teste
+  if(distanciaFrente<10){
+    digitalWrite(LIGHT, HIGH);
+  }else if(distanciaFrente>7){
+    digitalWrite(LIGHT, LOW);
+  }
+  
+  //delay(1000);
 }
