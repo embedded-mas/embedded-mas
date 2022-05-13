@@ -1,9 +1,12 @@
+#include<Embedded_Protocol_2.h> // biblioteca para envio de crenças
+#include <Ultrasonic.h>
+#include<NoDelay.h>
+
 //pinos de controle do motor 1(IN1 e IN2)  motor 2 (IN3 e IN4)
 const int IN_1 = 4;
 const int IN_2 = 5;
 const int IN_3 = 6;
 const int IN_4 = 7;
-
 
 //pinos de controle dos sencores ultrassonicos
 const int ECHO_DIR = 2;
@@ -15,20 +18,22 @@ const int ECHO_FRENTE = 9;
 
 const int LIGHT = 13;
 
-#include<Embedded_Protocol_2.h> // biblioteca para envio de crenças
+
+
 Communication com;
 
-#include <Ultrasonic.h>
 Ultrasonic sensorFrente(TRIG_FRENTE, ECHO_FRENTE);
-Ultrasonic sensorEsq(TRIG_ESQ, ECHO_ESQ);
-Ultrasonic sensorDir(TRIG_DIR, ECHO_DIR);
+//Ultrasonic sensorEsq(TRIG_ESQ, ECHO_ESQ);
+//Ultrasonic sensorDir(TRIG_DIR, ECHO_DIR);
+
+noDelay BeliefTime(500); //tempo do envio das crenças
 
 // Crenças
 int lightState = 0;
 float distanciaFrente = 0;
+float old_distanciaFrente = 0;
 float distanciaEsq = 0;
 float distanciaDir = 0;
-
 
 
 //Classe para facilitar o uso da ponte H L298N na manipulação dos motores na função Setup e Loop.
@@ -73,7 +78,7 @@ void setup() {
   digitalWrite(LIGHT, 1); //light starts off
   Serial.begin(9600);
 
-  delay(3000); //wait 5 seconds (to set up the multi-agent system)
+  delay(3000); //wait 3 seconds (to set up the multi-agent system)
 }
 
 
@@ -116,26 +121,25 @@ void loop()
 
   //Crenças----------------------------------------------------------------------------------------------------------
   distanciaFrente = sensorFrente.Ranging(CM);// ultrassom.Ranging(CM) retorna a distancia em centímetros(CM) ou polegadas(INC)
-  distanciaEsq = sensorEsq.Ranging(CM);
-  distanciaDir = sensorDir.Ranging(CM);
+
+
+ if(BeliefTime.update())//Checks to see if set time has past
+ {
+  if(old_distanciaFrente != distanciaFrente){
 
   com.startBelief("distanciaFrente");
   com.beliefAdd(distanciaFrente);
   com.endBelief();
-  
-  com.startBelief("distanciaEsquerda");
-  com.beliefAdd(distanciaEsq);
-  com.endBelief();
-  
-  com.startBelief("distanciaDireita");
-  com.beliefAdd(distanciaDir);
-  com.endBelief();
-
-  com.startBelief("lightState");
-  com.beliefAdd(lightState);
-  com.endBelief();
-
+  old_distanciaFrente = distanciaFrente;
   com.sendMessage();
+
+  }
+  
+
+ // com.startBelief("lightState");
+ // com.beliefAdd(lightState);
+ // com.endBelief();
+ }
   //---------------------------------------------------------------------------------------------------------------------------
 
   //teste
