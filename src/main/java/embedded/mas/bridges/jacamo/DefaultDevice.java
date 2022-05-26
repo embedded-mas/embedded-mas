@@ -2,6 +2,8 @@ package embedded.mas.bridges.jacamo;
 
 import java.util.Collection;
 
+import embedded.mas.exception.EmbeddedActionException;
+import embedded.mas.exception.EmbeddedActionNotFoundException;
 import embedded.mas.exception.PerceivingException;
 import jason.asSyntax.Atom;
 import jason.asSyntax.Literal;
@@ -18,18 +20,18 @@ import jason.asSyntax.Literal;
 public abstract class DefaultDevice implements IDevice {
 	
 	protected Atom id;
-	protected IPhysicalInterface microcontroller;
+	protected IExternalInterface microcontroller;
 	
 
 
-	public DefaultDevice(Atom id, IPhysicalInterface microcontroller) {
+	public DefaultDevice(Atom id, IExternalInterface microcontroller) {
 		this.id = id;
 		this.microcontroller = microcontroller;
 	}
 
 
 	/* Returns a collection of percepts from the sensor */
-	public abstract Collection<Literal> getPercepts() throws PerceivingException;;
+	public abstract Collection<Literal> getPercepts() throws PerceivingException;
 
 
 	public Atom getId() {
@@ -48,7 +50,7 @@ public abstract class DefaultDevice implements IDevice {
 	 * @param actionName
 	 * @return
 	 */
-	public abstract boolean execEmbeddedAction(String actionName, Object[] args);
+	public abstract boolean execEmbeddedAction(String actionName, Object[] args) throws EmbeddedActionNotFoundException,EmbeddedActionException;
 
 
 }

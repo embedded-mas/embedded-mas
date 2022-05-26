@@ -1,4 +1,5 @@
-package ros.msgs.std_msgs;
+package embedded.mas.bridges.ros.ros.msgs.std_msgs;
+
 
 /**
  * A generic specified Java Bean for capturing many of the primitive data-type messages used by ROS in the std_msgs

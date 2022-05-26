@@ -1,4 +1,4 @@
-package ros.tools;
+package embedded.mas.bridges.ros.ros.tools;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;

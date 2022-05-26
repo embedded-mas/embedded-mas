@@ -16,7 +16,7 @@ plugins {
 }
 
 
-version = '0.029-SNAPSHOT'
+version = '0.032-SNAPSHOT'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -40,6 +40,12 @@ dependencies {
     implementation group: 'org.jason' , name: 'jason'   , version: '2.6-SNAPSHOT'
     implementation group: 'javax.json', name: 'javax.json-api', version: '1.1.4'
     implementation group: 'org.glassfish', name: 'javax.json', version: '1.1.4'
+    
+
+		
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.2' 
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.13.2'
+    implementation group: 'org.eclipse.jetty.websocket', name: 'websocket-server', version: '9.4.46.v20220331'
     
 	// https://mvnrepository.com/artifact/org.rxtx/rxtx
 	implementation group: 'org.rxtx', name: 'rxtx', version: '2.1.7'

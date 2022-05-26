@@ -18,7 +18,7 @@ public class RxTxDevice extends DefaultDevice implements IDevice{
 	@Override
 	public Collection<Literal> getPercepts() throws PerceivingException {
 		ArrayList<Literal> percepts = new ArrayList<Literal>(); //adicionar os valores lidos arduino na lista percepts (dúvidas - olhar DemoDevice)
-		String beliefs[] = microcontroller.read().split(",");
+		String beliefs[] = ((IPhysicalInterface) microcontroller).read().split(",");
 		percepts.add(Literal.parseLiteral(beliefs[0]));
 		percepts.add(Literal.parseLiteral(beliefs[1]));
 		percepts.add(Literal.parseLiteral(beliefs[2]));

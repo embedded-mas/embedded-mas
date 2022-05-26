@@ -4,16 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import embedded.mas.exception.PerceivingException;
-import jason.RevisionFailedException;
 import jason.architecture.AgArch;
-import jason.asSemantics.Agent;
-import jason.asSemantics.Event;
-import jason.asSemantics.Intention;
 import jason.asSyntax.Literal;
-import jason.asSyntax.Trigger;
-import jason.asSyntax.Trigger.TEOperator;
-import jason.asSyntax.Trigger.TEType;
-import jason.stdlib.sublist;
 
 public abstract class DefaultEmbeddedAgArch extends AgArch{
 	

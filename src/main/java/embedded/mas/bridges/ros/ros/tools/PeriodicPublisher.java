@@ -1,7 +1,7 @@
-package ros.tools;
+package embedded.mas.bridges.ros.ros.tools;
 
-import ros.Publisher;
-import ros.RosBridge;
+import embedded.mas.bridges.ros.ros.Publisher;
+import embedded.mas.bridges.ros.ros.RosBridge;
 
 import java.util.Timer;
 import java.util.TimerTask;
