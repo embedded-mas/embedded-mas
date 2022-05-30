@@ -53,8 +53,6 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 
 		listener = new RosListenDelegate() {
 			public void receive(JsonNode data, String stringRep) {
-				MessageUnpacker<PrimitiveMsg<String>> unpacker = new MessageUnpacker<PrimitiveMsg<String>>(PrimitiveMsg.class);
-				PrimitiveMsg<String> msg = unpacker.unpackRosMessage(data);
 				synchronized(mensagens){
 					try {						
 						Literal functor = parseLiteral(data.get("topic").textValue().replaceAll("/", "_"));
@@ -132,6 +130,12 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 			pub.publish(new PrimitiveMsg<Integer>(Integer.parseInt(s)));
 		else
 			pub.publish(new PrimitiveMsg<String>(s));
+	}
+
+	@Override
+	public boolean serviceRequest(String serviceName, JsonNode serviceArguments) {
+		this.bridge.doServiceRequest(serviceName, serviceArguments);
+		return true;
 	}
 
 

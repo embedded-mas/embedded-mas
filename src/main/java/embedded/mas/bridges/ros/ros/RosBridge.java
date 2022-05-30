@@ -698,6 +698,12 @@ public class RosBridge {
 
 	}
 
+	
+	public boolean doServiceRequest(String serviceName, JsonNode serviceArguments) {
+		this.sendRawMessage("{ \"op\": \"call_service\", \"service\": \""+ serviceName +"\", \"args\": "+ serviceArguments +"}");
+		return true;
+	}
+	
 	public static class FragmentManager{
 
 		protected String id;
