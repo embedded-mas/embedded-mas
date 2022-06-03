@@ -6,6 +6,7 @@ import java.util.Collection;
 import embedded.mas.exception.PerceivingException;
 import jason.architecture.AgArch;
 import jason.asSyntax.Literal;
+import static jason.asSyntax.ASSyntax.createLiteral;
 
 public abstract class DefaultEmbeddedAgArch extends AgArch{
 	
@@ -57,6 +58,8 @@ public abstract class DefaultEmbeddedAgArch extends AgArch{
 		for(IDevice s:this.devices) { //for each sensor
 			try {
 				Collection<Literal> p = s.getPercepts();
+				for(Literal l:p)
+					l.addAnnot(createLiteral("device", s.getId()));
 				if(p!=null)
 					percepts.addAll(p);//get all the sensor data
 			} catch (PerceivingException e) {} //if it fails, do nothing 			
