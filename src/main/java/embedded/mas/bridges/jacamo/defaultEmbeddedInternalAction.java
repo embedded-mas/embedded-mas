@@ -35,14 +35,14 @@ public class defaultEmbeddedInternalAction extends EmbeddedInternalAction {
 				for(int i=0;i<((ListTermImpl)args[2]).size();i++) {
 					arguments[i] = ((ListTermImpl)args[2]).get(i).toString().replaceAll("\"(.+)\"", "$1");
 				}
-				device.execEmbeddedAction(args[1].toString().replaceAll("\"(.+)\"", "$1"), arguments);
+				return device.execEmbeddedAction(args[1].toString().replaceAll("\"(.+)\"", "$1"), arguments);
 			}
 			else { //default condition
-				device.execEmbeddedAction(args[1].toString().replaceAll("\"(.+)\"", "$1"), new String[]{args[2].toString().replaceAll("\"(.+)\"", "$1")});
+				return device.execEmbeddedAction(args[1].toString().replaceAll("\"(.+)\"", "$1"), new String[]{args[2].toString().replaceAll("\"(.+)\"", "$1")});
 			}
 
 
-			return true;
+			
 		}else return false;
 	}
 }

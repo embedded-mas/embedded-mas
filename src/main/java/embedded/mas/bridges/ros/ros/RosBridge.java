@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
@@ -70,6 +71,10 @@ public class RosBridge {
 	protected boolean hasConnected = false;
 
 	protected boolean printMessagesAsReceived = false;
+	
+	protected String bridgeId; //identifier of the current bridge to be used in message exchanges
+	protected int serviceRequestCount = 0; //counter of service requests
+	protected HashMap<String, JsonNode> serviceReplies = new HashMap<>();
 
 
 	/**
@@ -131,6 +136,9 @@ public class RosBridge {
 
 	public RosBridge(){
 		this.closeLatch = new CountDownLatch(1);
+		this.bridgeId = java.time.Clock.systemUTC().instant().toString() + 
+				   new Random().nextInt(1000) + 
+				   new Random().nextInt(1000);
 	}
 
 
@@ -243,7 +251,13 @@ public class RosBridge {
 				}
 				else if(op.equals("fragment")){
 					this.processFragment(node);
-				}
+				}else
+					if(op.equals("service_response")){
+						synchronized (serviceReplies) {
+							serviceReplies.put(node.get("id").asText(), node);
+						}
+						
+					}
 			}
 		} catch(IOException e) {
 			System.out.println("Could not parse ROSBridge web socket message into JSON data");
@@ -577,7 +591,7 @@ public class RosBridge {
 		}
 
 	}
-
+	
 	/**
 	 * Attempts to turn the the provided object into a JSON message and send it to the ROSBridge server.
 	 * If the object does not satisfy the Rosbridge protocol, it may have no affect.
@@ -700,8 +714,28 @@ public class RosBridge {
 
 	
 	public boolean doServiceRequest(String serviceName, JsonNode serviceArguments) {
-		this.sendRawMessage("{ \"op\": \"call_service\", \"service\": \""+ serviceName +"\", \"args\": "+ serviceArguments +"}");
+		this.sendRawMessage("{ \"op\": \"call_service\", \"service\": \""+ serviceName +"\", \"args\": "+ serviceArguments +",\"id\":\""+ getServiceRequestId() +"\"}");
 		return true;
+	}
+	
+	public JsonNode doServiceRequestResponse(String serviceName, JsonNode serviceArguments) {
+		String requestId = getServiceRequestId();
+		this.sendRawMessage("{ \"op\": \"call_service\", \"service\": \""+ serviceName +"\", \"args\": "+ serviceArguments +",\"id\":\""+ requestId +"\"}");
+		while(serviceReplies.get(requestId)==null) {
+			try {	
+				Thread.sleep((long) (Math.random()*100));
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		JsonNode node = serviceReplies.get(requestId);
+		serviceReplies.remove(requestId);
+		return node;
+
+	}
+	
+	private String getServiceRequestId() {
+		return this.bridgeId + this.serviceRequestCount++;
 	}
 	
 	public static class FragmentManager{

@@ -134,10 +134,13 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 
 	@Override
 	public boolean serviceRequest(String serviceName, JsonNode serviceArguments) {
-		this.bridge.doServiceRequest(serviceName, serviceArguments);
-		return true;
+		return this.bridge.doServiceRequest(serviceName, serviceArguments);
 	}
 
-
+	
+	public JsonNode serviceRequestResponse(String serviceName, JsonNode serviceArguments) {
+		return this.bridge.doServiceRequestResponse(serviceName, serviceArguments);
+	}
+	
 
 }
