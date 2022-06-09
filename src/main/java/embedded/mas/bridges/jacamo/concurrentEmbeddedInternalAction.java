@@ -78,7 +78,7 @@ public class concurrentEmbeddedInternalAction extends ConcurrentInternalAction {
 
 	@Override
 	public void timeout(TransitionSystem ts, String intentionKey) {
-
+		failInt(ts, intentionKey);
 
 	}
 
