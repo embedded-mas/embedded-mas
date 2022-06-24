@@ -32,9 +32,44 @@ public class ServiceParam {
 	 * @return
 	 */
 	public String toJsonValue() {
-		return "\""+ paramName + "\":" + paramValue.toString(); 
+		String pValue = "";;
+		if(paramValue.getClass().isArray()) 
+			pValue = pValue + arrayToJsonValue((Object[])paramValue);
+		else
+			if(paramValue instanceof ServiceParameters) {
+				pValue = ((ServiceParameters)paramValue).toJson().toString();
+			}
+			else
+				if(paramValue instanceof String) 
+					pValue = pValue + "\"" + paramValue.toString() + "\"" ;
+				else
+					pValue = paramValue.toString();
+		return "\""+ paramName + "\":" + pValue ; 
 	}
-	
-	
+
+	private String arrayToJsonValue(Object[] paramValue) {
+		String pValue = "[";
+		for(Object p: (Object[])paramValue) {
+			if(p instanceof String) 
+				pValue = pValue + "\"" + p.toString() + "\"," ;
+			else
+				if(p instanceof ServiceParam) 
+					pValue = pValue + ((ServiceParam)p).toJsonValue() + ",";
+				else
+					if(p instanceof ServiceParameters)
+						pValue = pValue + ((ServiceParameters)p).toJson() + ",";
+					else
+						pValue = pValue.concat(p.toString()).concat(",");
+		}
+		pValue = pValue.substring(0,pValue.length()-1)+"]";
+		return pValue;
+	}
+
+	@Override
+	public String toString() {
+		return "ServiceParam [paramName=" + paramName + ", paramValue=" + paramValue + "]";
+	}
+
+
 
 }

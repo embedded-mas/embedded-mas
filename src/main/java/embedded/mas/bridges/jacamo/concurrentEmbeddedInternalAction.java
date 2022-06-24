@@ -15,14 +15,9 @@ public class concurrentEmbeddedInternalAction extends ConcurrentInternalAction {
 	 * args:
 	 * 0. DeviceName
 	 * 1. ActionName
-	 * 2. Timeout (optional) - default 1000 milliseconds
 	 */
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {  
-		int timeout;
-		if(args.length==2)
-			timeout = Integer.parseInt(args[2].toString());
-		else
-			timeout = 1000;
+		int timeout = 5000;
 
 		// suspend the intention by a given timeout
 		final String key = suspendInt(ts, "embeddedAction", timeout); 
