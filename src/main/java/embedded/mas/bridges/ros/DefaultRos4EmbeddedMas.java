@@ -55,9 +55,12 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 			public void receive(JsonNode data, String stringRep) {
 				synchronized(mensagens){
 					try {						
-						Literal functor = parseLiteral(data.get("topic").textValue().replaceAll("/", "_"));
-						String terms = jsonToPredArguments(data.get("msg"));
-						Literal p = parseLiteral(functor+"("+terms+")");
+						Literal p = customizeBelief(data.get("topic").textValue(),data.get("msg"));
+						if(p==null) {
+							Literal functor = parseLiteral(data.get("topic").textValue().replaceAll("/", "_"));
+							String terms = jsonToPredArguments(data.get("msg"));
+							p = parseLiteral(functor+"("+terms+")");
+						}
 						topicValues.put(data.get("topic").toString().replaceAll("^\"|\"$", ""),p);
 					} catch (ParseException e) {
 						// TODO Auto-generated catch block
@@ -141,6 +144,20 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 	public JsonNode serviceRequestResponse(String serviceName, JsonNode serviceArguments) {
 		return this.bridge.doServiceRequestResponse(serviceName, serviceArguments);
 	}
-	
+
+
+	/**
+	 * Customizes beliefs when should not follow the default format translated from rostopics.
+	 * By default, returns null. In this case, the belief follows the default translation from the rostopic.
+	 * To return values other than null, override this method in subclasses. In this case, the method is supposed to build and return a literal representing
+	 * the belief corresponding to the topic. 
+	 * 
+	 * @param topicName: name of the topic to be converted to belief.
+	 * @param data: JSON containing the topic values. This JSON is produced by the rosbridge, which is an interface ROS-Java. To inspect this JSON, print the value of this parameter. 
+	 * @return null to follow the default conversion from topic value to belief; a literal representing the corresponding belief otherwise.
+	 */
+	protected Literal customizeBelief(String topicName, JsonNode data) {
+		return null;
+	}
 
 }
