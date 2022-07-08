@@ -27,27 +27,27 @@ public class MyDemoDevice extends JSONWatcherDevice {
 
 	// # atuacoes
 	public boolean doMotor1Horario() {
-		this.microcontroller.write("A");
+		//this.microcontroller.write("A");
 		return true;
 	}
 	public boolean doMotor1Antihorario() {
-		this.microcontroller.write("B");
+		//this.microcontroller.write("B");
 		return true;
 	}
 	public boolean doMotor1Para(){
-		this.microcontroller.write("C");
+		//this.microcontroller.write("C");
 		return true;
 	}
 	public boolean doMotor2Horario() {
-		this.microcontroller.write("D");
+		//this.microcontroller.write("D");
 		return true;
 	}
 	public boolean doMotor2Antihorario() {
-		this.microcontroller.write("E");
+		//this.microcontroller.write("E");
 		return true;
 	}
 	public boolean doMotor2Para(){
-		this.microcontroller.write("F");
+		//this.microcontroller.write("F");
 		return true;
 	}
 }

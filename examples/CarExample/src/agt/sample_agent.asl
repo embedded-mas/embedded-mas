@@ -5,13 +5,12 @@ started.
     !move.
 
 +!move : distanciaFrente(X) & X<10
-<-  iaLib.tras;
+<-  iaLib.ligaLed;
+	iaLib.frente;
     !move.
-//+!move : distanciaDireita(Y) & Y>100
-//<-  iaLib.direita;
-//    !move.
 +!move : distanciaFrente(X) & X>10
-<-  iaLib.frente;
+<-  iaLib.desligaLed;
+	iaLib.tras;
     !move.
 +!move <- !move.
 
