@@ -14,7 +14,8 @@ public class ServiceParameters extends ArrayList<ServiceParam> {
 		for(ServiceParam p:this) {
 			s = s.concat(p.toJsonValue()) + ",";		
 		}
-		s = s.substring(0, s.length()-1); //remove the last comma
+		if(s.length()>0)
+			s = s.substring(0, s.length()-1); //remove the last comma
 		try {
 			return new ObjectMapper().readTree("{"+s+"}");
 		} catch (JsonMappingException e) {
