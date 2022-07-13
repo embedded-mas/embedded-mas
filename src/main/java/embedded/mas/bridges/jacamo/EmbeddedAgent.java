@@ -47,15 +47,25 @@ public abstract class EmbeddedAgent extends Agent {
 	protected abstract void setupSensors();
 
 
-
+    @Deprecated
 	public void addSensor(DefaultDevice device) {
+		this.addDevice(device);
+	}
+
+    @Deprecated
+	public void removeSensor(DefaultDevice device) {
+		this.removeDevice(device);
+	}
+
+	
+	public void addDevice(DefaultDevice device) {
 		devices.add(device);
 	}
 
-	public void removeSensor(DefaultDevice device) {
+	public void removeDevice(DefaultDevice device) {
 		devices.remove(device);
 	}
-
+	
 	public List<DefaultDevice> getDevices(){
 		return this.devices;
 	}
