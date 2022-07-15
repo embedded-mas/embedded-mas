@@ -58,10 +58,11 @@ public abstract class DefaultEmbeddedAgArch extends AgArch{
 		for(IDevice s:this.devices) { //for each sensor
 			try {
 				Collection<Literal> p = s.getPercepts();
-				for(Literal l:p)
-					l.addAnnot(createLiteral("device", s.getId()));
-				if(p!=null)
+				if(p!=null) {
+					for(Literal l:p)
+						l.addAnnot(createLiteral("device", s.getId()));
 					percepts.addAll(p);//get all the sensor data
+				}
 			} catch (PerceivingException e) {} //if it fails, do nothing 			
 		}
 		if(percepts.size()==0) return null;

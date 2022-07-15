@@ -10,6 +10,9 @@ import jason.asSyntax.Atom;
 
 public class DemoEmbeddedAgent extends EmbeddedAgent {
 	
+	
+	private SerialReader arduino = new SerialReader("/dev/ttyUSB0",9600);
+	
 	@Override
 	public void initAg() {
 		super.initAg();
@@ -17,7 +20,7 @@ public class DemoEmbeddedAgent extends EmbeddedAgent {
 
 	@Override
 	protected void setupSensors() {
-		SerialReader arduino = new SerialReader("/dev/ttyUSB0",9600);
+//		SerialReader arduino = new SerialReader("/dev/ttyUSB0",9600);
 		
 		CarDevice device = new CarDevice(new Atom("arduino1"), arduino);
 		this.addSensor(device);	
@@ -31,14 +34,14 @@ public class DemoEmbeddedAgent extends EmbeddedAgent {
 		System.out.println("Fazendo o carro andar para frente...");
 		//seleciona os devices e suas atuacoes que que serão utilizados na acao
 		CarDevice device1 =(CarDevice)this.getDevices().get(0);
-		device1.doMotor1Horario();
 		device1.doMotor2Horario();
+		device1.doMotor1Antihorario();
 		return true;
 	}
 	public boolean tras() {
 		System.out.println("Fazendo o carro andar para trás...");
 		CarDevice device1 =(CarDevice)this.getDevices().get(0);
-		device1.doMotor1Antihorario();
+		device1.doMotor1Horario();
 		device1.doMotor2Antihorario();
 		return true;
 	}

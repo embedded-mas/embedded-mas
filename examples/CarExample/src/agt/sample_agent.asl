@@ -4,7 +4,7 @@ started.
 <- .print("Hello World!");
     !move.
 
-+!move : distanciaFrente(X) & X<10
++!move : distanciaFrente(X) & X<=10
 <-  iaLib.ligaLed;
 	iaLib.frente;
     !move.

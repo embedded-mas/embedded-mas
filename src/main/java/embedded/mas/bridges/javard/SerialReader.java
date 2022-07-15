@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Stack;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -28,7 +29,7 @@ public class SerialReader extends Arduino implements IPhysicalInterface{
 	private Queue<String> jsonList = new LinkedList<String>(); //variavel sincronizada (makeJSON && makeBeliefs)
 	private Map<String,Stack<String>> historico = new HashMap<String,Stack<String>>();
 	private Map<String,String> mapPercepts = new HashMap<String,String>();
-	private ArrayList<String> percepts = new ArrayList<String>(); //TODO: Mudar de <String> para <Literal>
+	private CopyOnWriteArrayList<String> percepts = new CopyOnWriteArrayList<String>(); //TODO: Mudar de <String> para <Literal>
 	
 	private String msgSpliter = "\n";
 	private String lengthSpliter = "::";
@@ -52,6 +53,8 @@ public class SerialReader extends Arduino implements IPhysicalInterface{
 			s += belief;
 			s += "/";
 		}
+		if(s=="")
+			return null;
 		return s;
 	}
 	

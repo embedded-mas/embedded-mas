@@ -25,7 +25,12 @@ public class CarDevice extends DefaultDevice implements IDevice{
 	@Override
 	public Collection<Literal> getPercepts() throws PerceivingException {
 		ArrayList<Literal> percepts = new ArrayList<Literal>();
-		for (String belief : ((String) microcontroller.read()).split("/")) {
+		String beliefs = microcontroller.read();
+		if(beliefs == null)
+				return null;
+		
+		for (String belief : beliefs.split("/")) {
+			System.out.println("Error: ");
 			System.out.println(belief);
 			percepts.add(Literal.parseLiteral(belief));
 		}
