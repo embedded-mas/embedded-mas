@@ -2,20 +2,24 @@ started.
 
 +started : true
 <- .print("Hello World!");
-    !move.
+	+moving(foward).
 
-+!move : distanciaFrente(X) & X<=10
-<-  iaLib.ligaLed;
-	iaLib.frente;
-	.wait(1000);
-    !move.
-    
-+!move : distanciaFrente(X) & X>10
-<-  iaLib.desligaLed;
++distanciaFrente(X) : X<20 & not moving(back)
+<- !moveBack.
+	
++!moveBack : not moving(back) & distanciaFrente(X) & X<20
+<- 	-+moving(back);
+	iaLib.ligaLed;
 	iaLib.tras;
-	.wait(1000);
-    !move.
-    
-+!move <- !move.
+	.print("Fazendo o carro andar para tras").
++!moveBack. 
 
-+distanciaFrente(X) <- .print("Distancia Frente: ",X).
++distanciaFrente(X) : X>=20 & not moving(forward)
+<- !moveForward.
+
++!moveForward : not moving(forward) & distanciaFrente(X) & X>=20
+<-  -+moving(forward);
+	iaLib.desligaLed;
+	iaLib.frente;
+	.print("Fazendo o carro andar para frente").
++!moveForward.
