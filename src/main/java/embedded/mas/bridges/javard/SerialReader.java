@@ -107,23 +107,26 @@ public class SerialReader extends Arduino implements IPhysicalInterface{
 		String leituraSplit[];
 		if(leituraBuffer!="") {
 			leituraSplit = leituraBuffer.split(msgSpliter);
-			if(isMASMessage(leituraSplit[leituraSplit.length-1])) 
-				leituraBuffer = "";
-			else
-				leituraBuffer = leituraSplit[leituraSplit.length-1];
+			if(leituraSplit.length>0) {
+				if(isMASMessage(leituraSplit[leituraSplit.length-1])) 
+					leituraBuffer = "";
+				else
+					leituraBuffer = leituraSplit[leituraSplit.length-1];
 
-			for(int i = leituraSplit.length-1; i>-1 ;i--) { //percorre o vetor de trás para frente
-				if(isMASMessage(leituraSplit[i]))
-					synchronized(jsonList) {
-						jsonList.add(verifyAndDecode(leituraSplit[i]));
-					}
+				for(int i = leituraSplit.length-1; i>-1 ;i--) { //percorre o vetor de trás para frente
+					if(isMASMessage(leituraSplit[i]))
+						synchronized(jsonList) {
+							jsonList.add(verifyAndDecode(leituraSplit[i]));
+						}
+				}
+				
+				// print a lista de jason
+				//System.out.println("\n## - Lista de JSON");
+//				for(int i = 0; i<jsonList.size() ;i++) {
+//						//System.out.println(jsonList.get(i));
+//				}
 			}
 			
-			// print a lista de jason
-			//System.out.println("\n## - Lista de JSON");
-//			for(int i = 0; i<jsonList.size() ;i++) {
-//					//System.out.println(jsonList.get(i));
-//			}
 		}
 		makeBeliefs();
 	}
