@@ -27,7 +27,7 @@ public class JSONDeviceByRequest extends DefaultDevice implements IDevice {
 	public Collection<Literal> getPercepts() throws PerceivingException {
 		
 		
-		String json = microcontroller.read();
+		String json = this.getMicrocontroller().read();
 		
 		if(json.equals("")) return null; //if reads an empty string from the microcontroller
 		
@@ -65,6 +65,11 @@ public class JSONDeviceByRequest extends DefaultDevice implements IDevice {
 	public boolean execEmbeddedAction(String actionName, Object[] args) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public IPhysicalInterface getMicrocontroller() {
+		return (IPhysicalInterface) this.microcontroller;
 	}
 	
 }

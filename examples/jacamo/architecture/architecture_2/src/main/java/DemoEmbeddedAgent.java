@@ -17,7 +17,7 @@ public class DemoEmbeddedAgent extends EmbeddedAgent {
 	}
 
 	@Override
-	protected void setupSensors() {
+	protected void setupDevices() {
 
 		Arduino4EmbeddedMas arduino = new Arduino4EmbeddedMas("/dev/ttyUSB0",9600);
 		arduino.openConnection();

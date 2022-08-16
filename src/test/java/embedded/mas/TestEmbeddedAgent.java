@@ -23,7 +23,7 @@ public class TestEmbeddedAgent {
 		return new EmbeddedAgent() {
 			
 			@Override
-			protected void setupSensors() {
+			protected void setupDevices() {
 				// TODO Auto-generated method stub
 				
 			}
