@@ -19,8 +19,8 @@ public abstract class EmbeddedAgent extends Agent {
 
 
 	@Override
-	public void initAg() {
-		setupSensors();
+	public void initAg() {		
+		setupDevices();
 		super.initAg(); 
 		checkSensor c = new checkSensor();
 		c.start();
@@ -44,8 +44,7 @@ public abstract class EmbeddedAgent extends Agent {
 	/*
 	 * Set up the devices of the agent
 	 */
-	protected abstract void setupSensors();
-
+	protected abstract void setupDevices();
 
     @Deprecated
 	public void addSensor(DefaultDevice device) {

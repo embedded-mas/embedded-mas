@@ -28,6 +28,11 @@ public class LiteralDevice extends DefaultDevice implements IDevice {
 	public boolean execEmbeddedAction(String topic,  Object[] args) {
 		return false;
 	}
+
+	@Override
+	public ILiteralListInterface getMicrocontroller() {
+		return (ILiteralListInterface) this.microcontroller;
+	}
 	
 
 

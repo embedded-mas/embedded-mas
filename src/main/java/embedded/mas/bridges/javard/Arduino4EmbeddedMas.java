@@ -25,8 +25,9 @@ public class Arduino4EmbeddedMas extends Arduino implements IPhysicalInterface{
 		this.openConnection();
 	}
 	
-	@Override
-	public String read() {       
+
+	@SuppressWarnings("unchecked")
+	public String read() {      
 		return this.serialRead();
 	}
 	

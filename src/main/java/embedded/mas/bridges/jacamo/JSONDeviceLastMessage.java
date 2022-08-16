@@ -86,5 +86,10 @@ public class JSONDeviceLastMessage extends DefaultDevice implements IDevice {
 		return false;
 	}
 
+	@Override
+	public IPhysicalInterface getMicrocontroller() {
+		return (IPhysicalInterface) this.microcontroller;
+	}
+
 
 }

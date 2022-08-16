@@ -56,4 +56,9 @@ public class DemoDevice extends DefaultDevice  {
 		return true;
 	}
 
+	@Override
+	public IExternalInterface getMicrocontroller() {
+		return this.microcontroller;
+	}
+
 }

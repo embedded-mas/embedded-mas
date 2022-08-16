@@ -60,7 +60,7 @@ public class MicrocontrollerMonitor extends Thread {
 	
 public void decode() throws PerceivingException {
 		String json = microcontroller.read();
-		if(!json.equals("")) { //if reads an non empty string from the microcontroller
+		if(json!=null && !json.equals("")) { //if reads an non empty string from the microcontroller
 			if(json.equals("Message conversation error")) { //if the message is not propealy read
 				throw new PerceivingException();		
 			}
