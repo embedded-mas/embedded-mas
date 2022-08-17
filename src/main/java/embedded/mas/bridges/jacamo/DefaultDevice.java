@@ -42,6 +42,8 @@ public abstract class DefaultDevice implements IDevice {
 		this.id = id;
 	}
 	
+	public abstract IExternalInterface getMicrocontroller();
+	
 	/**
 	 *  Each device is supposed to enabled a set of actions (to be imposed on the actuators).
 	 *  From this method, the device is supposed to properly trigger the action identified by the actionName.

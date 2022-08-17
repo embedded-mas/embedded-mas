@@ -2,8 +2,7 @@
 #include<ArduinoJson.h>
 
 Communication communication;
-const int capacity = JSON_OBJECT_SIZE(6);
-StaticJsonDocument<capacity> doc;
+
 
 const int LIGHT = 10;
 
@@ -43,7 +42,7 @@ void loop()
   
   if(light_state==1){ 
     /* wait a random time and switch the light off if it is on */
-     delay_time = random(2,15)*1000;
+     delay_time = random(2,10)*1000;
      delay(delay_time);
      digitalWrite(LIGHT,0);
      light_state = 0;

@@ -26,7 +26,7 @@ public class JSONWatcherDevice extends DefaultDevice implements IDevice {
 	
 	public JSONWatcherDevice(Atom id, IPhysicalInterface microcontroller) {
 		super(id, microcontroller);	
-		MicrocontrollerMonitor microcontrollerMonitor = new MicrocontrollerMonitor(listOfBeliefs,microcontroller);
+		MicrocontrollerMonitor microcontrollerMonitor = new MicrocontrollerMonitor(listOfBeliefs,this.getMicrocontroller());
 		microcontrollerMonitor.start();
 	}
 	
@@ -49,6 +49,11 @@ public class JSONWatcherDevice extends DefaultDevice implements IDevice {
 	public boolean execEmbeddedAction(String actionName, Object[] args) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public IPhysicalInterface getMicrocontroller() {
+		return (IPhysicalInterface) this.microcontroller;
 	}
 	
 	

@@ -32,7 +32,7 @@ public class MyDemoDevice extends JSONWatcherDevice {
 	}
 	
 	public boolean doLightOn() {
-		this.microcontroller.write("light_on");
+		this.getMicrocontroller().write("light_on");
 		return true;
 	}
 
