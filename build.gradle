@@ -16,7 +16,7 @@ plugins {
 }
 
 
-version = '0.038016-SNAPSHOT'
+version = '0.038017-SNAPSHOT'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
