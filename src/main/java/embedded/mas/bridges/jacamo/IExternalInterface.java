@@ -11,5 +11,7 @@ public abstract interface IExternalInterface {
 	
 	/* Read a string from the microcontroller */
 	public <T> T read();
+	
+	public void execEmbeddedAction(EmbeddedAction action);
 
 }

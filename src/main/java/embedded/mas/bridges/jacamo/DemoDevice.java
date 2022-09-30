@@ -61,4 +61,21 @@ public class DemoDevice extends DefaultDevice  {
 		return this.microcontroller;
 	}
 
+	
+	
+	@Override
+	public boolean execEmbeddedAction(Atom actionName) {
+		EmbeddedAction action = getEmbeddedAction(actionName);
+		if(action!=null) {
+			if(action instanceof EmbeddedAtomAction) {
+				System.out.println("[" + ((EmbeddedAtomAction)action).getActuationName() +"]");			
+				return true;
+			}
+		}
+		else
+			System.out.println("null!!");
+		return false;
+	}
+
+	
 }

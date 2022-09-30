@@ -20,7 +20,7 @@ import embedded.mas.exception.PerceivingException;
 import jason.asSyntax.Atom;
 import jason.asSyntax.Literal;
 
-public class JSONWatcherDevice extends DefaultDevice implements IDevice {
+public class JSONWatcherDevice extends SerialDevice implements IDevice {
 	
 	List<Collection<Literal>> listOfBeliefs = Collections.synchronizedList(new ArrayList<Collection<Literal>>());
 	
@@ -50,11 +50,4 @@ public class JSONWatcherDevice extends DefaultDevice implements IDevice {
 		// TODO Auto-generated method stub
 		return false;
 	}
-
-	@Override
-	public IPhysicalInterface getMicrocontroller() {
-		return (IPhysicalInterface) this.microcontroller;
-	}
-	
-	
 }

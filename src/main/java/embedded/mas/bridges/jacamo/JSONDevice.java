@@ -17,7 +17,7 @@ import embedded.mas.exception.PerceivingException;
 import jason.asSyntax.Atom;
 import jason.asSyntax.Literal;
 
-public class JSONDevice extends DefaultDevice implements IDevice {
+public class JSONDevice extends SerialDevice implements IDevice {
 
 	
 	
@@ -53,7 +53,8 @@ public class JSONDevice extends DefaultDevice implements IDevice {
 				belief = belief + ")";
 
 				//System.out.println(belief);
-				percepts.add(Literal.parseLiteral(belief));
+				//percepts.add(Literal.parseLiteral(belief));
+				percepts.add(customizeBelief(Literal.parseLiteral(belief)));
 			}
 
 			return percepts;
@@ -66,9 +67,6 @@ public class JSONDevice extends DefaultDevice implements IDevice {
 		return false;
 	}
 
-	@Override
-	public IPhysicalInterface getMicrocontroller() {
-		return (IPhysicalInterface) this.microcontroller;
-	}
+
 
 }

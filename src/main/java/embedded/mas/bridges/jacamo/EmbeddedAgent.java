@@ -1,8 +1,12 @@
 package embedded.mas.bridges.jacamo;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import embedded.mas.bridges.jacamo.config.DefaultConfig;
 import jason.architecture.AgArch;
 import jason.asSemantics.Agent;
 import jason.asSemantics.Unifier;
@@ -21,9 +25,28 @@ public abstract class EmbeddedAgent extends Agent {
 	@Override
 	public void initAg() {		
 		setupDevices();
-		super.initAg(); 
+		super.initAg();
+		if(new File( Paths.get("").toAbsolutePath()+"/src/main/java/"+getTS().getAgArch().getAgName() + ".yaml").exists()) {
+			DefaultConfig conf = new DefaultConfig();
+			List<DefaultDevice>  d =  conf.loadFromYaml(Paths.get("").toAbsolutePath()+"/src/main/java/"+getTS().getAgArch().getAgName() + ".yaml");
+			devices.addAll(d);
+			//for(int i=0;i<d.size();i++)
+			//	System.out.println("----" + d.get(i).getId() + " - " + d.get(i).getClass().getName());
+		}
+		
+
 		checkSensor c = new checkSensor();
 		c.start();
+
+		/*File f = new File( Paths.get("").toAbsolutePath()+"/src/main/java/"+getTS().getAgArch().getAgName() + ".yaml");
+		try {
+			System.out.println("**** arquivo " + f.getName() + " - " + f.getCanonicalPath());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+		
+		
 
 	}
 
@@ -44,7 +67,9 @@ public abstract class EmbeddedAgent extends Agent {
 	/*
 	 * Set up the devices of the agent
 	 */
+
 	protected abstract void setupDevices();
+
 
     @Deprecated
 	public void addSensor(DefaultDevice device) {
