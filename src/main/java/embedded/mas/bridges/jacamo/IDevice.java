@@ -21,6 +21,6 @@ public interface IDevice {
 	
 	public IEmbeddedAction getEmbeddedAction(Atom actionName);
 	
-	public boolean execEmbeddedAction(Atom actionName);
+	public boolean execEmbeddedAction(Atom actionName, Object[] args);
 
 }

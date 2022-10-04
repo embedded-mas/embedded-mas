@@ -64,11 +64,14 @@ public class DemoDevice extends DefaultDevice  {
 	
 	
 	@Override
-	public boolean execEmbeddedAction(Atom actionName) {
+	public boolean execEmbeddedAction(Atom actionName,Object[] args) {
 		EmbeddedAction action = getEmbeddedAction(actionName);
 		if(action!=null) {
 			if(action instanceof EmbeddedAtomAction) {
-				System.out.println("[" + ((EmbeddedAtomAction)action).getActuationName() +"]");			
+				String arguments = "";
+				for(int i=0;i<args.length;i++)
+					arguments = arguments.concat(args[i].toString());
+				System.out.println("[" + ((EmbeddedAtomAction)action).getActuationName() +"]" + arguments);			
 				return true;
 			}
 		}

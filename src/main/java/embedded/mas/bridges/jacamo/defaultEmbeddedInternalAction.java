@@ -2,6 +2,7 @@ package embedded.mas.bridges.jacamo;
 
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.Atom;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Term;
 
@@ -19,8 +20,7 @@ public class defaultEmbeddedInternalAction extends EmbeddedInternalAction {
 	 */
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {  
 		if(ts.getAg() instanceof EmbeddedAgent) {
-			
-			
+
 			//find the device the action is applyied upon
 			DefaultDevice device = null;
 			String deviceName = args[0].toString().replaceAll("\"(.+)\"", "$1");
@@ -32,20 +32,27 @@ public class defaultEmbeddedInternalAction extends EmbeddedInternalAction {
 			}					
 			if(device==null) throw new Exception("Device " + deviceName + " not found.");
 
-
-			
-			EmbeddedAction action = device.getEmbeddedAction(createAtom(args[1].toString().replaceAll("\"(.+)\"", "$1")));			
-			//Case 1. The device has an EmbeddedAction
-			if(action!=null) { 			
-				if(SerialDevice.class.isAssignableFrom(device.getClass())) {
-					return device.execEmbeddedAction(createAtom(args[1].toString().replaceAll("\"(.+)\"", "$1")));
+			EmbeddedAction action = device.getEmbeddedAction(createAtom(args[1].toString().replaceAll("\"(.+)\"", "$1")));	
+			Atom actionName = createAtom(args[1].toString().replaceAll("\"(.+)\"", "$1"));			
+			if(action!=null) { 	//Case 1. The device has an EmbeddedAction
+				if(args[2] instanceof ListTermImpl){ //if arguments in args[2] are a list 
+					Object[] arguments = new Object[((ListTermImpl)args[2]).size()];			
+					for(int i=0;i<((ListTermImpl)args[2]).size();i++) {
+						arguments[i] = ((ListTermImpl)args[2]).get(i).toString().replaceAll("\"(.+)\"", "$1");
 					}
-					else throw new Exception("Embedded action " + args[1].toString() + "not available in " + deviceName);
 
+					//Check whether the current device class is adapted to execute embedded actions. 
+					//New kinds of devices must be adapted here to execute embedded actions
+					if(SerialDevice.class.isAssignableFrom(device.getClass())||
+							LiteralDevice.class.isAssignableFrom(device.getClass())) {
+						return device.execEmbeddedAction(actionName,arguments);
+					}else throw new Exception("Embedded action " + actionName + "not available in " + deviceName);
+				}
+				else return device.execEmbeddedAction(actionName, new Object[] {args[2]});
 			}
 
-			else {
-				//Case 2. The action is implemented as java code in the device
+
+			else {//Case 2. The action is implemented as java code in the device (old style)				
 				if(args[2] instanceof ListTermImpl){ //if arguments in args[2] are a list 
 					String[] arguments = new String[((ListTermImpl)args[2]).size()];			
 					for(int i=0;i<((ListTermImpl)args[2]).size();i++) {

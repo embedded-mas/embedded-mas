@@ -56,9 +56,6 @@ public abstract class DefaultDevice implements IDevice {
 	}
 
 	public final EmbeddedAction getEmbeddedAction(Atom actionName) {
-		for(Atom k : embeddedActions.keySet()) {
-		}
-		
 		return embeddedActions.get(actionName);
 	}
 
@@ -75,7 +72,7 @@ public abstract class DefaultDevice implements IDevice {
 			throws EmbeddedActionNotFoundException, EmbeddedActionException;
 
 	@Override
-	public boolean execEmbeddedAction(Atom actionName) {		
+	public boolean execEmbeddedAction(Atom actionName, Object[] args) {		
 		return false;
 	}
 	
