@@ -1,6 +1,9 @@
 package embedded.mas.bridges.ros;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import embedded.mas.bridges.ros.ros.RosBridge;
 import embedded.mas.bridges.ros.ros.RosListenDelegate;
@@ -150,7 +153,16 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 		if(type.equals("std_msgs/Int32"))
 			pub.publish(new PrimitiveMsg<Integer>(Integer.parseInt(s)));
 		else
-			pub.publish(new PrimitiveMsg<String>(s));
+			if(type.equals("geometry_msgs/Pose")) //TODO: handle application specific message types in application-customized extensions of DefaultRos4EmbeddedMas
+				try {
+					pub.publish(new ObjectMapper().readTree(s));
+				} catch (JsonMappingException e) {
+					e.printStackTrace();
+				} catch (JsonProcessingException e) {
+					e.printStackTrace();
+				}
+			else
+				pub.publish(new PrimitiveMsg<String>(s));
 	}
 
 	@Override
