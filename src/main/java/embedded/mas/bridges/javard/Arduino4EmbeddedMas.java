@@ -8,6 +8,7 @@
 package embedded.mas.bridges.javard;
 
 import arduino.Arduino;
+import embedded.mas.bridges.jacamo.EmbeddedAction;
 import embedded.mas.bridges.jacamo.IPhysicalInterface;
 
 import com.fazecast.jSerialComm.*;
@@ -35,6 +36,7 @@ public class Arduino4EmbeddedMas extends Arduino implements IPhysicalInterface{
 	@Override
 	public boolean write(String s) {
 		try {
+			System.out.println("[Arduino4EmbeddedMas] writing " + s);
 			serialWrite(s);
 			return true;
 		}catch (Exception e) {
@@ -101,6 +103,13 @@ public class Arduino4EmbeddedMas extends Arduino implements IPhysicalInterface{
 		else {
 			return "Message conversation error";
 		}
+		
+	}
+
+
+	@Override
+	public void execEmbeddedAction(EmbeddedAction action) {
+		System.err.println("Method execEmbeddedAction not implemented in " + this.getClass().getName());
 		
 	}
 

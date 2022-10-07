@@ -32,4 +32,16 @@ public class ServiceParameters extends ArrayList<ServiceParam> {
 		return true;		
 	}
 
+	@Override
+	public String toString() {
+		String s = "ServiceParameters ";
+		for(int i=0;i<this.size();i++)
+			s = s.concat(this.get(i).getParamName());
+		return s;
+	}
+	
+	
+	
+	
+
 }

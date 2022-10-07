@@ -20,6 +20,7 @@ public class LiteralDevice extends DefaultDevice implements IDevice {
 
 	@Override
 	public Collection<Literal> getPercepts() throws PerceivingException {
+		//System.out.println("[LiteralDevice] doing get percepts " + this.microcontroller.getClass().getName());
 		List<Literal> beliefs = microcontroller.read();
 		return beliefs;
 	}

@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.Enumeration;
 
+import embedded.mas.bridges.jacamo.EmbeddedAction;
 import embedded.mas.bridges.jacamo.IPhysicalInterface;
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
@@ -156,5 +157,12 @@ public class SerialRxTx implements SerialPortEventListener, IPhysicalInterface{
 
 	public void setSerialPortName(String serialPortName) {
 		this.serialPortName = serialPortName;
+	}
+
+	@Override
+	public void execEmbeddedAction(EmbeddedAction action) {
+		// TODO implementar
+		System.err.println("Method execEmbeddedAction not implemented in " + this.getClass().getName());
+
 	}
 }

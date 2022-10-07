@@ -1,6 +1,3 @@
-// Inicializa o ROS: roscore
-// Inicializa a ponte de comunicação entre ROS e JAVA: roslaunch rosbridge_server rosbridge_websocket.launch
-
 package embedded.mas.bridges.ros;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -10,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import embedded.mas.bridges.ros.ros.RosBridge;
 import embedded.mas.bridges.ros.ros.RosListenDelegate;
+import embedded.mas.bridges.jacamo.EmbeddedAction;
 import embedded.mas.bridges.ros.ros.Publisher;
 import embedded.mas.bridges.ros.ros.msgs.std_msgs.PrimitiveMsg;
 import embedded.mas.bridges.ros.ros.tools.MessageUnpacker;
@@ -20,6 +18,8 @@ import jason.asSyntax.parser.TokenMgrError;
 import static jason.asSyntax.ASSyntax.parseLiteral;
 
 import java.util.*;
+
+import org.apache.tools.ant.util.CollectionUtils;
 
 
 /**
@@ -50,6 +50,7 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 	public DefaultRos4EmbeddedMas(String connectionStr, ArrayList<String> topics, ArrayList<String> types) {
 
 
+		System.out.println("[DefaultRos4EmbeddedMas] creating... topics " + topics.size());
 		//bridge.connect("ws://localhost:" + port, true);
 		this.connection = connectionStr;
 		bridge.connect(connectionStr, true);
@@ -64,7 +65,10 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 							String terms = jsonToPredArguments(data.get("msg"));
 							p = parseLiteral(functor+"("+terms+")");
 						}
-						topicValues.put(data.get("topic").toString().replaceAll("^\"|\"$", ""),p);
+						//System.out.println("[DefaultRos4EmbeddedMas] atualizando topico " + data.get("topic").toString().replaceAll("^\"|\"$", ""));
+						synchronized (topicValues) {
+							topicValues.put(data.get("topic").toString().replaceAll("^\"|\"$", ""),p);	
+						}						
 					} catch (ParseException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -110,12 +114,26 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 
 
 	@Override
-	public List<Literal> read() {		
+	public List<Literal> read() {	
+		//System.out.println("[DefaultRos4EmbeddedMas] doing read");
 		return rosRead();
 	}
 
 	public List<Literal> rosRead(){
-		return new ArrayList<Literal>(topicValues.values());
+		//System.out.println("[DefaultRos4EmbeddedMas] doing ros read " + topicValues.values().size() + "/" + topicValues.size());	
+		//if(topicValues.values().size()==topicValues.size())
+		//return new ArrayList<Literal>(topicValues.values().toArray());
+		//List<Literal> l = Arrays.asList(topicValues.values().toArray());
+		//return Arrays.asList(topicValues.values().toArray());
+		ArrayList<Literal> list = new ArrayList<Literal>();
+		synchronized (topicValues) { 
+			//for(Literal l:topicValues.values())
+			//list.add(l);	
+			return new ArrayList<Literal>(topicValues.values());
+		}
+		
+		
+		//return list;
 
 	}
 
@@ -152,7 +170,7 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 		return this.bridge.doServiceRequest(serviceName, serviceArguments);
 	}
 
-	
+
 	public JsonNode serviceRequestResponse(String serviceName, JsonNode serviceArguments) {
 		return this.bridge.doServiceRequestResponse(serviceName, serviceArguments);
 	}
@@ -170,6 +188,17 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 	 */
 	protected Literal customizeBelief(String topicName, JsonNode data) {
 		return null;
+	}
+
+	@Override
+	public void execEmbeddedAction(EmbeddedAction action) {
+		if(action instanceof TopicWritingAction) 
+			rosWrite(((TopicWritingAction)action).getTopicName(), ((TopicWritingAction)action).getTopicType(), ((TopicWritingAction)action).getValue().toString());
+		else
+			if(action instanceof ServiceRequestAction) {
+				serviceRequest(((ServiceRequestAction)action).getServiceName(), ((ServiceRequestAction)action).getServiceParameters().toJson());
+			}
+
 	}
 
 }

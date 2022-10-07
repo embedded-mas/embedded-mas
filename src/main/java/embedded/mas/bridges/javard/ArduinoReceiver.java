@@ -2,6 +2,7 @@ package embedded.mas.bridges.javard;
 
 import embedded.mas.bridges.javard.SerialBuffer;
 import arduino.Arduino;
+import embedded.mas.bridges.jacamo.EmbeddedAction;
 import embedded.mas.bridges.jacamo.IPhysicalInterface;
 
 import java.util.ArrayList;
@@ -97,6 +98,13 @@ public class ArduinoReceiver extends Arduino implements IPhysicalInterface{
 		}
 		
 	return b;
+	}
+
+	@Override
+	public void execEmbeddedAction(EmbeddedAction action) {
+		// TODO implementar
+		System.err.println("Method execEmbeddedAction not implemented in " + this.getClass().getName());
+		
 	}
 
 
