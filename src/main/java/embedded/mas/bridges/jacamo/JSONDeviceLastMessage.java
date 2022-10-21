@@ -17,7 +17,7 @@ import embedded.mas.exception.PerceivingException;
 import jason.asSyntax.Atom;
 import jason.asSyntax.Literal;
 
-public class JSONDeviceLastMessage extends DefaultDevice implements IDevice {
+public class JSONDeviceLastMessage extends SerialDevice implements IDevice {
 	
 	ArrayList<Collection<Literal>> listOfBeliefs = new ArrayList<Collection<Literal>>();
 	
@@ -86,10 +86,6 @@ public class JSONDeviceLastMessage extends DefaultDevice implements IDevice {
 		return false;
 	}
 
-	@Override
-	public IPhysicalInterface getMicrocontroller() {
-		return (IPhysicalInterface) this.microcontroller;
-	}
-
+	
 
 }

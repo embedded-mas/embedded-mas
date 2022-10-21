@@ -17,7 +17,7 @@ import embedded.mas.exception.PerceivingException;
 import jason.asSyntax.Atom;
 import jason.asSyntax.Literal;
 
-public class JSONDevice extends DefaultDevice implements IDevice {
+public class JSONDevice extends SerialDevice implements IDevice {
 
 	
 	
@@ -29,6 +29,7 @@ public class JSONDevice extends DefaultDevice implements IDevice {
 	public Collection<Literal> getPercepts() throws PerceivingException {
 		String json = this.getMicrocontroller().read();
 		
+		if(json==null) return null;
 		if(json.equals("")) return null; //if reads an empty string from the microcontroller
 		
 		if(json.equals("Message conversation error")) //if the message is not propealy read
@@ -52,7 +53,8 @@ public class JSONDevice extends DefaultDevice implements IDevice {
 				belief = belief + ")";
 
 				//System.out.println(belief);
-				percepts.add(Literal.parseLiteral(belief));
+				//percepts.add(Literal.parseLiteral(belief));
+				percepts.add(customizeBelief(Literal.parseLiteral(belief)));
 			}
 
 			return percepts;
@@ -65,9 +67,6 @@ public class JSONDevice extends DefaultDevice implements IDevice {
 		return false;
 	}
 
-	@Override
-	public IPhysicalInterface getMicrocontroller() {
-		return (IPhysicalInterface) this.microcontroller;
-	}
+
 
 }

@@ -14,5 +14,13 @@ public interface IDevice {
 	public Collection<Literal> getPercepts() throws PerceivingException;
 	
 	public Atom getId();
+	
+	public void addEmbeddedAction(EmbeddedAction embeddedAction);
+	
+	public void removeEmbeddedAction(EmbeddedAction embeddedAction);
+	
+	public IEmbeddedAction getEmbeddedAction(Atom actionName);
+	
+	public boolean execEmbeddedAction(Atom actionName, Object[] args);
 
 }

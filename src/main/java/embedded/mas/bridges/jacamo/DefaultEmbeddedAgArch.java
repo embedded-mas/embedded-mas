@@ -7,10 +7,12 @@ import embedded.mas.exception.PerceivingException;
 import jason.architecture.AgArch;
 import jason.asSyntax.Literal;
 import static jason.asSyntax.ASSyntax.createLiteral;
+import static jason.asSyntax.ASSyntax.createAtom;
+
 
 public abstract class DefaultEmbeddedAgArch extends AgArch{
-	
-		
+
+
 	protected Collection <DefaultDevice> devices = null;
 
 
@@ -24,7 +26,7 @@ public abstract class DefaultEmbeddedAgArch extends AgArch{
 		Collection<Literal> p = super.perceive(); //get the default perceptions
 		Collection<Literal> sensorData = updateSensor(); //get the sensor data
 		if(p!=null&&sensorData!=null) //attach the sensor data in the default perception list
-		   p.addAll(sensorData);
+			p.addAll(sensorData);
 		else
 			if(sensorData!=null)
 				p = sensorData;
@@ -43,7 +45,7 @@ public abstract class DefaultEmbeddedAgArch extends AgArch{
 
 	}
 
-	
+
 	private final Collection<Literal> updateSensor() {
 		/* Same comment as in EmbeddeAgent.checkSensor
 		 * The architecture requres a list of devices to handle the perceptions. 
@@ -52,16 +54,19 @@ public abstract class DefaultEmbeddedAgArch extends AgArch{
 		   TODO: improve this */
 		if(this.devices==null) return null;
 		//*******************
-		
-		
+
+
 		ArrayList<Literal> percepts = new ArrayList<Literal>();
 		for(IDevice s:this.devices) { //for each sensor
 			try {
 				Collection<Literal> p = s.getPercepts();
-				for(Literal l:p)
-					l.addAnnot(createLiteral("device", s.getId()));
-				if(p!=null)
+				if(p!=null) {
+					for(Literal l:p) {
+						l.addAnnot(createLiteral("device", s.getId()));
+					}
+
 					percepts.addAll(p);//get all the sensor data
+				}
 			} catch (PerceivingException e) {} //if it fails, do nothing 			
 		}
 		if(percepts.size()==0) return null;

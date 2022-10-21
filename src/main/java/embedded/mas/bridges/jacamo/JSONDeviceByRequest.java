@@ -17,7 +17,7 @@ import embedded.mas.exception.PerceivingException;
 import jason.asSyntax.Atom;
 import jason.asSyntax.Literal;
 
-public class JSONDeviceByRequest extends DefaultDevice implements IDevice {
+public class JSONDeviceByRequest extends SerialDevice implements IDevice {
 	
 	public JSONDeviceByRequest(Atom id, IPhysicalInterface microcontroller) {
 		super(id, microcontroller);	
@@ -67,9 +67,5 @@ public class JSONDeviceByRequest extends DefaultDevice implements IDevice {
 		return false;
 	}
 
-	@Override
-	public IPhysicalInterface getMicrocontroller() {
-		return (IPhysicalInterface) this.microcontroller;
-	}
 	
 }
