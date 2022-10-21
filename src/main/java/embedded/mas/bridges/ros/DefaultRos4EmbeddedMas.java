@@ -216,12 +216,12 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 
 	@Override
 	public void execEmbeddedAction(EmbeddedAction action) {
-		if(action instanceof TopicWritingAction) 
+		/*if(action instanceof TopicWritingAction) 
 			rosWrite(((TopicWritingAction)action).getTopicName(), ((TopicWritingAction)action).getTopicType(), ((TopicWritingAction)action).getValue().toString());
 		else
 			if(action instanceof ServiceRequestAction) {
 				serviceRequest(((ServiceRequestAction)action).getServiceName(), ((ServiceRequestAction)action).getServiceParameters().toJson());
-			}
+			}*/
 
 	}
 
