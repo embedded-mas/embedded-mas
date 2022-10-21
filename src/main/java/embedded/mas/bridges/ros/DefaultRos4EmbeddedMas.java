@@ -16,6 +16,7 @@ import jason.asSyntax.Literal;
 import jason.asSyntax.parser.ParseException;
 import jason.asSyntax.parser.TokenMgrError;
 import static jason.asSyntax.ASSyntax.parseLiteral;
+import static jason.asSyntax.ASSyntax.createAtom;
 
 import java.util.*;
 
@@ -31,6 +32,12 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 
 	private RosListenDelegate listener = null;
 	private ArrayList<Literal> mensagens = new ArrayList<Literal>();
+	
+	
+	/*
+	 * beliefName is a map where the key is the name of the topic and the value is the corresponding belief functor
+	 */
+	private HashMap<String, Literal> beliefName = new HashMap<>();
 
 	/* topicValues is a hash where the key is the topic name and the value is the topic value.
 	 * It stores all the current read node values. When a node value changes, it is added to the hash table and updated 
@@ -45,15 +52,32 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 	private String connection=null;
 
 
-
 	//TODO: throw exception when topics and types have different sizes	
 	public DefaultRos4EmbeddedMas(String connectionStr, ArrayList<String> topics, ArrayList<String> types) {
+			createDefaultRos4EmbeddedMas(connectionStr, topics, types, null);
+	}
+
+	
+	//TODO: throw exception when topics and types have different sizes	
+	public DefaultRos4EmbeddedMas(String connectionStr, ArrayList<String> topics, ArrayList<String> types, ArrayList<String>beliefNames) {
+		createDefaultRos4EmbeddedMas(connectionStr, topics, types, beliefNames);
+	}
 
 
-		System.out.println("[DefaultRos4EmbeddedMas] creating... topics " + topics.size());
-		//bridge.connect("ws://localhost:" + port, true);
+	private void createDefaultRos4EmbeddedMas(String connectionStr, ArrayList<String> topics, ArrayList<String> types, ArrayList<String>beliefNames) {
 		this.connection = connectionStr;
 		bridge.connect(connectionStr, true);
+		
+		//TODO: throw exception when topics and belief names have different sizes
+		if(beliefNames==null) {
+			for(String s:topics)
+				this.beliefName.put(s, createAtom(s));
+		}else{
+			for(int i=0;i<topics.size();i++) {
+				this.beliefName.put(topics.get(i), createAtom(beliefNames.get(i)));
+			}
+		}
+		
 
 		listener = new RosListenDelegate() {
 			public void receive(JsonNode data, String stringRep) {
@@ -61,7 +85,7 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 					try {						
 						Literal p = customizeBelief(data.get("topic").textValue(),data.get("msg"));
 						if(p==null) {
-							Literal functor = parseLiteral(data.get("topic").textValue().replaceAll("/", "_"));
+							Literal functor = beliefName.get(data.get("topic").textValue().replaceAll("/", "_"));
 							String terms = jsonToPredArguments(data.get("msg"));
 							p = parseLiteral(functor+"("+terms+")");
 						}
