@@ -6,6 +6,7 @@ import java.util.HashMap;
 import embedded.mas.exception.EmbeddedActionException;
 import embedded.mas.exception.EmbeddedActionNotFoundException;
 import embedded.mas.exception.PerceivingException;
+import jason.asSemantics.Unifier;
 import jason.asSyntax.Atom;
 import jason.asSyntax.Literal;
 
@@ -38,7 +39,7 @@ public class SerialDevice extends DefaultDevice {
 	}
 
 	@Override
-	public boolean execEmbeddedAction(String actionName, Object[] args)
+	public boolean execEmbeddedAction(String actionName, Object[] args, Unifier un)
 			throws EmbeddedActionNotFoundException, EmbeddedActionException {
 		return false;
 	}

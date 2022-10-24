@@ -14,6 +14,7 @@ import javax.json.JsonObject;
 import javax.json.JsonReader;
 
 import embedded.mas.exception.PerceivingException;
+import jason.asSemantics.Unifier;
 import jason.asSyntax.Atom;
 import jason.asSyntax.Literal;
 
@@ -62,11 +63,14 @@ public class JSONDevice extends SerialDevice implements IDevice {
 	}
 
 	@Override
-	public boolean execEmbeddedAction(String actionName, Object[] args) {
+	public boolean execEmbeddedAction(String actionName, Object[] args, Unifier Un) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
-
+	@Override
+	public IPhysicalInterface getMicrocontroller() {
+		return (IPhysicalInterface) this.microcontroller;
+	}
 
 }
