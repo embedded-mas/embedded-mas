@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import embedded.mas.exception.PerceivingException;
+import jason.asSemantics.Unifier;
 import jason.asSyntax.Atom;
 import jason.asSyntax.Literal;
 
@@ -28,7 +29,7 @@ public class RxTxDevice extends DefaultDevice implements IDevice{
 	}
 	
 	@Override
-	public boolean execEmbeddedAction(String actionName, Object[] args) {
+	public boolean execEmbeddedAction(String actionName, Object[] args, Unifier un) {
 		// TODO Auto-generated method stub
 		return false;
 	}

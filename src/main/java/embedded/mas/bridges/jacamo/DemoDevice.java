@@ -5,8 +5,12 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import jason.asSemantics.Unifier;
 import jason.asSyntax.Atom;
 import jason.asSyntax.Literal;
+import jason.asSyntax.NumberTerm;
+import jason.asSyntax.NumberTermImpl;
+import jason.asSyntax.Term;
 
 
 
@@ -45,9 +49,16 @@ public class DemoDevice extends DefaultDevice  {
 	}
 
 	@Override
-	public boolean execEmbeddedAction(String actionName, Object[] args) {
+	public boolean execEmbeddedAction(String actionName, Object[] args, Unifier un) {
 		if(actionName.equals("print"))
-			return doEmbeddedPrint(args[0].toString());
+			return doEmbeddedPrint(args[0].toString());	
+		else
+			if(actionName.equals("double")) { 
+				double r = Double.parseDouble(args[0].toString()) * 2;
+				NumberTerm result = new NumberTermImpl(r);
+				return un.unifies(result, (Term) args[1]);			
+
+			}
 		return false;
 	}
 	
@@ -64,8 +75,24 @@ public class DemoDevice extends DefaultDevice  {
 	
 	
 	@Override
-	public boolean execEmbeddedAction(Atom actionName,Object[] args) {
-		EmbeddedAction action = getEmbeddedAction(actionName);
+	public void addEmbeddedAction(EmbeddedAction embeddedAction) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void removeEmbeddedAction(EmbeddedAction embeddedAction) {
+		// TODO Auto-generated method stub
+
+	}
+
+	
+
+
+
+	@Override
+	public boolean execEmbeddedAction(Atom actionName, Object[] args) {
+		IEmbeddedAction action = getEmbeddedAction(actionName);
 		if(action!=null) {
 			if(action instanceof EmbeddedAtomAction) {
 				String arguments = "";

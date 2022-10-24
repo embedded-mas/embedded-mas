@@ -3,10 +3,10 @@ package embedded.mas.bridges.jacamo;
 import java.util.Collection;
 import java.util.HashMap;
 
-import embedded.mas.bridges.ros.TopicWritingAction;
 import embedded.mas.exception.EmbeddedActionException;
 import embedded.mas.exception.EmbeddedActionNotFoundException;
 import embedded.mas.exception.PerceivingException;
+import jason.asSemantics.Unifier;
 import jason.asSyntax.Atom;
 import jason.asSyntax.Literal;
 
@@ -68,10 +68,13 @@ public abstract class DefaultDevice implements IDevice {
 	 * @param actionName
 	 * @return
 	 */
-	public abstract boolean execEmbeddedAction(String actionName, Object[] args)
-			throws EmbeddedActionNotFoundException, EmbeddedActionException;
+	public final boolean execEmbeddedAction(String actionName, Object[] args) throws EmbeddedActionNotFoundException,EmbeddedActionException{
+		return execEmbeddedAction(actionName, args, null);
+	}
 
-	@Override
+	public abstract boolean execEmbeddedAction(String actionName, Object[] args, Unifier un) throws EmbeddedActionNotFoundException,EmbeddedActionException;
+
+    @Override
 	public boolean execEmbeddedAction(Atom actionName, Object[] args) {		
 		return false;
 	}

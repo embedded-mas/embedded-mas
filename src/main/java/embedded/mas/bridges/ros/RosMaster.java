@@ -1,9 +1,16 @@
 package embedded.mas.bridges.ros;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import static embedded.mas.bridges.jacamo.Utils.jsonToPredArguments;
 
 import embedded.mas.bridges.jacamo.LiteralDevice;
+import jason.asSemantics.Unifier;
 import jason.asSyntax.Atom;
+import jason.asSyntax.Literal;
+import jason.asSyntax.parser.ParseException;
+import jason.asSyntax.parser.TokenMgrError;
+
+import static jason.asSyntax.ASSyntax.parseLiteral;
 import static jason.asSyntax.ASSyntax.createAtom;
 
 public class RosMaster extends LiteralDevice {
@@ -14,7 +21,24 @@ public class RosMaster extends LiteralDevice {
 	}
 
 	protected final boolean serviceRequest(String serviceName, ServiceParameters parameters) {
-		return ((DefaultRos4EmbeddedMas) microcontroller).serviceRequest(serviceName, parameters.toJson()); 
+		if(parameters==null)
+			return ((DefaultRos4EmbeddedMas) microcontroller).serviceRequest(serviceName, null);	 
+		else
+			return ((DefaultRos4EmbeddedMas) microcontroller).serviceRequest(serviceName, parameters.toJson()); 
+	}
+
+	protected Literal serviceRequestResponse(String serviceName, ServiceParameters parameters) {
+		try {
+			if(parameters==null)
+				return parseLiteral(jsonToPredArguments(((DefaultRos4EmbeddedMas) microcontroller).serviceRequestResponse(serviceName, null).get("values")));			
+			else
+				return parseLiteral(jsonToPredArguments(((DefaultRos4EmbeddedMas) microcontroller).serviceRequestResponse(serviceName, parameters.toJson())));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		} catch (TokenMgrError e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	protected final boolean blockingServiceRequest(String serviceName, ServiceParameters parameters) {
@@ -29,8 +53,9 @@ public class RosMaster extends LiteralDevice {
 
 
 	@Override
-	public boolean execEmbeddedAction(String actionName, Object[] args) {
-	/*	EmbeddedAction action = this.embeddedActions.get(createAtom(actionName));
+	public boolean execEmbeddedAction(String actionName, Object[] args, Unifier un) {
+		EmbeddedAction action = this.embeddedActions.get(createAtom(actionName));
+
 		if(action!=null)
 			if(action instanceof TopicWritingAction) {
 				((TopicWritingAction)action).setValue(args[0]);
@@ -39,6 +64,7 @@ public class RosMaster extends LiteralDevice {
 			else
 				if(action instanceof ServiceRequestAction) {
 					for(int i=0;i<args.length;i++) { //set service params
+						//TODO: implement service response handling
 						((ServiceRequestAction)action).getServiceParameters().get(i).setParamValue(args[i]);						
 					}					
 					this.getMicrocontroller().execEmbeddedAction(action);

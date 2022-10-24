@@ -4,6 +4,7 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Atom;
 import jason.asSyntax.ListTermImpl;
+import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Term;
 
 import static jason.asSyntax.ASSyntax.createAtom;
@@ -54,18 +55,27 @@ public class defaultEmbeddedInternalAction extends EmbeddedInternalAction {
 
 			else {//Case 2. The action is implemented as java code in the device (old style)				
 				if(args[2] instanceof ListTermImpl){ //if arguments in args[2] are a list 
-					String[] arguments = new String[((ListTermImpl)args[2]).size()];			
+					Term[] arguments = new Term[((ListTermImpl)args[2]).size()];			
 					for(int i=0;i<((ListTermImpl)args[2]).size();i++) {
-						arguments[i] = ((ListTermImpl)args[2]).get(i).toString().replaceAll("\"(.+)\"", "$1");
+						arguments[i] = adaptTerm(((ListTermImpl)args[2]).get(i));
 					}
-					return device.execEmbeddedAction(args[1].toString().replaceAll("\"(.+)\"", "$1"), arguments);
+					return device.execEmbeddedAction(args[1].toString().replaceAll("\"(.+)\"", "$1"), arguments,un);
 				}
 				else { //default condition
-					return device.execEmbeddedAction(args[1].toString().replaceAll("\"(.+)\"", "$1"), new String[]{args[2].toString().replaceAll("\"(.+)\"", "$1")});
+					return device.execEmbeddedAction(args[1].toString().replaceAll("\"(.+)\"", "$1"), new String[]{args[2].toString().replaceAll("\"(.+)\"", "$1")},un);
 				}
 
 			}
 
+
+			
 		}else return false;
+	}
+	
+	private Term adaptTerm(Term t) {
+		if(t.toString().matches("\"(.+)\"")) 
+			return new StringTermImpl(t.toString().replaceAll("\"(.+)\"", "$1")); 
+		return t;
+		
 	}
 }
