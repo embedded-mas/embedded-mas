@@ -11,7 +11,6 @@ import jason.asSyntax.parser.ParseException;
 import jason.asSyntax.parser.TokenMgrError;
 
 import static jason.asSyntax.ASSyntax.parseLiteral;
-import static jason.asSyntax.ASSyntax.createAtom;
 
 public class RosMaster extends LiteralDevice {
 
@@ -54,7 +53,7 @@ public class RosMaster extends LiteralDevice {
 
 	@Override
 	public boolean execEmbeddedAction(String actionName, Object[] args, Unifier un) {
-		EmbeddedAction action = this.embeddedActions.get(createAtom(actionName));
+		/*EmbeddedAction action = this.embeddedActions.get(createAtom(actionName));
 
 		if(action!=null)
 			if(action instanceof TopicWritingAction) {
