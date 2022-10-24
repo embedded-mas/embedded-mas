@@ -193,9 +193,7 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 		else
 			if(action instanceof ServiceRequestAction) {
 				serviceRequest(((ServiceRequestAction)action).getServiceName(), ((ServiceRequestAction)action).getServiceParameters().toJson());
-			}
-			*/
-
+			}*/
 	}
 
 }
