@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.List;
 
 import embedded.mas.exception.PerceivingException;
+import jason.asSemantics.Unifier;
 import jason.asSyntax.Atom;
 import jason.asSyntax.Literal;
 
@@ -20,13 +21,12 @@ public class LiteralDevice extends DefaultDevice implements IDevice {
 
 	@Override
 	public Collection<Literal> getPercepts() throws PerceivingException {
-		//System.out.println("[LiteralDevice] doing get percepts " + this.microcontroller.getClass().getName());
 		List<Literal> beliefs = microcontroller.read();
 		return beliefs;
 	}
 
 	@Override
-	public boolean execEmbeddedAction(String topic,  Object[] args) {
+	public boolean execEmbeddedAction(String topic,  Object[] args, Unifier un) {
 		return false;
 	}
 
