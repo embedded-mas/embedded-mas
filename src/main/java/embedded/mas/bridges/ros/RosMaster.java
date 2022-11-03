@@ -3,6 +3,7 @@ package embedded.mas.bridges.ros;
 import com.fasterxml.jackson.databind.JsonNode;
 import static embedded.mas.bridges.jacamo.Utils.jsonToPredArguments;
 
+import embedded.mas.bridges.jacamo.EmbeddedAction;
 import embedded.mas.bridges.jacamo.LiteralDevice;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Atom;
@@ -74,7 +75,8 @@ public class RosMaster extends LiteralDevice {
 
 	@Override
 	public boolean execEmbeddedAction(Atom actionName,Object[] args) {
-		/*EmbeddedAction action = this.embeddedActions.get(actionName);
+		System.out.println("[RosMaster] going to exec action " + actionName);
+		EmbeddedAction action = this.embeddedActions.get(actionName);
 		if(action!=null)
 			if(action instanceof TopicWritingAction) {
 				((TopicWritingAction)action).setValue(args[0]);
@@ -85,10 +87,10 @@ public class RosMaster extends LiteralDevice {
 					for(int i=0;i<args.length;i++) { //set service params
 						((ServiceRequestAction)action).getServiceParameters().get(i).setParamValue(args[i]);						
 					}					
+					System.out.println("[RosMaster] going to exec action 2 " + actionName);
 					this.getMicrocontroller().execEmbeddedAction(action);
 				}
-		return true;*/
-		return false;
+		return true;
 	}
 	
 	

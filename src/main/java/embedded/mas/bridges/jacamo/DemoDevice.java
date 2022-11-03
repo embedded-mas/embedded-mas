@@ -73,18 +73,6 @@ public class DemoDevice extends DefaultDevice  {
 	}
 
 	
-	
-	@Override
-	public void addEmbeddedAction(EmbeddedAction embeddedAction) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void removeEmbeddedAction(EmbeddedAction embeddedAction) {
-		// TODO Auto-generated method stub
-
-	}
 
 	
 

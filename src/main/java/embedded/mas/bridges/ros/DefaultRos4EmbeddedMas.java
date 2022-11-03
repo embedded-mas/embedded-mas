@@ -162,6 +162,7 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 
 	@Override
 	public boolean serviceRequest(String serviceName, JsonNode serviceArguments) {
+		System.out.println("[DefaultRos4EmbeddedMas] requesting service  " +  serviceName + " - " + serviceArguments.textValue());
 		return this.bridge.doServiceRequest(serviceName, serviceArguments);
 	}
 
@@ -187,13 +188,14 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 	}
 
 	@Override
-	public void execEmbeddedAction(EmbeddedAction action) {
-		/*if(action instanceof TopicWritingAction) 
+	public void execEmbeddedAction(EmbeddedAction action) {		
+		if(action instanceof TopicWritingAction) 
 			rosWrite(((TopicWritingAction)action).getTopicName(), ((TopicWritingAction)action).getTopicType(), ((TopicWritingAction)action).getValue().toString());
 		else
 			if(action instanceof ServiceRequestAction) {
+				System.out.println("[DefaultRos4EmbeddedMas] going to exec action  " + action.getActionName() + ((ServiceRequestAction)action).getServiceParameters());
 				serviceRequest(((ServiceRequestAction)action).getServiceName(), ((ServiceRequestAction)action).getServiceParameters().toJson());
-			}*/
+			}
 	}
 
 }

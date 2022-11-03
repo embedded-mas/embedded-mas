@@ -1,14 +1,27 @@
 package embedded.mas.bridges.ros;
 
+import java.util.Arrays;
+
+import embedded.mas.exception.InvalidRosServiceParameterTypeException;
+
 public class ServiceParam {
 	
 	private String paramName;
 	private Object paramValue;
-	
-	public ServiceParam(String paramName, Object paramValue) {
+	private String paramType;
+
+
+	private String[] paramTypes = {"float32","uint8","string"};
+
+	public ServiceParam(String paramName, Object paramValue, String paramType)// throws InvalidRosServiceParameterTypeException 
+	{
 		super();
-		this.paramName = paramName;
-		this.paramValue = paramValue;
+		//if(Arrays.stream(this.paramTypes).anyMatch(paramType::equals)){			
+			this.paramName = paramName;
+			this.paramValue = paramValue;				
+			this.setParamType(paramType);
+		//}else
+		//	throw new InvalidRosServiceParameterTypeException("Invalid ros service parameter type: " + paramType);
 	}
 
 	public String getParamName() {
@@ -26,7 +39,19 @@ public class ServiceParam {
 	public void setParamValue(Object paramValue) {
 		this.paramValue = paramValue;
 	}
-	
+
+	public String getParamType() {
+		return paramType;
+	}
+
+	public void setParamType(String paramType)// throws InvalidRosServiceParameterTypeException 
+	{
+		//if(Arrays.asList(this.paramTypes).contains(paramType))
+			this.paramType = paramType;
+		//else
+		//	throw new InvalidRosServiceParameterTypeException("Invalid ros service parameter type: " + paramType);
+	}
+
 	/**
 	 * Return a string in the key-value json format
 	 * @return
@@ -67,8 +92,10 @@ public class ServiceParam {
 
 	@Override
 	public String toString() {
-		return "ServiceParam [paramName=" + paramName + ", paramValue=" + paramValue + "]";
+		return "ServiceParam [paramName=" + paramName + ", paramValue=" + paramValue + ", paramType=" + paramType + "]";
 	}
+
+
 
 
 
