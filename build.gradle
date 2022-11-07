@@ -16,7 +16,7 @@ plugins {
 }
 
 
-version = '0.05013-CONF'
+version = '0.05025-CONF'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8

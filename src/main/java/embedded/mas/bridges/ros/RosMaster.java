@@ -75,7 +75,6 @@ public class RosMaster extends LiteralDevice {
 
 	@Override
 	public boolean execEmbeddedAction(Atom actionName,Object[] args) {
-		System.out.println("[RosMaster] going to exec action " + actionName);
 		EmbeddedAction action = this.embeddedActions.get(actionName);
 		if(action!=null)
 			if(action instanceof TopicWritingAction) {
@@ -87,7 +86,6 @@ public class RosMaster extends LiteralDevice {
 					for(int i=0;i<args.length;i++) { //set service params
 						((ServiceRequestAction)action).getServiceParameters().get(i).setParamValue(args[i]);						
 					}					
-					System.out.println("[RosMaster] going to exec action 2 " + actionName);
 					this.getMicrocontroller().execEmbeddedAction(action);
 				}
 		return true;
