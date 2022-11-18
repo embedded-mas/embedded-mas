@@ -29,6 +29,6 @@ The agent has a perception "light_state(S)" (where S=1 means led on; S=0 means l
 #### Arduino requirements ###
 1. [ArduinoJson](https://arduinojson.org/)
 1. [Rosserial Arduino Library](https://github.com/frankjoshua/rosserial_arduino_lib)
-   Procedure required after installation: edit the ```msg.h``` file (usually located Arduino/libraries/Rosserial_Arduino_Library/src/ros in line 40 write ```#include <string.h>``` and in line 68 and 182 remove ```std:: before memcpy``` 
+   1.1 Procedure required after installation: edit the ```msg.h``` file (usually located in Arduino/libraries/Rosserial_Arduino_Library/src/ros in line 40 write ```#include <string.h>``` and in line 68 and 182 remove ```std:: before memcpy``` 
 1. Embedded Protocol 
-   Installation: copy the [Embedded_Protocol_2 folder](https://github.com/embedded-mas/embedded-mas/tree/master/src/arduino/Embedded_Protocol_2) to the Arduino libraries folder (in Linux, tipically ~/Arduino/)
+   1.1 Installation: copy the [Embedded_Protocol_2 folder](https://github.com/embedded-mas/embedded-mas/tree/master/src/arduino/Embedded_Protocol_2) to the Arduino libraries folder (in Linux, tipically ~/Arduino/)
