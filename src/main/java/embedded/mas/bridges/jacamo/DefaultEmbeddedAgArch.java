@@ -7,10 +7,9 @@ import embedded.mas.exception.PerceivingException;
 import jason.architecture.AgArch;
 import jason.asSyntax.Literal;
 import static jason.asSyntax.ASSyntax.createLiteral;
-import static jason.asSyntax.ASSyntax.createAtom;
 
 
-public abstract class DefaultEmbeddedAgArch extends AgArch{
+public class DefaultEmbeddedAgArch extends AgArch{
 
 
 	protected Collection <DefaultDevice> devices = null;
@@ -24,7 +23,10 @@ public abstract class DefaultEmbeddedAgArch extends AgArch{
 	@Override
 	public Collection<Literal> perceive() {
 		Collection<Literal> p = super.perceive(); //get the default perceptions
-		Collection<Literal> sensorData = updateSensor(); //get the sensor data
+		Collection<Literal> sensorData = null;
+		if(devices!=null)
+			sensorData = updateSensor(); //get the sensor data	
+		
 		if(p!=null&&sensorData!=null) //attach the sensor data in the default perception list
 			p.addAll(sensorData);
 		else
@@ -52,22 +54,24 @@ public abstract class DefaultEmbeddedAgArch extends AgArch{
 		   In some point after the agent creation, an architecture other than DefaultEmbeddedAgArch is set and the list of sensor is lost.
 		   This method update the list of devices if it is null.
 		   TODO: improve this */
-		if(this.devices==null) return null;
-		//*******************
-
-
 		ArrayList<Literal> percepts = new ArrayList<Literal>();
-		for(IDevice s:this.devices) { //for each sensor
-			try {
-				Collection<Literal> p = s.getPercepts();
-				if(p!=null) {
-					for(Literal l:p) {
-						l.addAnnot(createLiteral("device", s.getId()));
-					}
+		synchronized (this.devices) {
 
-					percepts.addAll(p);//get all the sensor data
-				}
-			} catch (PerceivingException e) {} //if it fails, do nothing 			
+			if(this.devices==null) return null;
+			//*******************
+			
+			for(IDevice s:this.devices) { //for each sensor
+				try {
+					Collection<Literal> p = s.getPercepts();
+					if(p!=null) {
+						for(Literal l:p) {
+							l.addAnnot(createLiteral("device", s.getId()));
+						}
+
+						percepts.addAll(p);//get all the sensor data
+					}
+				} catch (PerceivingException e) {} //if it fails, do nothing 			
+			}
 		}
 		if(percepts.size()==0) return null;
 		return percepts;

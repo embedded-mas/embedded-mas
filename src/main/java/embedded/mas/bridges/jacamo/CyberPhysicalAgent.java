@@ -87,8 +87,15 @@ public abstract class CyberPhysicalAgent extends Agent {
 		
 		@Override
 		public void run() {			
-			while(arch==null)  
-				arch = getEmbeddedArch();			
+			while(arch==null) {  
+				arch = getEmbeddedArch();
+				try {
+					Thread.sleep(10);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 			arch.setDevices(devices);
 			return;
 		}
