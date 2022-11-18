@@ -7,8 +7,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import embedded.mas.exception.InvalidRosServiceParameterTypeException;
-
 public class ServiceParameters extends ArrayList<ServiceParam> {
 	
 	public JsonNode toJson() {
@@ -29,8 +27,8 @@ public class ServiceParameters extends ArrayList<ServiceParam> {
 		}
 	}
 
-	public boolean addParameter(String parameterName, Object ParameterValue, String parameterType) throws InvalidRosServiceParameterTypeException {
-		this.add(new ServiceParam(parameterName, ParameterValue, parameterType));
+	public boolean addParameter(String parameterName, Object ParameterValue) {
+		this.add(new ServiceParam(parameterName, ParameterValue));
 		return true;		
 	}
 
