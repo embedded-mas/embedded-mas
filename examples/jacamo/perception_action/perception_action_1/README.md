@@ -22,5 +22,13 @@ The agent has a perception "light_state(S)" (where S=1 means led on; S=0 means l
 		
 		(e.g. sudo chmod a+rw /dev/ttyUSB0)
 
-1. Load the program [read_char](arduino/lights/lights.ino) to an Arduino
+1. Load [this code](arduino/lights/lights.ino) to an Arduino
 1. In a terminal, type ```./gradlew run -q --console=plain ```
+
+
+#### Arduino requirements ###
+1. [ArduinoJson](https://arduinojson.org/)
+1. [Rosserial Arduino Library](https://github.com/frankjoshua/rosserial_arduino_lib)
+   Procedure required after installation: edit the ```msg.h``` file (usually located Arduino/libraries/Rosserial_Arduino_Library/src/ros in line 40 write ```#include <string.h>``` and in line 68 and 182 remove ```std:: before memcpy``` 
+1. Embedded Protocol 
+   Installation: copy the [Embedded_Protocol_2 folder](https://github.com/embedded-mas/embedded-mas/tree/master/src/arduino/Embedded_Protocol_2) to the Arduino libraries folder (in Linux, tipically ~/Arduino/)
