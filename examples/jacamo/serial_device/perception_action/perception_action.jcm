@@ -15,9 +15,7 @@
 mas architecture_1 {
 
     agent sample_agent{
-      //ag-class: DemoEmbeddedAgent
-      //ag-arch: DemoEmbeddedAgentArch
-      ag-class: embedded.mas.bridges.jacamo.EmbeddedAgent      
+      ag-class: embedded.mas.bridges.jacamo.CyberPhysicalAgent      
       ag-arch: embedded.mas.bridges.jacamo.DefaultEmbeddedAgArch
     }
 

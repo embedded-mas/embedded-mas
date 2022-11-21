@@ -5,9 +5,8 @@
       .wait(500);
       !move.
       
-      
-+turtle1_pose(x(X),y(Y),theta(T),linear_velocity(LV),angular_velocity(AV))
-   <- .print("Position changed. x: ", X, "; y: ", Y, "; theta: ", T, "; linear velocity: ", LV, "; angular velocity: ", AV).
++turtle_position(x(X),y(Y),theta(T),linear_velocity(LV),angular_velocity(AV))
+   <- .print("Position changed. x: ", X, "; y: ", Y, "; theta: ", T, "; linear velocity: ", LV, "; angular velocity: ", AV).  
       
      
  

@@ -14,10 +14,9 @@
 
 mas perception_action {
 
-    agent sample_agent{
-      //ag-class: DemoEmbeddedAgentROS
-      ag-class: embedded.mas.bridges.jacamo.EmbeddedAgent
-      ag-arch: DemoEmbeddedAgentArch
+    agent sample_agent{    
+      ag-class: embedded.mas.bridges.jacamo.CyberPhysicalAgent
+      ag-arch: embedded.mas.bridges.jacamo.DefaultEmbeddedAgArch
     }
 
 

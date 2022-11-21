@@ -13,7 +13,7 @@
       embedded.mas.bridges.jacamo.defaultEmbeddedInternalAction("sample_roscore","update_value1",V+1 ).
      
 /* The plans below illustrate the reading of string values and the writing to ros topics */      
-+current_time(V) : .time(H,M,S) & .concat(H,":",M,":",S,Msg)
++current_hour(V) : .time(H,M,S) & .concat(H,":",M,":",S,Msg)
    <-.print("Read time ", V, " - ", Msg);
      .wait(2000);
      embedded.mas.bridges.jacamo.defaultEmbeddedInternalAction("sample_roscore","update_time",Msg).

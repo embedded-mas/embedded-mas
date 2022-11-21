@@ -18,38 +18,22 @@
       className: DefaultRos4EmbeddedMas  
       #perceptionTopics: List of topics whose values are converted into perceptions.
       #                  Each topic requires to define its name and its type.   
-      perceptionTopics:
-         - topicName: value1
-           topicType: std_msgs/Int32
-         - topicName: value2
-           topicType: std_msgs/Int32  
-         - topicName: current_time
-           topicType: std_msgs/String
-         - topicName: turtle1/pose
-           topicType: turtlesim/Pose
-      #actions: An agent acts upon ROS by topic writings and service requests, configured in the items topicWritingActions and serviceRequestActions, respectively.
-      #         This example illustrate only topic writing actions. An example of service request action configuration is commented below.   
-      actions:       
-        #Each topic writing action requires to configure three parameters:
-        # 1. actionName: the name of the action performed by the agent
-        # 2. topicName: the name of the topic affected by the action
-        # 3. topicType: the type of the topic.
-        # For example, the first configured action defines that, when a agent executes the action update_value1, the corresponding atuation 
-        #    is the writing of an integer value in the topic value1. The written value is the parameter of the action triggered by the agent.
-        topicWritingActions:          
-          - actionName: update_value1
-            topicName: /value1
-            topicType: std_msgs/Int32
-          - actionName: update_value2              
-            topicName: /value2
-            topicType: std_msgs/Int32
-          - actionName: update_time              
-            topicName: /current_time
-            topicType: std_msgs/String  
-        serviceRequestActions:
-           - actionName: move_turtle
-             serviceName: /turtle1/teleport_relative
-             params:
-                - linear
-                - angular
+  perceptionTopics:         
+      - topicName: turtle1/pose
+        topicType: turtlesim/Pose
+        beliefName: turtle_position
+  #actions: An agent acts upon ROS by topic writings and service requests, configured in the items topicWritingActions and serviceRequestActions, respectively.
+  #         This example illustrate only service request actions. 
+  actions:       
+    #Each topic writing action requires to configure three parameters:
+    # 1. actionName: the name of the action performed by the agent
+    # 2. serviceName: the name of the service to be called
+    # 3. params: a list of the names of parameters required by the service
+    serviceRequestActions:
+        - actionName: move_turtle
+          serviceName: /turtle1/teleport_relative
+          params:
+            - linear
+            - angular
+            
 
