@@ -5,3 +5,4 @@ This folder includes examples of Jason agents with ROS. All the examples illustr
 1. [perception_action_topicWritingAction](perception_action_topicWritingAction): actions of the agents are based on writing in ROS topics.
 1. [perception_action_serviceAction](perception_action_serviceAction): actions of the agents are based on requesting ROS services.
 
+These are basic examples of Jason-ROS integration. Advanced examples are available [here](https://github.com/embedded-mas/ros-devs/tree/main/examples).
