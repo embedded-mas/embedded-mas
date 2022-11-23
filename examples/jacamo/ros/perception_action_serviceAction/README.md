@@ -1,7 +1,9 @@
 # Example of ROS-Based agent
 
 ## Scenario
-This example illustrates agent actions that correspond to ROS service requests. It contains a randomly moving turtle agent. The moviment is commanded through a ROS service. 
+This example illustrates agent actions that correspond to ROS service requests. It contains a randomly moving turtle agent (see the agent code [here](src/agt/sample_agent.asl)). The turtle agent moves itself by executing the action ```move_turtle```. This action is concretely realized through the ROS service ```/turtle1/teleport_relative```. This service does not have a response message. Actions based on services without response handling are triggered by the ```defaultEmbeddedInternalAction``` internal action.
+
+To illustrate actions that consider the service responses, the agent also executes the action ```get_loggers```.  This action is concretely realized through the ROS service ```/turtlesim/get_loggers```. This service produces a response, which the agent prints in the console. Actions based on services with response handling are triggered by the ```requestResponseEmbeddedInternalAction``` internal action.
 
 
 ## Requirements
@@ -25,11 +27,6 @@ roslaunch rosbridge_server rosbridge_websocket.launch
 3. Launch the turtlesim simulator
 ```
 rosrun turtlesim turtlesim_node
-```
-
-Optionally, launch all the ROS requirements simultaneously (Linux systems)
-```
-roscore & roslaunch rosbridge_server rosbridge_websocket.launch & rosrun turtlesim turtlesim_node
 ```
 
 4. Launch the JaCaMo application:
@@ -68,5 +65,5 @@ The actions enabled by the actuators connected to a <em>device</em> may be inclu
 
    - ```params```: a list of the names of parameters required by the service.
 
-In this example, the requested service does not have a response message. Services with responses are not supported in yaml configurations and require a different setup, as shown [here](https://github.com/embedded-mas/ros-devs/tree/main/examples/services). The yaml configuration of services with responses will be available soon.
+
 

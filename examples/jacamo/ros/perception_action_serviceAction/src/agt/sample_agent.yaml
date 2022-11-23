@@ -34,6 +34,9 @@
           serviceName: /turtle1/teleport_relative
           params:
             - linear
-            - angular
+            - angular          
+        - actionName: get_loggers
+          serviceName: /turtlesim/get_loggers          
+          #this action does not have any parameters
             
 
