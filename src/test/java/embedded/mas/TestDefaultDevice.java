@@ -12,6 +12,7 @@ import static jason.asSyntax.ASSyntax.createAtom;
 import embedded.mas.bridges.jacamo.DemoDevice;
 import embedded.mas.bridges.jacamo.EmbeddedAtomAction;
 import embedded.mas.bridges.jacamo.LiteralDevice;
+import jason.asSemantics.Unifier;
 import jason.asSyntax.Literal;
 
 public class TestDefaultDevice {
@@ -58,7 +59,7 @@ public class TestDefaultDevice {
 		PrintStream originalOut = System.out;
 		System.setOut(new PrintStream(out));
 		
-		device.execEmbeddedAction(createAtom("print"), new Object[] {Integer.valueOf(12345), "abcde"});
+		device.execEmbeddedAction(createAtom("print"), new Object[] {Integer.valueOf(12345), "abcde"}, new Unifier());
 				
 		assertEquals("[doPrint]12345abcde", out.toString().trim());
 		

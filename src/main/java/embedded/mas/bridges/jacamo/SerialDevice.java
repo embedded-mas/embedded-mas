@@ -30,7 +30,7 @@ public class SerialDevice extends DefaultDevice {
 	}
 
 	@Override
-	public boolean execEmbeddedAction(Atom actionName, Object[] args) {
+	public boolean execEmbeddedAction(Atom actionName, Object[] args, Unifier un) {
 		EmbeddedAction action = getEmbeddedAction(actionName);		
 		if(action instanceof SerialEmbeddedAction) {
 			return this.getMicrocontroller().write(((SerialEmbeddedAction)action).getActuationName().toString());
