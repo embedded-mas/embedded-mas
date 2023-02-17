@@ -3,10 +3,12 @@ package embedded.mas.bridges.ros;
 import com.fasterxml.jackson.databind.JsonNode;
 import static embedded.mas.bridges.jacamo.Utils.jsonToPredArguments;
 
+import embedded.mas.bridges.jacamo.EmbeddedAction;
 import embedded.mas.bridges.jacamo.LiteralDevice;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Atom;
 import jason.asSyntax.Literal;
+import jason.asSyntax.Term;
 import jason.asSyntax.parser.ParseException;
 import jason.asSyntax.parser.TokenMgrError;
 
@@ -54,7 +56,7 @@ public class RosMaster extends LiteralDevice {
 
 	@Override
 	public boolean execEmbeddedAction(String actionName, Object[] args, Unifier un) {
-		EmbeddedAction action = this.embeddedActions.get(createAtom(actionName));
+		/*EmbeddedAction action = this.embeddedActions.get(createAtom(actionName));
 
 		if(action!=null)
 			if(action instanceof TopicWritingAction) {
@@ -73,9 +75,29 @@ public class RosMaster extends LiteralDevice {
 		return false;
 	}
 
+
+
+	public boolean execEmbeddedAction(String actionName, Object[] args, Term returnArg, Unifier un) throws Exception {
+		EmbeddedAction action = this.embeddedActions.get(createAtom(actionName));			
+		if(action instanceof ServiceRequestAction) {
+			Literal response;
+			if(args==null)
+				response = this.serviceRequestResponse(((ServiceRequestAction)action).getServiceName(), null);
+			else {
+				for(int i=0;i<args.length;i++) { //set service params
+					((ServiceRequestAction)action).getServiceParameters().get(i).setParamValue(args[i]);						
+				}			  
+				response = this.serviceRequestResponse(((ServiceRequestAction)action).getServiceName(), ((ServiceRequestAction)action).getServiceParameters());
+			}
+			return un.unifies(response, returnArg);
+		}else
+			throw new Exception("Action must be of class " + ((ServiceRequestAction)action).getClass().getName());
+	}
+
+
 	@Override
-	public boolean execEmbeddedAction(Atom actionName,Object[] args) {
-		/*EmbeddedAction action = this.embeddedActions.get(actionName);
+	public boolean execEmbeddedAction(Atom actionName,Object[] args, Unifier un) {
+		EmbeddedAction action = this.embeddedActions.get(actionName);
 		if(action!=null)
 			if(action instanceof TopicWritingAction) {
 				((TopicWritingAction)action).setValue(args[0]);
@@ -88,8 +110,7 @@ public class RosMaster extends LiteralDevice {
 					}					
 					this.getMicrocontroller().execEmbeddedAction(action);
 				}
-		return true;*/
-		return false;
+		return true;
 	}
 	
 	

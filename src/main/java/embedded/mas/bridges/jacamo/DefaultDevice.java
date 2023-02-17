@@ -75,7 +75,7 @@ public abstract class DefaultDevice implements IDevice {
 	public abstract boolean execEmbeddedAction(String actionName, Object[] args, Unifier un) throws EmbeddedActionNotFoundException,EmbeddedActionException;
 
     @Override
-	public boolean execEmbeddedAction(Atom actionName, Object[] args) {		
+	public boolean execEmbeddedAction(Atom actionName, Object[] args, Unifier un) {		
 		return false;
 	}
 	

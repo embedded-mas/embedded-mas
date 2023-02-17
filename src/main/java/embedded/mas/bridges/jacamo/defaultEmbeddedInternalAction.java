@@ -4,6 +4,7 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Atom;
 import jason.asSyntax.ListTermImpl;
+import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Term;
 
@@ -18,6 +19,7 @@ public class defaultEmbeddedInternalAction extends EmbeddedInternalAction {
 	 * args:
 	 * 0. DeviceName
 	 * 1. ActionName
+	 * 2. Parameters
 	 */
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {  
 		if(ts.getAg() instanceof EmbeddedAgent) {
@@ -39,17 +41,20 @@ public class defaultEmbeddedInternalAction extends EmbeddedInternalAction {
 				if(args[2] instanceof ListTermImpl){ //if arguments in args[2] are a list 
 					Object[] arguments = new Object[((ListTermImpl)args[2]).size()];			
 					for(int i=0;i<((ListTermImpl)args[2]).size();i++) {
-						arguments[i] = ((ListTermImpl)args[2]).get(i).toString().replaceAll("\"(.+)\"", "$1");
+						if(((ListTermImpl)args[2]).get(i) instanceof NumberTermImpl)
+							arguments[i] = ((ListTermImpl)args[2]).get(i);
+						else
+						   arguments[i] = ((ListTermImpl)args[2]).get(i).toString().replaceAll("\"(.+)\"", "$1");
 					}
 
 					//Check whether the current device class is adapted to execute embedded actions. 
 					//New kinds of devices must be adapted here to execute embedded actions
 					if(SerialDevice.class.isAssignableFrom(device.getClass())||
 							LiteralDevice.class.isAssignableFrom(device.getClass())) {
-						return device.execEmbeddedAction(actionName,arguments);
+						return device.execEmbeddedAction(actionName,arguments,un);
 					}else throw new Exception("Embedded action " + actionName + "not available in " + deviceName);
 				}
-				else return device.execEmbeddedAction(actionName, new Object[] {args[2]});
+				else return device.execEmbeddedAction(actionName, new Object[] {args[2]},un);
 			}
 
 

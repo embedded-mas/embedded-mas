@@ -75,7 +75,7 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 				this.beliefName.put(s.replaceAll("/", "_"), createAtom(s.replaceAll("/", "_")));
 		}else{
 			for(int i=0;i<topics.size();i++) {
-				this.beliefName.put(topics.get(i).replaceAll("/", "_"), createAtom(beliefNames.get(i)));
+				this.beliefName.put(topics.get(i).replaceAll("/", "_"), createAtom(beliefNames.get(i).replaceAll("/", "_")));
 			}
 		}
 		
@@ -187,13 +187,13 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 	}
 
 	@Override
-	public void execEmbeddedAction(EmbeddedAction action) {
-		/*if(action instanceof TopicWritingAction) 
+	public void execEmbeddedAction(EmbeddedAction action) {		
+		if(action instanceof TopicWritingAction) 
 			rosWrite(((TopicWritingAction)action).getTopicName(), ((TopicWritingAction)action).getTopicType(), ((TopicWritingAction)action).getValue().toString());
 		else
 			if(action instanceof ServiceRequestAction) {
 				serviceRequest(((ServiceRequestAction)action).getServiceName(), ((ServiceRequestAction)action).getServiceParameters().toJson());
-			}*/
+			}
 	}
 
 }

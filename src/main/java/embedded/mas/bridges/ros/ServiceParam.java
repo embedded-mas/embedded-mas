@@ -1,14 +1,19 @@
 package embedded.mas.bridges.ros;
 
+import java.util.Arrays;
+
+
 public class ServiceParam {
 	
 	private String paramName;
 	private Object paramValue;
-	
-	public ServiceParam(String paramName, Object paramValue) {
+
+
+
+	public ServiceParam(String paramName, Object paramValue){
 		super();
 		this.paramName = paramName;
-		this.paramValue = paramValue;
+		this.paramValue = paramValue;				
 	}
 
 	public String getParamName() {
@@ -26,7 +31,7 @@ public class ServiceParam {
 	public void setParamValue(Object paramValue) {
 		this.paramValue = paramValue;
 	}
-	
+
 	/**
 	 * Return a string in the key-value json format
 	 * @return
@@ -69,6 +74,8 @@ public class ServiceParam {
 	public String toString() {
 		return "ServiceParam [paramName=" + paramName + ", paramValue=" + paramValue + "]";
 	}
+
+
 
 
 

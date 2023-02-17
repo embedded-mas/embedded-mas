@@ -73,25 +73,13 @@ public class DemoDevice extends DefaultDevice  {
 	}
 
 	
-	
-	@Override
-	public void addEmbeddedAction(EmbeddedAction embeddedAction) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void removeEmbeddedAction(EmbeddedAction embeddedAction) {
-		// TODO Auto-generated method stub
-
-	}
 
 	
 
 
 
 	@Override
-	public boolean execEmbeddedAction(Atom actionName, Object[] args) {
+	public boolean execEmbeddedAction(Atom actionName, Object[] args, Unifier un) {
 		IEmbeddedAction action = getEmbeddedAction(actionName);
 		if(action!=null) {
 			if(action instanceof EmbeddedAtomAction) {
