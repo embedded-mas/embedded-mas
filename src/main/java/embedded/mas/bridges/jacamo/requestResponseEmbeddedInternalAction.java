@@ -51,6 +51,10 @@ public class requestResponseEmbeddedInternalAction extends EmbeddedInternalActio
 
 						arguments = new Object[((ListTermImpl)args[2]).size()];			
 						for(int i=0;i<((ListTermImpl)args[2]).size();i++) {
+							if(((ListTermImpl)args[2]).get(i) instanceof ListTermImpl) { //if the i-th parameter is a nested list, handle it as an array
+								arguments[i] = ((ListTermImpl)(((ListTermImpl)args[2]).get(i))).toArray(); //turn the nested list in array
+							}
+							else
 							if(((ListTermImpl)args[2]).get(i) instanceof NumberTermImpl)
 								arguments[i] = ((ListTermImpl)args[2]).get(i);
 							else
