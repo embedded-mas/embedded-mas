@@ -34,7 +34,7 @@ public class RosMaster extends LiteralDevice {
 			if(parameters==null)
 				return parseLiteral(jsonToPredArguments(((DefaultRos4EmbeddedMas) microcontroller).serviceRequestResponse(serviceName, null).get("values")));			
 			else
-				return parseLiteral(jsonToPredArguments(((DefaultRos4EmbeddedMas) microcontroller).serviceRequestResponse(serviceName, parameters.toJson())));
+				return parseLiteral(jsonToPredArguments(((DefaultRos4EmbeddedMas) microcontroller).serviceRequestResponse(serviceName, parameters.toJson()).get("values")));
 		} catch (ParseException e) {
 			e.printStackTrace();
 		} catch (TokenMgrError e) {
@@ -78,14 +78,17 @@ public class RosMaster extends LiteralDevice {
 
 
 	public boolean execEmbeddedAction(String actionName, Object[] args, Term returnArg, Unifier un) throws Exception {
-		EmbeddedAction action = this.embeddedActions.get(createAtom(actionName));			
+		EmbeddedAction action = this.embeddedActions.get(createAtom(actionName));
+		if(args!=null&&!checkArrayArguments(args))
+			throw new Exception("Array arguments require all elements of the same type.");
+
 		if(action instanceof ServiceRequestAction) {
 			Literal response;
 			if(args==null)
 				response = this.serviceRequestResponse(((ServiceRequestAction)action).getServiceName(), null);
 			else {
 				for(int i=0;i<args.length;i++) { //set service params
-					((ServiceRequestAction)action).getServiceParameters().get(i).setParamValue(args[i]);						
+					((ServiceRequestAction)action).getServiceParameters().get(i).setParamValue(args[i]);
 				}			  
 				response = this.serviceRequestResponse(((ServiceRequestAction)action).getServiceName(), ((ServiceRequestAction)action).getServiceParameters());
 			}
@@ -97,6 +100,8 @@ public class RosMaster extends LiteralDevice {
 
 	@Override
 	public boolean execEmbeddedAction(Atom actionName,Object[] args, Unifier un) {
+		if(!checkArrayArguments(args))
+			return false;
 		EmbeddedAction action = this.embeddedActions.get(actionName);
 		if(action!=null)
 			if(action instanceof TopicWritingAction) {
@@ -112,7 +117,23 @@ public class RosMaster extends LiteralDevice {
 				}
 		return true;
 	}
-	
-	
-	
+
+
+	/**
+	 * Check wheter the arguments are consistent.
+	 */
+	private boolean checkArrayArguments(Object[] args) {
+		for(int i=0;i<args.length;i++) {
+			if(args[i].getClass().isArray()&&((Object[])args[i]).length>1) {
+				Object vClass =  ((Object[])args[i])[0].getClass(); //check the class of the 1st element of the array
+				for(int j=1;j<((Object[])args[i]).length;j++) { //check whether the remainder elements are of different class
+					if( ((Object[])args[i])[j].getClass()!=vClass)
+						return false;
+				}
+			}
+		}
+		return true;
+	}
+
+
 }
