@@ -13,11 +13,6 @@ public class ServiceParam {
 	public ServiceParam(String paramName, Object paramValue){
 		super();
 		this.paramName = paramName;
-		if(paramValue=="on") 
-			this.paramValue = 0;
-		else
-			if(paramValue=="off") 
-				this.paramValue = 0;
 		this.paramValue = paramValue;				
 	}
 
