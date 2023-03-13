@@ -37,5 +37,24 @@ public class TestServiceParam {
    
 		
 	}
+	
+	@Test
+	public void testTypeConversionOnJsonOnValue() {
+		ServiceParam p3 = new ServiceParam("pOn", "on");
+		assertEquals(p3.getParamName(), "pOn");
+		assertEquals(p3.getParamValue(), "on");
+		assertEquals(p3.toJsonValue(), "\"pOn\":1");
+	}
+	
+	@Test
+	public void testTypeConversionOnJsonOffValue() {
+		ServiceParam p3 = new ServiceParam("pOff", "off");
+		assertEquals(p3.getParamName(), "pOff");
+		assertEquals(p3.getParamValue(), "off");
+		assertEquals(p3.toJsonValue(), "\"pOff\":0");
+	}
+	
+	
+
 
 }
