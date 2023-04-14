@@ -1,0 +1,11 @@
+// Agent sample_agent in project teste_embedded_mas
+
+/* Initial beliefs and rules */
+
+/* Initial goals */
+
+!start.
+
+/* Plans */
+
++!start : true <- .print("hello world.").
