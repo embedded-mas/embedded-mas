@@ -10,7 +10,7 @@ To illustrate actions that consider the service responses, the agent also execut
 1. ROS (recommended [ROS Noetic](http://wiki.ros.org/noetic))
 2. [Rosbridge](http://wiki.ros.org/rosbridge_suite/Tutorials/RunningRosbridge)
 3. [Turtlesim](http://wiki.ros.org/turtlesim)
-4. Unzip the file [libs.zip](libs.zip) in the lib/ folder placed within the Jason instalation folder (same folder where the Jason jar is placed)
+
 
 ## Running the example
 
@@ -29,8 +29,10 @@ roslaunch rosbridge_server rosbridge_websocket.launch
 rosrun turtlesim turtlesim_node
 ```
 
+4. To run with gradle, in a shell, type  ```./gradlew run```
 
-4. In JEdit, open the file serviceAction.mas2j and run the application
+
+5. As an alternative, to run with JEdit, follow the following steps: (1) unzip the file [libs.zip](libs.zip) in the lib/ folder placed within the Jason instalation folder (same folder where the Jason jar is placed); (2) Open the file serviceAction.mas2j and uncomment the classpath directive (line 22); and (3) run the application
 
 
 

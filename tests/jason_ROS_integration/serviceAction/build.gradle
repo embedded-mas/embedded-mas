@@ -25,12 +25,14 @@ repositories {
     //maven { url "http://jacamo.sourceforge.net/maven2" }
     maven { url "https://raw.githubusercontent.com/jacamo-lang/mvn-repo/master" }
     maven { url "https://jade.tilab.com/maven/" }
+    maven { url "https://raw.github.com/embedded-mas/embedded-mas-mvn-repo/master" }
 
     flatDir { dirs 'lib' }
 }
 
 dependencies {
-    implementation('org.jason:jason:2.5.1')
+    implementation('org.jason:jason:3.1')
+    implementation('embedded-mas:embedded-mas:0.055-SNAPSHOT')
 }
 
 sourceSets {
@@ -47,7 +49,7 @@ sourceSets {
 task run (type: JavaExec, dependsOn: 'classes') {
     description 'runs the application'
     main = 'jason.infra.local.RunLocalMAS'
-    args 'teste_embedded_mas.mas2j'
+    args 'serviceAction.mas2j'
 	// options:
 	//     args = ['teste_embedded_mas.mas2j', '--debug']
 	//     args = ['teste_embedded_mas.mas2j', '--log-conf', 'l.p'] // to use file l.p to configure logging

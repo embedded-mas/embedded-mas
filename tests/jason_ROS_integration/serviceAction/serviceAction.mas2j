@@ -19,5 +19,5 @@ MAS teste_embedded_mas {
 
 		
 
-	classpath: "bin/embedded-mas-0.055-SNAPSHOT.jar;bin/snakeyaml-1.30.jar;";
+	//classpath: "bin/embedded-mas-0.055-SNAPSHOT.jar;bin/snakeyaml-1.30.jar;";
 }
