@@ -30,6 +30,7 @@ public class Arduino4EmbeddedMas extends Arduino implements IPhysicalInterface{
 	@SuppressWarnings("unchecked")
 	public String read() {      
 		String msg = this.serialRead();
+		System.out.println("[Arduino4EmbeddedMas] read " + msg);
 		return msg;
 	}
 	

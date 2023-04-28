@@ -83,7 +83,7 @@ public void decode() throws PerceivingException {
 					}
 					belief = belief + ")";
 
-					//System.out.println(belief);
+					System.out.println("[MicrontrollerMonitor] decode " + belief);
 					percepts.add(Literal.parseLiteral(belief));
 				}
 				this.lista.add(percepts);
