@@ -43,7 +43,9 @@ public class MicrocontrollerMonitor extends Thread {
 	public void run(){
 		while(true) {
 			try {
+				System.out.println("[MicrontrollerMonitor] executando thread 1...");
 				this.decode();
+				System.out.println("[MicrontrollerMonitor] executando thread 2...");
 			} catch (PerceivingException e1) {
 				if(e1.getMessage()!=null) System.err.println(e1.getMessage());
 				e1.printStackTrace();
@@ -83,12 +85,14 @@ public void decode() throws PerceivingException {
 					}
 					belief = belief + ")";
 
-					System.out.println("[MicrontrollerMonitor] decode " + belief);
+					System.out.println("[MicrontrollerMonitor] decode 1 " + belief);
 					percepts.add(Literal.parseLiteral(belief));
+					System.out.println("[MicrontrollerMonitor] decode 2 " + belief);
 				}
 				this.lista.add(percepts);
+				System.out.println("[MicrontrollerMonitor] adicionou percpts " + this.lista.size());
 			}
-		}
+		} else System.out.println("[MicrontrollerMonitor] JSON  vazio");
 	}
 
 }

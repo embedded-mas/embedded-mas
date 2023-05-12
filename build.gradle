@@ -16,7 +16,7 @@ plugins {
 }
 
 
-version = '0.05503-DEVS'
+version = '0.05510-DEVS'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
