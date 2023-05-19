@@ -75,7 +75,7 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 				this.beliefName.put(s.replaceAll("/", "_"), createAtom(s.replaceAll("/", "_")));
 		}else{
 			for(int i=0;i<topics.size();i++) {
-				this.beliefName.put(topics.get(i).replaceAll("/", "_"), createAtom(beliefNames.get(i)));
+				this.beliefName.put(topics.get(i).replaceAll("/", "_"), createAtom(beliefNames.get(i).replaceAll("/", "_")));
 			}
 		}
 		

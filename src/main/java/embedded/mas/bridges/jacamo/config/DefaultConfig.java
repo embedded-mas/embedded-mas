@@ -72,11 +72,8 @@ public class DefaultConfig {
 		return a;
 	}
 
-	private DefaultRos4EmbeddedMas createRos4EmbeddedMas(String connectionStr, ArrayList<String> topics, ArrayList<String> types) {
-		/*System.out.println("+++" + connectionStr);
-		for(int i=0;i<topics.size();i++)
-			System.out.println("+++ " + topics.get(i) + " - " + types.get(i));*/
-		return  new DefaultRos4EmbeddedMas(connectionStr, topics, types);
+	private DefaultRos4EmbeddedMas createRos4EmbeddedMas(String connectionStr, ArrayList<String> topics, ArrayList<String> types, ArrayList<String> beliefNames) {
+		return new DefaultRos4EmbeddedMas(connectionStr, topics, types, beliefNames);
 
 	}
 
@@ -158,7 +155,7 @@ public class DefaultConfig {
 					LinkedHashMap item = (LinkedHashMap) l.get(i);
 					//System.out.println("--> " + l.size() + " - " +  l.get(i));
 					if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("Arduino4EmbeddedMas")|
-						((LinkedHashMap)item.get("microcontroller")).get("className").equals("SerialReader")) {
+							((LinkedHashMap)item.get("microcontroller")).get("className").equals("SerialReader")) {
 						microcontroller= createArduino4EmbeddedMas(((LinkedHashMap)item.get("microcontroller")).get("serial").toString(),
 								Integer.parseInt(((LinkedHashMap)item.get("microcontroller")).get("baudRate").toString()));
 						//actions
@@ -177,67 +174,52 @@ public class DefaultConfig {
 					}		
 					else
 						if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4EmbeddedMas")) {
-							//System.out.println(((LinkedHashMap)item.get("microcontroller")).get("connectionString").toString());
-							//System.out.println(((LinkedHashMap)item.get("microcontroller")).get("perceptionTopics").getClass().getName());
-							ArrayList perceptionTopics = (ArrayList) ((LinkedHashMap)item.get("microcontroller")).get("perceptionTopics");
-							//System.out.println("perception size " + perceptionTopics.size());
+							//ArrayList perceptionTopics = (ArrayList) ((LinkedHashMap)item.get("microcontroller")).get("perceptionTopics");
+							ArrayList perceptionTopics = (ArrayList) item.get("perceptionTopics");
 							ArrayList<String> topics = new ArrayList<String>();
 							ArrayList<String> types = new ArrayList<String>();
+							ArrayList<String> beliefNames = new ArrayList<String>();
 							for(int j=0;j<perceptionTopics.size();j++) {
 								topics.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicName").toString());
 								types.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicType").toString());
-								//System.out.println("=== " + perceptionTopics.get(j).toString() + " - " + perceptionTopics.get(j).getClass().getName());
+								if(((LinkedHashMap)perceptionTopics.get(j)).get("beliefName")==null)
+									beliefNames.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicName").toString());
+								else
+									beliefNames.add(((LinkedHashMap)perceptionTopics.get(j)).get("beliefName").toString());	
 							}
-							microcontroller= createRos4EmbeddedMas(((LinkedHashMap)item.get("microcontroller")).get("connectionString").toString(),topics,types);
-							//ArrayList actionsArray = (ArrayList) item.get("serialActions");
-							//System.out.println("[DefaultConfig] Actions " +  ((LinkedHashMap)item.get("microcontroller")).get("actions").getClass().getName() + " - " +  ((LinkedHashMap)((LinkedHashMap)item.get("microcontroller")).get("actions")).size());
-							
-							
-							 
+							microcontroller= createRos4EmbeddedMas(((LinkedHashMap)item.get("microcontroller")).get("connectionString").toString(),topics,types,beliefNames);
+
+
 							//handle topic writing actions
-							ArrayList topicWritingActions = (ArrayList) ((LinkedHashMap)((LinkedHashMap)item.get("microcontroller")).get("actions")).get("topicWritingActions");
-							for(int j=0;j<topicWritingActions.size();j++) {
-								//System.out.println("[DefaultConfig] topic writing actions " + topicWritingActions.get(j) + " - " + topicWritingActions.get(j).getClass().getName());
-								embeddedActionList.add(new TopicWritingAction(createAtom(((LinkedHashMap) topicWritingActions.get(j)).get("actionName").toString()),
-										               ((LinkedHashMap) topicWritingActions.get(j)).get("topicName").toString(),
-										               ((LinkedHashMap) topicWritingActions.get(j)).get("topicType").toString(),null));
-						
-										
-										//createAtom(((LinkedHashMap) topicWritingActions.get(i)).get("actionName")), ((LinkedHashMap) topicWritingActions.get(i)).get("topicName"), ((LinkedHashMap) topicWritingActions.get(i)).get("topicType"));
-							}
-							
-							//handle service request actions
-							ArrayList serviceRequestActions = (ArrayList) ((LinkedHashMap)((LinkedHashMap)item.get("microcontroller")).get("actions")).get("serviceRequestActions");
-							for(int j=0;j<serviceRequestActions.size();j++) {
-								ServiceParameters params = new ServiceParameters();								
-								//System.out.println("[DefaultConfig] service request actions " + serviceRequestActions.get(j));
-								//percorrer todos os parâmetros do serviço
-								//System.out.println("[DefaultConfig] " + ((LinkedHashMap)serviceRequestActions.get(j)).get("params") + ((LinkedHashMap)serviceRequestActions.get(j)).get("params").getClass().getName());
-								for(int k=0;k< ((ArrayList)((LinkedHashMap)serviceRequestActions.get(j)).get("params")).size();k++) {
-									//System.out.println("[DefaultConfig] " + ((ArrayList)((LinkedHashMap)serviceRequestActions.get(j)).get("params")).get(k) + " - "+((ArrayList)((LinkedHashMap)serviceRequestActions.get(j)).get("params")).get(k).getClass().getName());
-									//System.out.println("[DefaultConfig] " + ((ArrayList)((LinkedHashMap)serviceRequestActions.get(j)).get("params")).get(k)) );
-									//System.out.println("[DefaultConfig] " + ((LinkedHashMap)((ArrayList)((LinkedHashMap)serviceRequestActions.get(j)).get("params")).get(k)).get("paramName"));
-									//System.out.println("[DefaultConfig] >>>> " + ((ArrayList)((LinkedHashMap)serviceRequestActions.get(j)).get("params")).get(k));
-									//(ArrayList)((LinkedHashMap)serviceRequestActions.get(j)).get("params")).get(k))
-									//System.out.println("[DefaultConfig] vai adicionar parametro " + ((LinkedHashMap)((ArrayList)((LinkedHashMap)serviceRequestActions.get(j)).get("params")).get(k)).get("paramName"));
-									//System.out.println("[DefaultConfig] vai adicionar parametro " + ((ArrayList)((LinkedHashMap)serviceRequestActions.get(j)).get("params")).get(k));
-									//ServiceParam p = new ServiceParam(((LinkedHashMap)((ArrayList)((LinkedHashMap)serviceRequestActions.get(j)).get("params")).get(k).get("paramName").toString(), 
-									//		                           null,
-									//		                           ((LinkedHashMap)((ArrayList)((LinkedHashMap)serviceRequestActions.get(j)).get("params")).get(k)).get("paramType").toString());
-									ServiceParam p = new ServiceParam(((ArrayList)((LinkedHashMap)serviceRequestActions.get(j)).get("params")).get(k).toString(), 
-					                           null);
-									//System.out.println("[DefaultConfig] adicionou parametro " + p);
-									params.add(p);
+							//if(((LinkedHashMap)((LinkedHashMap)item.get("microcontroller")).get("actions")).get("topicWritingActions")!=null) {
+							if(((LinkedHashMap)item.get("actions")).get("topicWritingActions")!=null) {
+								ArrayList topicWritingActions = (ArrayList) ((LinkedHashMap)item.get("actions")).get("topicWritingActions");
+								for(int j=0;j<topicWritingActions.size();j++) {
+									embeddedActionList.add(new TopicWritingAction(createAtom(((LinkedHashMap) topicWritingActions.get(j)).get("actionName").toString()),
+											((LinkedHashMap) topicWritingActions.get(j)).get("topicName").toString(),
+											((LinkedHashMap) topicWritingActions.get(j)).get("topicType").toString(),null));
 								}
-								//criar o serviço e adicionar params								
-								//System.out.println("[DefaultConfig] Action name : " + ((LinkedHashMap)serviceRequestActions.get(j)).get("actionName"));
-								//System.out.println("[DefaultConfig] Service name: " + ((LinkedHashMap)serviceRequestActions.get(j)).get("serviceName"));
-								ServiceRequestAction serviceAction = new ServiceRequestAction(createAtom(((LinkedHashMap)serviceRequestActions.get(j)).get("actionName").toString()), 
-										                                 ((LinkedHashMap)serviceRequestActions.get(j)).get("serviceName").toString(), params);
-								embeddedActionList.add(serviceAction);
-								
 							}
-							
+
+							//handle service request actions
+							//if(((LinkedHashMap)((LinkedHashMap)item.get("microcontroller")).get("actions")).get("serviceRequestActions")!=null) {
+							if(((LinkedHashMap)item.get("actions")).get("serviceRequestActions")!=null) {
+								ArrayList serviceRequestActions = (ArrayList) ((LinkedHashMap)item.get("actions")).get("serviceRequestActions");
+								for(int j=0;j<serviceRequestActions.size();j++) {
+									ServiceParameters params = new ServiceParameters();
+									if(((LinkedHashMap)serviceRequestActions.get(j)).get("params")!=null)
+										for(int k=0;k< ((ArrayList)((LinkedHashMap)serviceRequestActions.get(j)).get("params")).size();k++) {
+											ServiceParam p = new ServiceParam(((ArrayList)((LinkedHashMap)serviceRequestActions.get(j)).get("params")).get(k).toString(), 
+													null);
+											params.add(p);
+										}
+									ServiceRequestAction serviceAction = null;
+									serviceAction = new ServiceRequestAction(createAtom(((LinkedHashMap)serviceRequestActions.get(j)).get("actionName").toString()), 
+												((LinkedHashMap)serviceRequestActions.get(j)).get("serviceName").toString(), params);
+									embeddedActionList.add(serviceAction);
+
+								}
+							}	
 
 						}
 					//System.out.println("*** " + microcontroller.getClass().getInterfaces());

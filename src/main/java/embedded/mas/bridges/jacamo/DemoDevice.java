@@ -79,7 +79,7 @@ public class DemoDevice extends DefaultDevice  {
 
 
 	@Override
-	public boolean execEmbeddedAction(Atom actionName, Object[] args) {
+	public boolean execEmbeddedAction(Atom actionName, Object[] args, Unifier un) {
 		IEmbeddedAction action = getEmbeddedAction(actionName);
 		if(action!=null) {
 			if(action instanceof EmbeddedAtomAction) {

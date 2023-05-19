@@ -8,97 +8,25 @@
 
 package embedded.mas.bridges.jacamo;
 
-import java.util.ArrayList;
+import java.io.File;
+import java.nio.file.Paths;
 import java.util.List;
 
-import jason.architecture.AgArch;
-import jason.asSemantics.Agent;
-
-public abstract class CyberPhysicalAgent extends Agent {
-
-	private final List<DefaultDevice> devices = new ArrayList<DefaultDevice>();
-	private DefaultEmbeddedAgArch arch = null;
+import embedded.mas.bridges.jacamo.config.DefaultConfig;
 
 
-	@Override
-	public void initAg() {		
-		setupDevices();
-		super.initAg(); 
-		checkSensor c = new checkSensor();
-		c.start();
+public class CyberPhysicalAgent extends EmbeddedAgent {
 
-	}
 
-	/* remove a belief according to the functor and source of the parameter*/
-	/*public void abolishByFunctorAndSource(Literal bel, Agent ag) {
-		bel = (Literal) bel.clone();
-		bel.makeTermsAnnon(); //change all the terms anonimous variables ("_")
-		Literal belFound = ag.findBel(bel, new Unifier()); //find the belief by the functor		
-		if(belFound!=null) {
-			belFound = (Literal) belFound.clone(); //clone to 
-			belFound.delSources(); //del all the sources (the same belief may be many sources) to add the only interesting source (below)
-			belFound.addSource(bel.getSources().get(0));
-			ag.getBB().remove(belFound);
+
+	protected void setupDevices() {
+		if(new File( Paths.get("").toAbsolutePath()+"/src/agt/"+getTS().getAgArch().getAgName() + ".yaml").exists()) {
+			DefaultConfig conf = new DefaultConfig();
+			List<DefaultDevice>  d =  conf.loadFromYaml(Paths.get("").toAbsolutePath()+"/src/agt/"+getTS().getAgArch().getAgName() + ".yaml");
+			this.getDevices().addAll(d);
 		}
-	}*/
-
-	protected abstract void setupDevices();
-	
-    @Deprecated
-	public void addSensor(DefaultDevice device) {
-		this.addDevice(device);
-	}
-
-    @Deprecated
-	public void removeSensor(DefaultDevice device) {
-		this.removeDevice(device);
-	}
-
-	
-	public void addDevice(DefaultDevice device) {
-		devices.add(device);
-	}
-
-	public void removeDevice(DefaultDevice device) {
-		devices.remove(device);
-	}
-	
-	public List<DefaultDevice> getDevices(){
-		return this.devices;
-	}
-	
-	
-	private DefaultEmbeddedAgArch getEmbeddedArch() {
-        AgArch arch = getTS().getAgArch().getFirstAgArch();
-        while (arch != null) {
-            if (arch instanceof DefaultEmbeddedAgArch) {
-                return (DefaultEmbeddedAgArch)arch;
-            }
-            arch = arch.getNextAgArch();
-        }
-        return null;
-    }
 
 
-	class checkSensor extends Thread{
-		/*
-		 * Wait until the architecture is set up to put the devices there. The architecture uses these artifacts to get the perceptions. 
-		 */
-		
-		@Override
-		public void run() {			
-			while(arch==null) {  
-				arch = getEmbeddedArch();
-				try {
-					Thread.sleep(10);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			arch.setDevices(devices);
-			return;
-		}
-	}
-	
+	};
+
 }

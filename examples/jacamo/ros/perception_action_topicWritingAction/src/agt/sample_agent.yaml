@@ -1,0 +1,51 @@
+# The root item of the CyberPhysicalAgent configuration is the Device.
+# A cyber-physical agent can be composed of one to many devices. A device is any external element which sensors and actuators are connected to. A device that may be either physical (e.g. an Arduino board), or virtual (e.g. a ROS core).
+# In this example, the agent is composed of a single device, that is a ROS core identified as "sample_roscore".
+- device_id: sample_roscore #device identifier. It is up to the designer to choose this name.
+  #className: the class that implements the interface between the parception/action systems and the device.
+  #           This class provides means to convert (i) sensor values in perceptions and (ii) action of the agents and actuations performed by the physical actuators.
+  #           Different interfaces can be implemented for different types of devices.
+  className:  embedded.mas.bridges.ros.RosMaster
+  # A device contains a microcontroller, that is an interface that provides access to external devices to get percepts and perform actuations
+  # Different microcontrollers have different parameters depending on their nature. For example, serial devices like Arduino require to configure serial ports and baudrates.
+  # In this example, the microcontroller is a Java-ROS interface with parameters related to topics and services.
+  microcontroller: 
+      id: ros1 #microcontroller identifier. It is up to the designer to choose this name.
+      #className: The class that implements the interface with the microcontroller.
+      #           This class provides means to read from and write to the microcontroller. 
+      #           Different interfaces can be implemented for different types of microcontrollers.
+      className: DefaultRos4EmbeddedMas  
+      connectionString: ws://localhost:9090 #connection with ROS      
+      #perceptionTopics: List of topics whose values are converted into perceptions.
+      #                  Each topic requires to define its name and its type.  
+      #                  By default, the belief name has the identifier as the topic identifier.  
+      #                      It is also possible to customize the belief using the optional key beliefName`, whose value is the intended belief name.  
+  perceptionTopics:
+      - topicName: value1
+        topicType: std_msgs/Int32
+      - topicName: value2
+        topicType: std_msgs/Int32  
+      - topicName: current_time
+        topicType: std_msgs/String
+        beliefName: current_hour
+  #actions: An agent acts upon ROS by topic writings and service requests, configured in the items topicWritingActions and serviceRequestActions, respectively.
+  #           This example illustrate only topic writing actions. 
+  actions:       
+    #Each topic writing action requires to configure three parameters:
+    # 1. actionName: the name of the action performed by the agent
+    # 2. topicName: the name of the topic affected by the action
+    # 3. topicType: the type of the topic.
+    # For example, the first configured action defines that, when a agent executes the action update_value1, the corresponding atuation 
+    #    is the writing of an integer value in the topic value1. The written value is the parameter of the action triggered by the agent.
+    topicWritingActions:          
+      - actionName: update_value1
+        topicName: /value1
+        topicType: std_msgs/Int32
+      - actionName: update_value2              
+        topicName: /value2
+        topicType: std_msgs/Int32
+      - actionName: update_time              
+        topicName: /current_time
+        topicType: std_msgs/String  
+
+
