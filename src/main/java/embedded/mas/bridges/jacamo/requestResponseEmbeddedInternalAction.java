@@ -89,11 +89,6 @@ public class requestResponseEmbeddedInternalAction extends EmbeddedInternalActio
 
 	}
 
-	private Term adaptTerm(Term t) {
-		if(t.toString().matches("\"(.+)\"")) 
-			return new StringTermImpl(t.toString().replaceAll("\"(.+)\"", "$1")); 
-		return t;
 
-	}
 
 }

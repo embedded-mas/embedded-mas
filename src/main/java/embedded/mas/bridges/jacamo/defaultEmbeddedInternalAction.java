@@ -77,10 +77,5 @@ public class defaultEmbeddedInternalAction extends EmbeddedInternalAction {
 		}else return false;
 	}
 	
-	private Term adaptTerm(Term t) {
-		if(t.toString().matches("\"(.+)\"")) 
-			return new StringTermImpl(t.toString().replaceAll("\"(.+)\"", "$1")); 
-		return t;
-		
-	}
+	
 }
