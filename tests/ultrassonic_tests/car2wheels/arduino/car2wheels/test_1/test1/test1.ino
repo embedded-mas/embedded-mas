@@ -8,8 +8,8 @@ Communication communication;
 //Definindo variáveis de entrada (sensor)
 #define TRIGGER_PIN_RIGHT A0
 #define ECHO_PIN_RIGHT A1
-#define TRIGGER_PIN_LEFT A2
-#define ECHO_PIN_LEFT A3
+#define TRIGGER_PIN_LEFT A5
+#define ECHO_PIN_LEFT A4
 
 #define MAX_DISTANCE 200
 
@@ -207,7 +207,7 @@ void move_left(){
 
 void distance_correction(){
 
-  if(dist_sensor_right == 0) dist_sensor_right = 1000;
-  if(dist_sensor_left == 0) dist_sensor_left = 1000;
+  if(dist_sensor_right == 0 || dist_sensor_right <= 6) dist_sensor_right = 1000;
+  if(dist_sensor_left == 0 || dist_sensor_left <= 6) dist_sensor_left = 1000;
 
 }

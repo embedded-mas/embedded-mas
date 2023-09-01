@@ -53,10 +53,10 @@ void loop()
   dist_sensor_2 = sonar_2.ping_cm();
 
   distance_correction();
-  Serial.print("Sensor 1:");
-  Serial.println(dist_sensor_1);
-  //Serial.print("Sensor 2:");
-  //Serial.println(dist_sensor_2);
+  //Serial.print("Sensor 1:");
+  //Serial.println(dist_sensor_1);
+  Serial.print("Sensor 2:");
+  Serial.println(dist_sensor_2);
 
   while(Serial.available() > 0){ //check whether there is some information from the serial (possibly from the agent)
     String s = Serial.readString();
@@ -106,8 +106,8 @@ void loop()
   }
 
   if(leitura == 1){
-    //*****SE NÃO ENCONTRAR NADA A 15CM DOS SENSORES, ENTÃO SEGUE*****
-    if(dist_sensor_1 >= 10 && dist_sensor_2 >= 10 && sensor_state != 1){
+    //*****SE NÃO ENCONTRAR NADA A 20 CM DOS SENSORES, ENTÃO SEGUE*****
+    if(dist_sensor_1 >= 20 && dist_sensor_2 >= 20 && sensor_state != 1){
       sensor_state = 1;
       leitura = 0;
       //pode seguir em frente
@@ -117,7 +117,7 @@ void loop()
       communication.sendMessage();
     }
     //*****SE ENCONTRAR ALGO PŔOXIMO, ENTÃO PARA E VERIFICA*****
-    else if(dist_sensor_1 < 10 && sensor_state != 0 || dist_sensor_2 < 10 && sensor_state != 0){
+    else if(dist_sensor_1 < 20 && sensor_state != 0 || dist_sensor_2 < 20 && sensor_state != 0){
       sensor_state = 0;
       leitura = 0;
 
