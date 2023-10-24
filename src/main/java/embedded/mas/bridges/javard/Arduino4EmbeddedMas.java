@@ -35,8 +35,7 @@ public class Arduino4EmbeddedMas extends Arduino implements IPhysicalInterface{
 	
 	@Override
 	public boolean write(String s) {
-		try {
-			System.out.println("[Arduino4EmbeddedMas] writing " + s);
+		try {			
 			serialWrite(s);
 			return true;
 		}catch (Exception e) {
