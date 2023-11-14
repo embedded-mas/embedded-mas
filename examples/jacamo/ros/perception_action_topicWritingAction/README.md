@@ -15,29 +15,84 @@ The scenario also includes a topic `current_time`, which stores a string describ
 
 ## Running the example
 
-1. Start the roscore:
+### 1. Ros node setup:
+
+#### 1.1 Container-based setup: 
+> > docker containers launch all the examples need to run. Use the following commands to launch the nodes either in ROS 1 or in ROS 2:
+> > > 1.1.1 ROS 1: 
+
+   ```
+   sudo docker run -it -p9090:9090 --rm --net=ros --name noetic maiquelb/embedded-mas-ros:0.5 \
+   /bin/bash -c "source /opt/ros/noetic/setup.bash && roslaunch rosbridge_server rosbridge_websocket.launch & \
+                 while ! rostopic list | grep '/value1'; do \
+                 source /opt/ros/noetic/setup.bash; \
+                 sleep 1; \
+                 done \
+                 && (rostopic pub /value1 std_msgs/Int32 0 & rostopic pub /current_time std_msgs/String 'unknown') \	
+                "
+   ```
+
+> > > 1.1.2 ROS 2:
+
 ```
-roscore
+sudo docker run -it -p9090:9090 --rm --net=ros --name noetic maiquelb/embedded-mas-ros2:0.6 \
+/bin/bash -c "ros2 launch rosbridge_server rosbridge_websocket_launch.xml & (\
+              while ! ros2 topic list | grep '/value1'; do \
+              ros2 topic pub --once /value1 std_msgs/Int32 \"{\"data\": 0}\" ; \
+              ros2 topic pub --once /current_time std_msgs/String \"{\"data\": \"unknown\"}\" ;\
+              sleep 1;\
+              done;  \
+              )&& ros2 launch rosbridge_server rosbridge_websocket_launch.xml\
+             "
 ```
 
-2. Launch the bridge between ROS and Java
-```
-roslaunch rosbridge_server rosbridge_websocket.launch
-```
 
-3. Write some initial values in ROS topics
-```
-rostopic pub /value1 std_msgs/Int32 0
-rostopic pub /current_time std_msgs/String "unknown"
-```
+#### 1.2 Local setup: 
+To run the ROS node in your computer, run the following steps:
 
-4. Launch the JaCaMo application:
+> > > ##### 1.2.1  Start the roscore:
+> > > ROS 1:
+> > > ```
+> > > roscore
+> > > ```
 
-Linux:
+> > > ROS 2: this step is not requred.
+
+> > > ##### 1.1.2. Launch the bridge between ROS and Java
+> > > ROS 1:
+> > > 
+> > > ```
+> > > roslaunch rosbridge_server rosbridge_websocket.launch
+> > > ```
+
+> > > ROS 2:
+> > > 
+> > > ```
+> > > ros2 launch rosbridge_server rosbridge_websocket_launch.xml
+> > > ```
+
+> > > ##### 1.1.2. Write some initial values in ROS topics
+> > > ROS 1: 
+> > > ```
+> > > rostopic pub /value1 std_msgs/Int32 0
+> > > rostopic pub /current_time std_msgs/String "unknown"
+
+> > >  ROS 2:
+> > > ```
+> > >  ros2 topic pub --once /value1 std_msgs/Int32 \"{\"data\": 0}\" 
+> > >  ros2 topic pub --once /current_time std_msgs/String \"{\"data\": \"unknown\"}\" 
+> > > ```
+
+
+
+
+### 2. Launch the JaCaMo application:
+
+#### Linux:
 ```
 ./gradlew run
 ```
-Windows:
+#### Windows:
 ```
 gradlew run 
 ```
