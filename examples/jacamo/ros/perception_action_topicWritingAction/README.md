@@ -8,18 +8,17 @@ The scenario includes the topics ```value1``` and ```value2```, which store inte
 
 The scenario also includes a topic `current_time`, which stores a string describing the current time. The agent perceives this information and updates the topic.
 
-## Requirements
-1. ROS (recommended [ROS Noetic](http://wiki.ros.org/noetic))
-2. [Rosbridge](http://wiki.ros.org/rosbridge_suite/Tutorials/RunningRosbridge)
-
 
 ## Running the example
 
 ### 1. Ros node setup:
+It is possible to choose between a container-based setup (only Docker is required) and a local setup (ROS core and related tools are required).
 
 #### 1.1 Container-based setup: 
-> > docker containers launch all the examples need to run. Use the following commands to launch the nodes either in ROS 1 or in ROS 2:
-> > > 1.1.1 ROS 1: 
+Requirements: [Docker](https://www.docker.com/)
+
+Use the following commands to launch the nodes either in ROS 1 or in ROS 2:
+##### 1.1.1 ROS 1: 
 
    ```
    sudo docker run -it -p9090:9090 --rm --net=ros --name noetic maiquelb/embedded-mas-ros:0.5 \
@@ -32,7 +31,7 @@ The scenario also includes a topic `current_time`, which stores a string describ
                 "
    ```
 
-> > > 1.1.2 ROS 2:
+##### 1.1.2 ROS 2:
 
 ```
 sudo docker run -it -p9090:9090 --rm --net=ros --name noetic maiquelb/embedded-mas-ros2:0.6 \
@@ -48,40 +47,40 @@ sudo docker run -it -p9090:9090 --rm --net=ros --name noetic maiquelb/embedded-m
 
 
 #### 1.2 Local setup: 
+Requirements
+1. ROS 1 (recommended [ROS Noetic](http://wiki.ros.org/noetic)) or ROS 2 (recommended [ROS Humble](http://wiki.ros.org/humble))
+2. [Rosbridge](http://wiki.ros.org/rosbridge_suite/Tutorials/RunningRosbridge)
+
 To run the ROS node in your computer, run the following steps:
 
-> > > ##### 1.2.1  Start the roscore:
-> > > ROS 1:
-> > > ```
-> > > roscore
-> > > ```
+##### 1.2.1  Start the roscore:
+ROS 1: ``` roscore ```
 
-> > > ROS 2: this step is not requred.
+ROS 2: this step is not requred.
 
-> > > ##### 1.1.2. Launch the bridge between ROS and Java
-> > > ROS 1:
-> > > 
-> > > ```
-> > > roslaunch rosbridge_server rosbridge_websocket.launch
-> > > ```
+##### 1.1.2. Launch the bridge between ROS and Java
+ROS 1:
+```
+roslaunch rosbridge_server rosbridge_websocket.launch
+```
 
-> > > ROS 2:
-> > > 
-> > > ```
-> > > ros2 launch rosbridge_server rosbridge_websocket_launch.xml
-> > > ```
+ROS 2:
+```
+ros2 launch rosbridge_server rosbridge_websocket_launch.xml
+```
 
-> > > ##### 1.1.2. Write some initial values in ROS topics
-> > > ROS 1: 
-> > > ```
-> > > rostopic pub /value1 std_msgs/Int32 0
-> > > rostopic pub /current_time std_msgs/String "unknown"
+##### 1.1.2. Write some initial values in ROS topics
+ROS 1: 
+```
+rostopic pub /value1 std_msgs/Int32 0
+rostopic pub /current_time std_msgs/String "unknown"
+```
+ROS 2:
 
-> > >  ROS 2:
-> > > ```
-> > >  ros2 topic pub --once /value1 std_msgs/Int32 \"{\"data\": 0}\" 
-> > >  ros2 topic pub --once /current_time std_msgs/String \"{\"data\": \"unknown\"}\" 
-> > > ```
+```
+ros2 topic pub --once /value1 std_msgs/Int32 \"{\"data\": 0}\" 
+ros2 topic pub --once /current_time std_msgs/String \"{\"data\": \"unknown\"}\" 
+```
 
 
 
