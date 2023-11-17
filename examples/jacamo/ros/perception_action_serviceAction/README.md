@@ -6,6 +6,9 @@ This example illustrates agent actions that correspond to ROS service requests. 
 To illustrate actions that consider the service responses, the agent also executes the action ```get_loggers```.  This action is concretely realized through the ROS service ```/turtlesim/get_loggers```. This service produces a response, which the agent prints in the console. Actions based on services with response handling are triggered by the ```requestResponseEmbeddedInternalAction``` internal action.
 
 
+
+
+
 ## Requirements
 1. ROS (recommended [ROS Noetic](http://wiki.ros.org/noetic))
 2. [Rosbridge](http://wiki.ros.org/rosbridge_suite/Tutorials/RunningRosbridge)
@@ -14,22 +17,45 @@ To illustrate actions that consider the service responses, the agent also execut
 
 ## Running the example
 
-1. Start the roscore
+
+### 1. Ros node setup:
+It is possible to choose between a container-based setup (only Docker is required) and a local setup (ROS core and related tools are required).
+
+#### 1.1 Container-based setup: 
+Requirements: [Docker](https://www.docker.com/)
+
+Use the following commands to launch the nodes either in ROS 1 or in ROS 2:
+##### 1.1.1 ROS 1: 
+   ```
+   sudo docker run -d --rm --net=ros --env="DISPLAY_WIDTH=3000" --env="DISPLAY_HEIGHT=1800" --env="RUN_XTERM=no" --name=novnc -p=8080:8080 theasp/novnc:latest  &&
+   sudo docker run -d --net=ros --name roscore --rm osrf/ros:noetic-desktop-full roscore &&
+   sudo docker run -it --net=ros --env="DISPLAY=novnc:0.0" --env="ROS_MASTER_URI=http://roscore:11311" \
+       --rm --name noetic -p9090:9090 maiquelb/embedded-mas-ros:0.6 /bin/bash -c "source /opt/ros/noetic/setup.bash && rosrun turtlesim turtlesim_node" &\
+   (until sudo docker exec noetic /bin/bash -c "echo 'ROS noetic container is ready'"; do echo "starting ROS container...."; sleep 1; done  &&\
+    sudo docker exec noetic /bin/bash -c "source /opt/ros/noetic/setup.bash && roslaunch rosbridge_server rosbridge_websocket.launch")
+   ```
+##### 1.1.2 ROS 2:
 ```
-roscore
+sudo docker run -d --rm --net=ros --env="DISPLAY_WIDTH=3000" --env="DISPLAY_HEIGHT=1800" --env="RUN_XTERM=no" --name=novnc -p=8080:8080 theasp/novnc:latest  &&
+sudo docker run -d --net=ros --name roscore --rm osrf/ros:noetic-desktop-full roscore &&
+sudo docker run -it --net=ros --env="DISPLAY=novnc:0.0" --env="ROS_MASTER_URI=http://roscore:11311" --rm --name humble -p9090:9090 maiquelb/embedded-mas-ros2:0.5 /bin/bash -c "source /opt/ros/humble/setup.bash && ros2 run turtlesim turtlesim_node" &\
+(until sudo docker exec humble /bin/bash -c "echo 'ROS humble container is ready'"; do echo "starting ROS container...."; sleep 1; done  &&\
+sudo docker exec humble /bin/bash -c "source /opt/ros/humble/setup.bash && ros2 launch rosbridge_server rosbridge_websocket_launch.xml")
 ```
 
-2. Launch the bridge between ROS and Java
+#### 1.2 Local setup: 
+
+##### 1.2.1. Launch the bridge between ROS and Java
 ```
-roslaunch rosbridge_server rosbridge_websocket.launch
+ros2 launch rosbridge_server rosbridge_websocket_launch.xml
 ```
 
-3. Launch the turtlesim simulator
+##### 1.2.2 Launch the turtlesim simulator
 ```
-rosrun turtlesim turtlesim_node
+ros2 run turtlesim turtlesim_node
 ```
 
-4. Launch the JaCaMo application:
+### 2. Launch the JaCaMo application:
 
 Linux:
 ```
