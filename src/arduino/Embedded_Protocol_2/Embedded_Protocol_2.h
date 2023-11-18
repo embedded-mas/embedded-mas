@@ -25,6 +25,9 @@ class Communication {
           void sendMessage();
           void publishROSMessage(ros::Publisher chatter, std_msgs::String str_msg);
 
+          String paramStr(String s);
+          int paramInt(String s, int p);
+
         private:
           String _beliefBuffer = "";
           String _allBeliefs = "";
@@ -32,6 +35,8 @@ class Communication {
           String _preamble = "==";
           String _start_message = "::";
           String _end_message = "--";
+
+          String _t;
 
 };
 
