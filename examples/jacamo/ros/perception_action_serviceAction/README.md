@@ -32,7 +32,7 @@ Use the following commands to launch the nodes either in ROS 1 or in ROS 2:
    sudo docker run -it --net=ros --env="DISPLAY=novnc:0.0" --env="ROS_MASTER_URI=http://roscore:11311" \
        --rm --name noetic -p9090:9090 maiquelb/embedded-mas-ros:0.6 /bin/bash -c "source /opt/ros/noetic/setup.bash && rosrun turtlesim turtlesim_node" &\
    (until sudo docker exec noetic /bin/bash -c "echo 'ROS noetic container is ready'"; do echo "starting ROS container...."; sleep 1; done  &&\
-    sudo docker exec noetic /bin/bash -c "source /opt/ros/noetic/setup.bash && roslaunch rosbridge_server rosbridge_websocket.launch")
+    sudo docker exec -d noetic /bin/bash -c "source /opt/ros/noetic/setup.bash && roslaunch rosbridge_server rosbridge_websocket.launch")
    ```
 ##### 1.1.2 ROS 2:
 ```
