@@ -27,7 +27,7 @@ Use the following commands to launch the nodes either in ROS 1 or in ROS 2:
                  source /opt/ros/noetic/setup.bash; \
                  sleep 1; \
                  done \
-                 && (rostopic pub /value1 std_msgs/Int32 0 & rostopic pub /current_time std_msgs/String 'unknown') \	
+                 && (rostopic pub /value1 std_msgs/Int32 0 & rostopic pub /current_time std_msgs/String 'unknown') \
                 "
    ```
 
