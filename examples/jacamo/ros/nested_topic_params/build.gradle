@@ -1,0 +1,74 @@
+defaultTasks 'run'
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+version '1.0'
+group   'org.jacamo'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    
+
+   
+   maven { url "https://raw.github.com/jacamo-lang/mvn-repo/master" } 
+   maven { url "https://raw.github.com/embedded-mas/embedded-mas-mvn-repo/master" }
+
+    mavenCentral()
+    jcenter()
+
+    
+    
+
+}
+
+dependencies {
+    implementation 'org.jacamo:jacamo:0.10-SNAPSHOT'
+    implementation "embedded-mas:embedded-mas:0.058-SNAPSHOT" 
+    //implementation files('/mnt/1C4C766F4C764414/maiquel/git/embedded-mas/build/libs/embedded-mas-0.057-SNAPSHOT.jar')
+    
+    implementation "javard:javard:0.032-SNAPSHOT"
+
+    //implementation 'org.yaml:snakeyaml:1.30'
+    //implementation 'javax.json:javax.json-api:1.1.4'
+    //implementation 'org.glassfish:javax.json:1.1.4'
+    //implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.2'  
+    //implementation 'com.fasterxml.jackson.core:jackson-core:2.13.2' 
+    //implementation 'org.eclipse.jetty.websocket:websocket-server:9.4.46.v20220331' 
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/env'
+            srcDir 'src/agt'
+            srcDir 'src/org'
+            srcDir 'src/java'
+        }
+        resources {
+            srcDir 'src/resources'
+        }
+    }
+}
+
+task run (type: JavaExec, dependsOn: 'classes') {
+    group       ' JaCaMo'
+    description 'runs the JaCaMo application'
+    doFirst {
+        mkdir 'log'
+    }
+    main 'jacamo.infra.JaCaMoLauncher'
+    args 'perception_action.jcm'
+    classpath sourceSets.main.runtimeClasspath
+}
+
+
+
+clean {
+    delete 'bin'
+    delete 'build'
+    delete 'log'
+}
+
