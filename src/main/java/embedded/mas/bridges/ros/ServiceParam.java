@@ -37,25 +37,28 @@ public class ServiceParam {
 	 * @return
 	 */
 	public String toJsonValue() {
-		String pValue = "";;
-		if(paramValue.getClass().isArray()) 
-			pValue = pValue + arrayToJsonValue((Object[])paramValue);
+		String pValue = "";
+		if(paramValue==null)
+			pValue="null";
 		else
-			if(paramValue instanceof ServiceParameters) {
-				pValue = ((ServiceParameters)paramValue).toJson().toString();
-			}
+			if(paramValue.getClass().isArray()) 
+				pValue = pValue + arrayToJsonValue((Object[])paramValue);
 			else
-				if(paramValue instanceof String) {					
-					if(paramValue.equals("on"))  //on/off values must be translated to 1/0
-						pValue = "1";
-					else
-						if(paramValue.equals("off"))  
-							pValue = "0";
-						else 								
-							pValue = pValue + "\"" + paramValue.toString() + "\"" ;
+				if(paramValue instanceof ServiceParameters) {
+					pValue = ((ServiceParameters)paramValue).toJson().toString();
 				}
 				else
-					pValue = paramValue.toString();
+					if(paramValue instanceof String) {					
+						if(paramValue.equals("on"))  //on/off values must be translated to 1/0
+							pValue = "1";
+						else
+							if(paramValue.equals("off"))  
+								pValue = "0";
+							else 								
+								pValue = pValue + "\"" + paramValue.toString() + "\"" ;
+					}
+					else
+						pValue = paramValue.toString();
 		return "\""+ paramName + "\":" + pValue ; 
 	}
 

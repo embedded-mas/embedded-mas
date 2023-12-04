@@ -105,7 +105,7 @@ public class RosMaster extends LiteralDevice {
 		EmbeddedAction action = this.embeddedActions.get(actionName);
 		if(action!=null)
 			if(action instanceof TopicWritingAction) {
-				((TopicWritingAction)action).setValue(args[0]);
+				((TopicWritingAction)action).setValue(args);
 				this.getMicrocontroller().execEmbeddedAction(action);
 			}	
 			else

@@ -14,6 +14,22 @@ import static jason.asSyntax.ASSyntax.createAtom;
 
 public class defaultEmbeddedInternalAction extends EmbeddedInternalAction {
 
+
+
+	private Object[] listToArguments(ListTermImpl args) {
+		Object[] arguments = new Object[args.size()];			
+		for(int i=0;i<args.size();i++) {
+			if(args.get(i) instanceof ListTermImpl)
+				arguments[i] = listToArguments((ListTermImpl) args.get(i));
+			else
+				if(args.get(i) instanceof NumberTermImpl)
+					arguments[i] = args.get(i);
+				else
+					arguments[i] = args.get(i).toString().replaceAll("\"(.+)\"", "$1");
+		}		
+		return arguments;
+	}
+
 	@Override
 	/**
 	 * args:
@@ -39,14 +55,8 @@ public class defaultEmbeddedInternalAction extends EmbeddedInternalAction {
 			Atom actionName = createAtom(args[1].toString().replaceAll("\"(.+)\"", "$1"));			
 			if(action!=null) { 	//Case 1. The device has an EmbeddedAction
 				if(args[2] instanceof ListTermImpl){ //if arguments in args[2] are a list 
-					Object[] arguments = new Object[((ListTermImpl)args[2]).size()];			
-					for(int i=0;i<((ListTermImpl)args[2]).size();i++) {
-						if(((ListTermImpl)args[2]).get(i) instanceof NumberTermImpl)
-							arguments[i] = ((ListTermImpl)args[2]).get(i);
-						else
-						   arguments[i] = ((ListTermImpl)args[2]).get(i).toString().replaceAll("\"(.+)\"", "$1");
-					}
-
+					Object[] arguments = listToArguments((ListTermImpl)args[2]);
+					
 					//Check whether the current device class is adapted to execute embedded actions. 
 					//New kinds of devices must be adapted here to execute embedded actions
 					if(SerialDevice.class.isAssignableFrom(device.getClass())||

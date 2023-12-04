@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jason.asSyntax.ListTermImpl;
+
 public class ServiceParameters extends ArrayList<ServiceParam> {
 	
 	public JsonNode toJson() {
@@ -32,6 +34,34 @@ public class ServiceParameters extends ArrayList<ServiceParam> {
 		return true;		
 	}
 
+	/* set a list of values to a list of parameterss */
+	public boolean setValues(Object[] values) {
+		if(values.length!=this.size())
+			return false;
+		for(int i=0;i<values.length;i++) {
+			if((values[i] instanceof ListTermImpl)|(values[i] instanceof Object[])) {	//if the i-th parameter is a list						
+				if(this.get(i).getParamValue() instanceof ServiceParameters) { //if the value is a list, the corresponding param must be a list of parameters
+					Object[] v = null;
+					if(values[i] instanceof ListTermImpl) {
+						v = ((ListTermImpl)values[i]).toArray();
+					}
+					else
+						if(values[i] instanceof Object[]) {
+							v = (Object[]) values[i];
+						}
+					((ServiceParameters)this.get(i).getParamValue()).setValues(v);
+				}
+				else	
+					return false;
+			}
+			else
+			{
+				this.get(i).setParamValue(values[i]);
+			}
+		}
+		return true;
+	}
+
 	@Override
 	public String toString() {
 		String s = "ServiceParameters ";
@@ -39,9 +69,9 @@ public class ServiceParameters extends ArrayList<ServiceParam> {
 			s = s.concat(this.get(i).getParamName());
 		return s;
 	}
-	
-	
-	
-	
+
+
+
+
 
 }

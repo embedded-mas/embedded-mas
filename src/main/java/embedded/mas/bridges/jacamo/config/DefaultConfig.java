@@ -191,13 +191,16 @@ public class DefaultConfig {
 
 
 							//handle topic writing actions
-							//if(((LinkedHashMap)((LinkedHashMap)item.get("microcontroller")).get("actions")).get("topicWritingActions")!=null) {
 							if(((LinkedHashMap)item.get("actions")).get("topicWritingActions")!=null) {
 								ArrayList topicWritingActions = (ArrayList) ((LinkedHashMap)item.get("actions")).get("topicWritingActions");
 								for(int j=0;j<topicWritingActions.size();j++) {
+									ServiceParameters params = new ServiceParameters();
+									if(((LinkedHashMap)topicWritingActions.get(j)).get("params")!=null)
+										params = buildServiceParameters( (ArrayList<Object>) ((LinkedHashMap) topicWritingActions.get(j)).get("params"));
+									
 									embeddedActionList.add(new TopicWritingAction(createAtom(((LinkedHashMap) topicWritingActions.get(j)).get("actionName").toString()),
 											((LinkedHashMap) topicWritingActions.get(j)).get("topicName").toString(),
-											((LinkedHashMap) topicWritingActions.get(j)).get("topicType").toString(),null));
+											((LinkedHashMap) topicWritingActions.get(j)).get("topicType").toString(),null,params));
 								}
 							}
 
@@ -215,7 +218,7 @@ public class DefaultConfig {
 										}
 									ServiceRequestAction serviceAction = null;
 									serviceAction = new ServiceRequestAction(createAtom(((LinkedHashMap)serviceRequestActions.get(j)).get("actionName").toString()), 
-												((LinkedHashMap)serviceRequestActions.get(j)).get("serviceName").toString(), params);
+											((LinkedHashMap)serviceRequestActions.get(j)).get("serviceName").toString(), params);
 									embeddedActionList.add(serviceAction);
 
 								}
@@ -275,5 +278,23 @@ public class DefaultConfig {
 		return devices;
 
 	}
+
+	private ServiceParameters buildServiceParameters(ArrayList<Object> object) {
+		ServiceParameters result = new ServiceParameters();
+		for(Object o:object) {
+			if(o instanceof LinkedHashMap) {
+				ServiceParam p;
+				for (Map.Entry<String, ArrayList> oo : ((LinkedHashMap<String, ArrayList>) o).entrySet()) {
+					if(oo.getValue() instanceof ArrayList) {
+						result.add( new ServiceParam(oo.getKey(), buildServiceParameters((ArrayList<Object>) oo.getValue())));
+					}
+				}
+			}
+			else
+				result.add(new ServiceParam(o.toString(), null));
+		}
+		return result;
+	}
+
 
 }
