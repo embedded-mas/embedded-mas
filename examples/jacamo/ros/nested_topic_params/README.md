@@ -3,6 +3,26 @@
 ## Scenario
 This example illustrates agent actions that correspond to ROS topic writing using nested parameters. It contains a randomly moving turtle agent (see the agent code [here](src/agt/sample_agent.asl)). The turtle agent moves itself by executing the action ```move_turtle```. This action is concretely realized through the writing in the topic ```/turtle1/cmd_vel```. This topic has a complex parameter structure, with nested parameters.
 
+
+The nested parameters must be set as nested lists. In this example, the parameters written in the topic ```/turtle1/cmd_vel``` have the form ``` {"linear":{"x":float64,"y":float64,"z":float64}, "angular":{"x":float64,"y":float64,"z":float64}}  ```. These parameters are configured in the yaml file as part of the corresponding topic writing action as follows:
+```
+   .
+   .
+   .
+   
+params:
+   - linear:
+      - x
+      - y
+      - z
+   - angular:
+      - x
+      - y
+      - z
+```
+
+ In the agent code, these parameters are set in the embedded internal action as ```defaultEmbeddedInternalAction("sample_roscore","move_turtle", [[X_linear,Y_linear,Z_linear],[X_angular,Y_angular,Z_angular]]); ```. 
+
 ## Requirements
 1. ROS (recommended [ROS Noetic](http://wiki.ros.org/noetic))
 2. [Rosbridge](http://wiki.ros.org/rosbridge_suite/Tutorials/RunningRosbridge)

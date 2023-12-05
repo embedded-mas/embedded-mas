@@ -26,17 +26,8 @@ repositories {
 
 dependencies {
     implementation 'org.jacamo:jacamo:0.10-SNAPSHOT'
-    implementation "embedded-mas:embedded-mas:0.058-SNAPSHOT" 
-    //implementation files('/mnt/1C4C766F4C764414/maiquel/git/embedded-mas/build/libs/embedded-mas-0.057-SNAPSHOT.jar')
-    
+    implementation "embedded-mas:embedded-mas:0.058-SNAPSHOT"     
     implementation "javard:javard:0.032-SNAPSHOT"
-
-    //implementation 'org.yaml:snakeyaml:1.30'
-    //implementation 'javax.json:javax.json-api:1.1.4'
-    //implementation 'org.glassfish:javax.json:1.1.4'
-    //implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.2'  
-    //implementation 'com.fasterxml.jackson.core:jackson-core:2.13.2' 
-    //implementation 'org.eclipse.jetty.websocket:websocket-server:9.4.46.v20220331' 
 }
 
 sourceSets {

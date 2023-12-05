@@ -29,6 +29,7 @@
       - actionName: move_turtle
         topicName: /turtle1/cmd_vel
         topicType: geometry_msgs/Twist
+        # the params "linear" and "angular" are both composed of a set of three other parameters.
         params:
            - linear:
               - x
