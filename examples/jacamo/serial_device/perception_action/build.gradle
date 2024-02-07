@@ -90,6 +90,12 @@ task uberJar(type: Jar, dependsOn: 'classes') {
     }
 }
 
+task buildJCMDeps (type: JavaExec, dependsOn: 'classes') {
+    mainClass = 'jacamo.infra.RunJaCaMoProject'
+    args = ['app1.jcm', '--deps']
+    classpath sourceSets.main.runtimeClasspath
+}
+
 clean {
     delete 'bin'
     delete 'build'
