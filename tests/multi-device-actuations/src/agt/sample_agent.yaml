@@ -1,0 +1,22 @@
+--- # Devices
+- device_id: my_device1
+  #className:  MyDemoDevice
+  className: embedded.mas.bridges.jacamo.DemoDevice
+  microcontroller: 
+      id: arduino1
+      className: DemoDevice      
+
+
+- device_id: my_device2
+  #className:  MyDemoDevice
+  className: embedded.mas.bridges.jacamo.DemoDevice
+  microcontroller: 
+      id: arduino1
+      className: DemoDevice      
+
+
+- actions:
+  - a1: 
+      - [my_device1.print,my_device2.doublex]
+      - [my_device2.print, my_device1.double]
+  - a2: [[my_device1.print,my_device2.double],[my_device2.print, my_device1.double]]
