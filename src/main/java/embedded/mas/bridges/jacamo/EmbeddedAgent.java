@@ -5,16 +5,21 @@
 package embedded.mas.bridges.jacamo;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
+import embedded.mas.bridges.jacamo.actuation.ActuationSequence;
 import jason.architecture.AgArch;
 import jason.asSemantics.Agent;
+import jason.asSyntax.Atom;
 
 
 public abstract class EmbeddedAgent extends Agent {
 
 	private final List<DefaultDevice> devices = new ArrayList<DefaultDevice>();
 	private DefaultEmbeddedAgArch arch = null;
+	protected HashMap<Atom, ActuationSequence> actionMap = new HashMap<Atom, ActuationSequence>();
 
 
 	@Override
@@ -51,6 +56,10 @@ public abstract class EmbeddedAgent extends Agent {
 		return this.devices;
 	}
 	
+	
+	public HashMap<Atom, ActuationSequence> getActionMap(){
+		return this.actionMap;
+	}
 	
 	private DefaultEmbeddedAgArch getEmbeddedArch() {
         AgArch arch = getTS().getAgArch().getFirstAgArch();

@@ -11,8 +11,11 @@ package embedded.mas.bridges.jacamo;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 
+import embedded.mas.bridges.jacamo.actuation.ActuationSequence;
 import embedded.mas.bridges.jacamo.config.DefaultConfig;
+import jason.asSyntax.Atom;
 
 
 public class CyberPhysicalAgent extends EmbeddedAgent {
@@ -24,6 +27,10 @@ public class CyberPhysicalAgent extends EmbeddedAgent {
 			DefaultConfig conf = new DefaultConfig();
 			List<DefaultDevice>  d =  conf.loadFromYaml(Paths.get("").toAbsolutePath()+"/src/agt/"+getTS().getAgArch().getAgName() + ".yaml");
 			this.getDevices().addAll(d);
+			
+			this.actionMap = conf.getActions(d,(Paths.get("").toAbsolutePath()+"/src/agt/"+getTS().getAgArch().getAgName() + ".yaml"));
+			for(Map.Entry<Atom, ActuationSequence> entry: actionMap.entrySet())
+				System.out.println(entry.getKey() + " +++  " + entry.getValue());
 		}
 
 

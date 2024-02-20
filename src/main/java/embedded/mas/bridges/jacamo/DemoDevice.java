@@ -29,7 +29,7 @@ public class DemoDevice extends DefaultDevice  {
 		super(id,null);
 		
 	}
-
+	
 	@Override
 	public Collection<Literal> getPercepts() {
 		ArrayList<Literal> percepts = new ArrayList<Literal>();
@@ -93,6 +93,11 @@ public class DemoDevice extends DefaultDevice  {
 		else
 			System.out.println("null!!");
 		return false;
+	}
+
+	@Override
+	public boolean execActuation(Atom actuationId, Object[] args) {
+		return execEmbeddedAction(actuationId, args, null);
 	}
 
 	
