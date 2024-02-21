@@ -78,7 +78,7 @@ public class RosMaster extends LiteralDevice {
 
 
 	public boolean execEmbeddedAction(String actionName, Object[] args, Term returnArg, Unifier un) throws Exception {
-		EmbeddedAction action = this.embeddedActions.get(createAtom(actionName));
+		EmbeddedAction action = this.getEmbeddedActions().get(createAtom(actionName));
 		if(args!=null&&!checkArrayArguments(args))
 			throw new Exception("Array arguments require all elements of the same type.");
 
@@ -102,7 +102,7 @@ public class RosMaster extends LiteralDevice {
 	public boolean execEmbeddedAction(Atom actionName,Object[] args, Unifier un) {
 		if(!checkArrayArguments(args))
 			return false;
-		EmbeddedAction action = this.embeddedActions.get(actionName);
+		EmbeddedAction action = this.getEmbeddedActions().get(actionName);
 		if(action!=null)
 			if(action instanceof TopicWritingAction) {
 				((TopicWritingAction)action).setValue(args);

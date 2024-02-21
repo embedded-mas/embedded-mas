@@ -23,7 +23,7 @@ public abstract class DefaultDevice implements IDevice {
 
 	protected Atom id;
 	protected IExternalInterface microcontroller;
-	protected HashMap<Atom, EmbeddedAction> embeddedActions = new HashMap<Atom, EmbeddedAction>();
+	private HashMap<Atom, EmbeddedAction> embeddedActions = new HashMap<Atom, EmbeddedAction>();
 
 	public DefaultDevice(Atom id, IExternalInterface microcontroller) {
 		this.id = id;
@@ -45,6 +45,12 @@ public abstract class DefaultDevice implements IDevice {
 
 	public abstract IExternalInterface getMicrocontroller();
 
+	
+	public HashMap<Atom, EmbeddedAction> getEmbeddedActions(){
+		return this.embeddedActions;
+	}
+	
+	
 	public void addEmbeddedAction(EmbeddedAction embeddedAction) {
 		this.embeddedActions.put(embeddedAction.getActionName(), embeddedAction);
 
