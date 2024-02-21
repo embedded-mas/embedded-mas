@@ -15,12 +15,12 @@ import java.util.Iterator;
 
 
 
-public class ActuationSet extends HashSet<Actuation>{
+public class ActuationSet extends HashSet<ActuationDevice>{
 
 	@Override
 	public String toString() {
 		String s = "{";
-		Iterator<Actuation> it = this.iterator();
+		Iterator<ActuationDevice> it = this.iterator();
 		while(it.hasNext()) {
 			s = s.concat(it.next().toString());
 			if(it.hasNext()) s = s.concat(",");

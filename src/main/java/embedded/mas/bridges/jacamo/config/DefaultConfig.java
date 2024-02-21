@@ -58,7 +58,7 @@ import embedded.mas.bridges.jacamo.IDevice;
 import embedded.mas.bridges.jacamo.IExternalInterface;
 import embedded.mas.bridges.jacamo.IPhysicalInterface;
 import embedded.mas.bridges.jacamo.SerialEmbeddedAction;
-import embedded.mas.bridges.jacamo.actuation.Actuation;
+import embedded.mas.bridges.jacamo.actuation.ActuationDevice;
 import embedded.mas.bridges.jacamo.actuation.ActuationSequence;
 import embedded.mas.bridges.jacamo.actuation.ActuationSet;
 import embedded.mas.bridges.javard.Arduino4EmbeddedMas;
@@ -171,7 +171,7 @@ public class DefaultConfig {
 												for(DefaultDevice d:devices)
 													if(d.getId().toString().equals(matcher.group(1)))
 														currentDevice = d;														
-												Actuation act = new Actuation(currentDevice, createAtom(matcher.group(2)));
+												ActuationDevice act = new ActuationDevice(currentDevice, createAtom(matcher.group(2)));
 												currentActuationSet.add(act);													
 											}												
 
@@ -214,7 +214,11 @@ public class DefaultConfig {
 					if(((LinkedHashMap) l.get(i)).get("device_id")!=null) {
 						System.out.println(">>>>" + l.get(i) + " - " + l.get(i).getClass().getName());
 						LinkedHashMap item = (LinkedHashMap) l.get(i);
-						//System.out.println("--> " + l.size() + " - " +  l.get(i));
+						
+						if(item.get("actuators")!=null)
+							System.out.println("Actuations: " + item.get("actuators") + " - " + item.get("actuators").getClass().getName());
+						
+						
 						if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("Arduino4EmbeddedMas")|
 								((LinkedHashMap)item.get("microcontroller")).get("className").equals("SerialReader")) {
 							microcontroller= createArduino4EmbeddedMas(((LinkedHashMap)item.get("microcontroller")).get("serial").toString(),
@@ -235,7 +239,9 @@ public class DefaultConfig {
 						}		
 						else
 							if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4EmbeddedMas")) {
-								//ArrayList perceptionTopics = (ArrayList) ((LinkedHashMap)item.get("microcontroller")).get("perceptionTopics");
+								
+								
+								
 								ArrayList perceptionTopics = (ArrayList) item.get("perceptionTopics");
 								ArrayList<String> topics = new ArrayList<String>();
 								ArrayList<String> types = new ArrayList<String>();

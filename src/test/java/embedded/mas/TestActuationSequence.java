@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import embedded.mas.bridges.jacamo.DemoDevice;
-import embedded.mas.bridges.jacamo.actuation.Actuation;
+import embedded.mas.bridges.jacamo.actuation.ActuationDevice;
 import embedded.mas.bridges.jacamo.actuation.ActuationSequence;
 import embedded.mas.bridges.jacamo.actuation.ActuationSet;
 
@@ -19,11 +19,11 @@ public class TestActuationSequence {
 		DemoDevice d1 = new DemoDevice(createAtom("myDevice1"));
 		DemoDevice d2 = new DemoDevice(createAtom("myDevice2"));
 		
-		Actuation a11 = new Actuation(d1, createAtom("a11"));
-		Actuation a12 = new Actuation(d1, createAtom("a12"));
+		ActuationDevice a11 = new ActuationDevice(d1, createAtom("a11"));
+		ActuationDevice a12 = new ActuationDevice(d1, createAtom("a12"));
 		
-		Actuation a21 = new Actuation(d1, createAtom("a21"));
-		Actuation a22 = new Actuation(d1, createAtom("a22"));
+		ActuationDevice a21 = new ActuationDevice(d1, createAtom("a21"));
+		ActuationDevice a22 = new ActuationDevice(d1, createAtom("a22"));
 		
 		ActuationSet aset1 = new ActuationSet();
 		aset1.add(a11);

@@ -5,6 +5,16 @@
   microcontroller: 
       id: arduino1
       className: DemoDevice      
+  actuators:
+    actuator_id: act1
+    actuations: 
+      - actuation_id: print
+        parameters:
+          - text
+      - actuation_id: double
+        parameters:
+          - value
+
 
 
 - device_id: my_device2

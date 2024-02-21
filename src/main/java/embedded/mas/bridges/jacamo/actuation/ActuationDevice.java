@@ -3,24 +3,24 @@ package embedded.mas.bridges.jacamo.actuation;
 import embedded.mas.bridges.jacamo.DefaultDevice;
 import jason.asSyntax.Atom;
 
-public class Actuation {
+public class ActuationDevice {
 
 	private DefaultDevice device;
 	private Atom actuationId;
 	
-	public Actuation(DefaultDevice device, Atom actuationId) {
+	public ActuationDevice(DefaultDevice device, Atom actuationId) {
 		super();
 		this.device = device;
 		this.actuationId = actuationId;
 	}
 
-	public DefaultDevice getDevice() {
+	/*public DefaultDevice getDevice() {
 		return device;
 	}
 
 	public void setDevice(DefaultDevice device) {
 		this.device = device;
-	}
+	}*/
 
 	public Atom getActuationId() {
 		return actuationId;

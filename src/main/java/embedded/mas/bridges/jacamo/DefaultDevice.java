@@ -6,6 +6,7 @@ import java.util.HashMap;
 import embedded.mas.exception.EmbeddedActionException;
 import embedded.mas.exception.EmbeddedActionNotFoundException;
 import embedded.mas.exception.PerceivingException;
+import jade.util.leap.HashSet;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Atom;
 import jason.asSyntax.Literal;
@@ -46,21 +47,25 @@ public abstract class DefaultDevice implements IDevice {
 	public abstract IExternalInterface getMicrocontroller();
 
 	
+	@Deprecated
 	public HashMap<Atom, EmbeddedAction> getEmbeddedActions(){
 		return this.embeddedActions;
 	}
 	
 	
+	@Deprecated
 	public void addEmbeddedAction(EmbeddedAction embeddedAction) {
 		this.embeddedActions.put(embeddedAction.getActionName(), embeddedAction);
 
 	}
 
+	@Deprecated
 	public void removeEmbeddedAction(EmbeddedAction embeddedAction) {
 		this.embeddedActions.remove(embeddedAction.getActionName());
 
 	}
 
+	@Deprecated
 	public final EmbeddedAction getEmbeddedAction(Atom actionName) {
 		return embeddedActions.get(actionName);
 	}

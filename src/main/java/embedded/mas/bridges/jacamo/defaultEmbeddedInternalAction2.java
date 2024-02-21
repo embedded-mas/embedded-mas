@@ -12,7 +12,7 @@ import static jason.asSyntax.ASSyntax.createAtom;
 
 import java.util.Iterator;
 
-import embedded.mas.bridges.jacamo.actuation.Actuation;
+
 import embedded.mas.bridges.jacamo.actuation.ActuationSequence;
 import embedded.mas.bridges.jacamo.actuation.ActuationSet;
 
@@ -42,7 +42,7 @@ public class defaultEmbeddedInternalAction2 extends EmbeddedInternalAction {
 	 * 0. ActionName
 	 */
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {  
-		if(ts.getAg() instanceof EmbeddedAgent) {
+		/*if(ts.getAg() instanceof EmbeddedAgent) {
 
 			EmbeddedAgent agent = (EmbeddedAgent) ts.getAg();
 			//check whether the action is in the agent's repertory			
@@ -85,17 +85,7 @@ public class defaultEmbeddedInternalAction2 extends EmbeddedInternalAction {
 			}
 
 
-			/*//find the device the action is applyied upon
-			DefaultDevice device = null;
-			String deviceName = args[0].toString().replaceAll("\"(.+)\"", "$1");
-			for(DefaultDevice dev:((EmbeddedAgent)ts.getAg()).getDevices()) {
-				if(dev.getId().toString().equals(deviceName)) {
-					device = dev;
-					break;
-				}
-			}					
-			if(device==null) throw new Exception("Device " + deviceName + " not found.");
-			 */
+	
 			EmbeddedAction action = device.getEmbeddedAction(createAtom(args[1].toString().replaceAll("\"(.+)\"", "$1")));	
 			Atom actionName = createAtom(args[1].toString().replaceAll("\"(.+)\"", "$1"));			
 			if(action!=null) { 	//Case 1. The device has an EmbeddedAction
@@ -125,11 +115,12 @@ public class defaultEmbeddedInternalAction2 extends EmbeddedInternalAction {
 					return device.execEmbeddedAction(args[1].toString().replaceAll("\"(.+)\"", "$1"), new String[]{args[2].toString().replaceAll("\"(.+)\"", "$1")},un);
 				}
 
-			}
+			}/*
 
 
 
-		}else return false;
+		}else return false;*/
+		return true;
 	}
 
 

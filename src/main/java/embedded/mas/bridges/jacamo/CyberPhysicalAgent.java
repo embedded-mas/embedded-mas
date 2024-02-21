@@ -23,6 +23,7 @@ public class CyberPhysicalAgent extends EmbeddedAgent {
 
 
 	protected void setupDevices() {
+		System.out.println("[CyberPhysicalAgent] Starting...");
 		if(new File( Paths.get("").toAbsolutePath()+"/src/agt/"+getTS().getAgArch().getAgName() + ".yaml").exists()) {
 			DefaultConfig conf = new DefaultConfig();
 			List<DefaultDevice>  d =  conf.loadFromYaml(Paths.get("").toAbsolutePath()+"/src/agt/"+getTS().getAgArch().getAgName() + ".yaml");
