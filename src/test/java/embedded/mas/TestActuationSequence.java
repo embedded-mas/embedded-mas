@@ -5,9 +5,11 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import embedded.mas.bridges.jacamo.DemoDevice;
+import embedded.mas.bridges.jacamo.actuation.Actuation;
 import embedded.mas.bridges.jacamo.actuation.ActuationDevice;
 import embedded.mas.bridges.jacamo.actuation.ActuationSequence;
 import embedded.mas.bridges.jacamo.actuation.ActuationSet;
+import embedded.mas.bridges.jacamo.actuation.Actuator;
 
 import static jason.asSyntax.ASSyntax.createAtom;
 
@@ -16,14 +18,13 @@ public class TestActuationSequence {
 	@Test
 	public void testaddFirst() {
 		
-		DemoDevice d1 = new DemoDevice(createAtom("myDevice1"));
-		DemoDevice d2 = new DemoDevice(createAtom("myDevice2"));
+		DemoDevice d1 = new DemoDevice(createAtom("myDevice1"));		
 		
-		ActuationDevice a11 = new ActuationDevice(d1, createAtom("a11"));
-		ActuationDevice a12 = new ActuationDevice(d1, createAtom("a12"));
+		ActuationDevice a11 = new ActuationDevice(d1, new Actuator(createAtom("a11")), new Actuation(createAtom("actuation11")));
+		ActuationDevice a12 = new ActuationDevice(d1, new Actuator(createAtom("a12")), new Actuation(createAtom("actuation12")));
 		
-		ActuationDevice a21 = new ActuationDevice(d1, createAtom("a21"));
-		ActuationDevice a22 = new ActuationDevice(d1, createAtom("a22"));
+		ActuationDevice a21 = new ActuationDevice(d1, new Actuator(createAtom("a21")), new Actuation(createAtom("actuation21")));
+		ActuationDevice a22 = new ActuationDevice(d1, new Actuator(createAtom("a22")), new Actuation(createAtom("actuation22")));
 		
 		ActuationSet aset1 = new ActuationSet();
 		aset1.add(a11);

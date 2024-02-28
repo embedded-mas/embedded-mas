@@ -26,15 +26,11 @@
 
 package embedded.mas.bridges.jacamo.config;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -45,28 +41,25 @@ import java.util.regex.Pattern;
 
 import org.yaml.snakeyaml.Yaml;
 
-import com.fasterxml.jackson.annotation.JacksonInject.Value;
-import com.fasterxml.jackson.core.exc.StreamReadException;
-import com.fasterxml.jackson.databind.DatabindException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-
 import embedded.mas.bridges.jacamo.DefaultDevice;
 import embedded.mas.bridges.jacamo.DemoDevice;
 import embedded.mas.bridges.jacamo.EmbeddedAction;
-import embedded.mas.bridges.jacamo.IDevice;
 import embedded.mas.bridges.jacamo.IExternalInterface;
-import embedded.mas.bridges.jacamo.IPhysicalInterface;
 import embedded.mas.bridges.jacamo.SerialEmbeddedAction;
+import embedded.mas.bridges.jacamo.actuation.Actuation;
 import embedded.mas.bridges.jacamo.actuation.ActuationDevice;
 import embedded.mas.bridges.jacamo.actuation.ActuationSequence;
 import embedded.mas.bridges.jacamo.actuation.ActuationSet;
+import embedded.mas.bridges.jacamo.actuation.Actuator;
 import embedded.mas.bridges.javard.Arduino4EmbeddedMas;
 import embedded.mas.bridges.ros.DefaultRos4EmbeddedMas;
 import embedded.mas.bridges.ros.ServiceParam;
 import embedded.mas.bridges.ros.ServiceParameters;
 import embedded.mas.bridges.ros.ServiceRequestAction;
 import embedded.mas.bridges.ros.TopicWritingAction;
+import embedded.mas.exception.InvalidActuationException;
+import embedded.mas.exception.InvalidActuatorException;
+import embedded.mas.exception.InvalidDeviceException;
 import jason.asSyntax.Atom;
 
 import static jason.asSyntax.ASSyntax.createAtom;
@@ -135,7 +128,7 @@ public class DefaultConfig {
 	}
 	 */
 
-	public HashMap<Atom, ActuationSequence> getActions(List<DefaultDevice> devices, String filename){
+	public HashMap<Atom, ActuationSequence> getActions(List<DefaultDevice> devices, String filename) throws InvalidDeviceException, InvalidActuationException, InvalidActuatorException{
 		HashMap<Atom, ActuationSequence> actionsMap = new HashMap<Atom, ActuationSequence>();
 		Yaml yaml = new Yaml();
 		Iterable<Object> itr;
@@ -155,11 +148,10 @@ public class DefaultConfig {
 									String actionName = it.next().toString(); //save the current action name
 									ArrayList actuationSequence = (ArrayList) actionItem.get(actionName); //save the actuation sequence, which is a sequence of actuation sets
 									ActuationSequence currentActuationSequence = new ActuationSequence(); //start a new actuation sequence
-									String regex = "([^.]+)\\.([^.]+)";
+									String regex = "([^.]+)\\.([^.]+)\\.([^.]+)";
 									Pattern pattern;
 									Matcher matcher;
 									for(int k=0;k<actuationSequence.size();k++) { //for each actuation set
-										//System.out.println("Actuation Set: " + actuationSequence.get(k));
 										ArrayList actuationSet = (ArrayList) actuationSequence.get(k);
 										ActuationSet currentActuationSet = new ActuationSet(); //start a new actuation set
 										for(int n=0;n<actuationSet.size();n++){// for each element in the actuation set
@@ -170,9 +162,36 @@ public class DefaultConfig {
 												DefaultDevice currentDevice = null;
 												for(DefaultDevice d:devices)
 													if(d.getId().toString().equals(matcher.group(1)))
-														currentDevice = d;														
-												ActuationDevice act = new ActuationDevice(currentDevice, createAtom(matcher.group(2)));
-												currentActuationSet.add(act);													
+														currentDevice = d;			
+												if(currentDevice==null) throw new InvalidDeviceException("Device " + matcher.group(1) + " not found.");
+												
+												if(currentDevice!=null) {
+													boolean actuatorFound = false;
+													Iterator<Actuator> actuatorIt = currentDevice.getActuators().iterator();
+													while(actuatorIt.hasNext()) {
+														Actuator currentActuator = actuatorIt.next();														
+														if(currentActuator.getId().toString().equals(matcher.group(2))) { //check whether the device has an actuator that matches with the specified in the action
+															actuatorFound = true;
+															//check whether the actuator includes the actuation specified
+															Iterator<Actuation> actuationIt = currentActuator.getActuations().iterator();
+															boolean actuationFound = false;
+															while(actuationIt.hasNext()) {
+																Actuation currentActuation = actuationIt.next();
+																if(currentActuation.getId().toString().equals(matcher.group(3))){
+																	actuationFound = true;
+																	ActuationDevice act = new ActuationDevice(currentDevice, currentActuator,currentActuation);
+																	currentActuationSet.add(act);
+																}
+															}
+															if(!actuationFound) throw new InvalidActuationException("Actuator " + matcher.group(1)+"."+matcher.group(2)+"."+ matcher.group(3) + " not found.");
+
+
+
+														}
+													}
+												if(!actuatorFound) throw new InvalidActuatorException("Actuator " + matcher.group(1)+"."+matcher.group(2) + " not found.");
+												}
+
 											}												
 
 										}
@@ -194,6 +213,32 @@ public class DefaultConfig {
 		return actionsMap;
 	}
 
+
+	public List<Actuator> processActuators(List actuatorYaml){		
+		ArrayList<Actuator> result = new ArrayList<Actuator>();		
+		if(actuatorYaml!=null) {
+
+			for(int i=0;i<actuatorYaml.size();i++){
+				LinkedHashMap currentActuator = (LinkedHashMap)actuatorYaml.get(i);
+				ArrayList actuationsList = (ArrayList) currentActuator.get("actuations");
+				Actuator actuator = new Actuator(createAtom(currentActuator.get("actuator_id").toString()));
+				for(int j = 0;j<actuationsList.size();j++) {
+					LinkedHashMap currentActuation =  (LinkedHashMap) actuationsList.get(j);
+					Actuation actuation = new Actuation(createAtom(currentActuation.get("actuation_id").toString()));
+					if(currentActuation.get("parameters")!=null) {
+						ArrayList parametersList = (ArrayList)currentActuation.get("parameters");
+						for(int k=0;k<parametersList.size();k++)
+							actuation.addParameter(createAtom(parametersList.get(k).toString()));
+					}
+					actuator.addActuation(actuation);					   
+				}
+				result.add(actuator);
+
+			}
+		}
+		return result;
+	}
+
 	public List<DefaultDevice> loadFromYaml(String filename) {
 
 		ArrayList<DefaultDevice> devices = new ArrayList<DefaultDevice>();
@@ -212,25 +257,13 @@ public class DefaultConfig {
 
 				for(int i=0;i<l.size();i++) {
 					if(((LinkedHashMap) l.get(i)).get("device_id")!=null) {
-						System.out.println(">>>>" + l.get(i) + " - " + l.get(i).getClass().getName());
 						LinkedHashMap item = (LinkedHashMap) l.get(i);
-						
-						if(item.get("actuators")!=null)
-							System.out.println("Actuations: " + item.get("actuators") + " - " + item.get("actuators").getClass().getName());
-						
-						
 						if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("Arduino4EmbeddedMas")|
 								((LinkedHashMap)item.get("microcontroller")).get("className").equals("SerialReader")) {
 							microcontroller= createArduino4EmbeddedMas(((LinkedHashMap)item.get("microcontroller")).get("serial").toString(),
 									Integer.parseInt(((LinkedHashMap)item.get("microcontroller")).get("baudRate").toString()));
-							//actions
-							//System.out.println("Actions:::: "+ item.get("serialActions") + "- " + item.get("serialActions").getClass().getName());
 							ArrayList actionsArray = (ArrayList) item.get("serialActions");
 							for(int j=0;j<actionsArray.size();j++) {
-								/*System.out.println(actionsArray.get(j) + " - " + actionsArray.get(j).getClass().getName() + 
-									           ((LinkedHashMap)actionsArray.get(j)).get("actionName").toString() + "->" + 
-									           ((LinkedHashMap)actionsArray.get(j)).get("actuationName").toString());
-								 */
 								SerialEmbeddedAction action  = new SerialEmbeddedAction(createAtom(((LinkedHashMap)actionsArray.get(j)).get("actionName").toString() ), 
 										createAtom(((LinkedHashMap)actionsArray.get(j)).get("actuationName").toString()));
 								embeddedActionList.add(action);
@@ -239,9 +272,6 @@ public class DefaultConfig {
 						}		
 						else
 							if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4EmbeddedMas")) {
-								
-								
-								
 								ArrayList perceptionTopics = (ArrayList) item.get("perceptionTopics");
 								ArrayList<String> topics = new ArrayList<String>();
 								ArrayList<String> types = new ArrayList<String>();
@@ -297,12 +327,6 @@ public class DefaultConfig {
 									//do nothing (so far)
 								}		
 
-						//System.out.println("*** " + microcontroller.getClass().getInterfaces());
-						/*** pegar todas as interfaces do microcontroller  e encontrar uma que estenda IExternalInterface */ 
-						//System.out.println("!!! " + microcontroller.getClass().getName() + " !!!");
-						//getInterface( microcontroller.getClass());
-						/***/
-
 
 						DefaultDevice device = null;
 						try {
@@ -315,9 +339,15 @@ public class DefaultConfig {
 								Constructor constructor = c.getConstructor(jason.asSyntax.Atom.class,getIExternalDevice(microcontroller.getClass()));
 								obj = constructor.newInstance(createAtom(item.get("device_id").toString()),microcontroller);
 							}
-							//System.out.println("Classe criada " + obj.getClass().getName());
 							for(EmbeddedAction a : embeddedActionList)
 								((DefaultDevice) obj).addEmbeddedAction(a);
+
+
+							List<Actuator> actuators = processActuators((ArrayList) item.get("actuators")); 
+							for(Actuator a : actuators)
+								((DefaultDevice) obj).addActuator(a);
+
+
 							devices.add((DefaultDevice) obj);
 						} catch (ClassNotFoundException e) {
 							// TODO Auto-generated catch block
@@ -384,7 +414,6 @@ public class DefaultConfig {
 					//System.out.println(l.get(0).getClass().getName());
 				}
 			}
-			getActions(devices, filename);
 			return devices;
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block

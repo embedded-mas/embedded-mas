@@ -1,38 +1,52 @@
 package embedded.mas.bridges.jacamo.actuation;
 
 import embedded.mas.bridges.jacamo.DefaultDevice;
-import jason.asSyntax.Atom;
 
 public class ActuationDevice {
 
 	private DefaultDevice device;
-	private Atom actuationId;
+	private Actuator actuator;
+	private Actuation actuation;
 	
-	public ActuationDevice(DefaultDevice device, Atom actuationId) {
+	public ActuationDevice(DefaultDevice device, Actuator actuator, Actuation actuation) {
 		super();
 		this.device = device;
-		this.actuationId = actuationId;
+		this.actuator = actuator;
+		this.actuation = actuation;
 	}
 
-	/*public DefaultDevice getDevice() {
+	public DefaultDevice getDevice() {
 		return device;
 	}
 
-	public void setDevice(DefaultDevice device) {
+	/*public void setDevice(DefaultDevice device) {
 		this.device = device;
 	}*/
 
-	public Atom getActuationId() {
-		return actuationId;
+	public Actuator getActuator() {
+		return this.actuator;
 	}
 
-	public void setActuationId(Atom actuationId) {
-		this.actuationId = actuationId;
+	public void setActuator(Actuator actuator) {
+		this.actuator = actuator;
 	}
+
+	
+	
+	public Actuation getActuation() {
+		return actuation;
+	}
+
+	public void setActuation(Actuation actuation) {
+		this.actuation = actuation;
+	}
+	
+	
+	
 
 	@Override
 	public String toString() {
-		return "(" + device.getId() + "," + actuationId + ")";
+		return "(" + device.getId() + "." + actuator.getId() + "." + actuation.toString() + ")";
 	}
 	
 	

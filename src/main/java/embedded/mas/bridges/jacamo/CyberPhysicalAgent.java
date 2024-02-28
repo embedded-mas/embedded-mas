@@ -11,11 +11,11 @@ package embedded.mas.bridges.jacamo;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Map;
 
-import embedded.mas.bridges.jacamo.actuation.ActuationSequence;
 import embedded.mas.bridges.jacamo.config.DefaultConfig;
-import jason.asSyntax.Atom;
+import embedded.mas.exception.InvalidActuationException;
+import embedded.mas.exception.InvalidActuatorException;
+import embedded.mas.exception.InvalidDeviceException;
 
 
 public class CyberPhysicalAgent extends EmbeddedAgent {
@@ -23,15 +23,23 @@ public class CyberPhysicalAgent extends EmbeddedAgent {
 
 
 	protected void setupDevices() {
-		System.out.println("[CyberPhysicalAgent] Starting...");
 		if(new File( Paths.get("").toAbsolutePath()+"/src/agt/"+getTS().getAgArch().getAgName() + ".yaml").exists()) {
 			DefaultConfig conf = new DefaultConfig();
 			List<DefaultDevice>  d =  conf.loadFromYaml(Paths.get("").toAbsolutePath()+"/src/agt/"+getTS().getAgArch().getAgName() + ".yaml");
 			this.getDevices().addAll(d);
 			
-			this.actionMap = conf.getActions(d,(Paths.get("").toAbsolutePath()+"/src/agt/"+getTS().getAgArch().getAgName() + ".yaml"));
-			for(Map.Entry<Atom, ActuationSequence> entry: actionMap.entrySet())
-				System.out.println(entry.getKey() + " +++  " + entry.getValue());
+			try {
+				this.actionMap = conf.getActions(d,(Paths.get("").toAbsolutePath()+"/src/agt/"+getTS().getAgArch().getAgName() + ".yaml"));
+			} catch (InvalidDeviceException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InvalidActuationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InvalidActuatorException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}		
 		}
 
 

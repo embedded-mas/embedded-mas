@@ -2,6 +2,8 @@ package embedded.mas.bridges.jacamo;
 
 import java.util.Collection;
 
+import embedded.mas.exception.InvalidActuationException;
+import embedded.mas.exception.InvalidActuatorException;
 import embedded.mas.exception.PerceivingException;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Atom;
@@ -24,6 +26,8 @@ public interface IDevice {
 	
 	public boolean execEmbeddedAction(Atom actionName, Object[] args, Unifier un);
 	
-	public boolean execActuation(Atom actuationId, Object[] args);
+	public boolean execActuation(Atom actuatorId, Atom actuationId, Object[] args,  Unifier un) throws InvalidActuatorException, InvalidActuationException;
+	
+	public boolean hasActuator(Atom actuatorId);
 
 }

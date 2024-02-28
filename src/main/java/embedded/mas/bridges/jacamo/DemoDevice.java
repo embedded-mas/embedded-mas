@@ -5,6 +5,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import embedded.mas.exception.InvalidActuatorException;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Atom;
 import jason.asSyntax.Literal;
@@ -96,9 +97,26 @@ public class DemoDevice extends DefaultDevice  {
 	}
 
 	@Override
-	public boolean execActuation(Atom actuationId, Object[] args) {
-		return execEmbeddedAction(actuationId, args, null);
+	public boolean doExecActuation(Atom actuatorId, Atom actuationId, Object[] args, Unifier un) {
+		if(actuationId.toString().equals("print"))
+			return doEmbeddedPrint(actuatorId, args[0].toString());
+		else
+			if(actuationId.toString().equals("double")) { 
+				double r = Double.parseDouble(args[0].toString()) * 2;
+				NumberTerm result = new NumberTermImpl(r);
+				return un.unifies(result, (Term) args[1]);			
+
+			}
+			
+		return false;
 	}
 
+
+	//************************* Implementations to test the actuation model that is based on actuators x actuations
+	private boolean doEmbeddedPrint(Atom actuatorId, String text) {
+		System.out.println("[" + this.id + "." + actuatorId  + ".print] " + text);
+		return true;
+	}
+	
 	
 }

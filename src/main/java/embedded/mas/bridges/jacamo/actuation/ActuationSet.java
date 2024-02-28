@@ -10,12 +10,12 @@
 
 package embedded.mas.bridges.jacamo.actuation;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 
 
-public class ActuationSet extends HashSet<ActuationDevice>{
+public class ActuationSet extends ArrayList<ActuationDevice>{
 
 	@Override
 	public String toString() {
