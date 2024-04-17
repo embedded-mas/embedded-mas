@@ -16,7 +16,7 @@ mas perception_action {
 
     agent turtle1{    
       ag-class: embedded.mas.bridges.jacamo.ros.RosBdiAgent
-      ag-arch: embedded.mas.bridges.jacamo.DefaultEmbeddedAgArch
+      ag-arch: embedded.mas.bridges.jacamo.ros.RosBdiAgArch
     }
 
     agent turtle2{    

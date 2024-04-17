@@ -21,7 +21,7 @@
   perceptionTopics:         
       - topicName: turtle2/pose
         topicType: turtlesim/Pose
-        beliefName: turtle_position
+        beliefName: robot_position
       - topicName: turtle2/energy
         topicType: std_msgs/Int32
         beliefName: myEnergy
@@ -32,7 +32,7 @@
   #         This example illustrate only service request actions. 
   actions:       
     topicWritingActions:          
-      - actionName: move_turtle
+      - actionName: move_robot
         topicName: /turtle2/cmd_vel
         topicType: geometry_msgs/Twist 
         params:
@@ -49,7 +49,7 @@
     # 2. serviceName: the name of the service to be called
     # 3. params: a list of the names of parameters required by the service
     serviceRequestActions:
-        #- actionName: move_turtle
+        #- actionName: move_robot
         #  serviceName: /turtle1/teleport_relative
         #  params:
         #    - linear
@@ -57,5 +57,12 @@
         - actionName: get_loggers
           serviceName: /turtlesim/get_loggers          
           #this action does not have any parameters
-            
+        - actionName: start_economic_mode
+          serviceName: /turtle1/set_pen
+          params:
+             - r
+             - g
+             - b
+             - width
+             - 'off'
 
