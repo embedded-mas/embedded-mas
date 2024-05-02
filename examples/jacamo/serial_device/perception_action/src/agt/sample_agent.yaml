@@ -1,6 +1,5 @@
 --- # Devices
 - device_id: arduino1
-  #className:  MyDemoDevice
   className: embedded.mas.bridges.jacamo.JSONWatcherDevice
   microcontroller: 
       id: arduino1

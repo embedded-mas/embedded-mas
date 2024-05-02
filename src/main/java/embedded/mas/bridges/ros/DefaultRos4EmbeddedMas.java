@@ -149,7 +149,8 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 			pub.publish(new PrimitiveMsg<Integer>(Integer.parseInt(s)));
 		else
 			if(type.equals("geometry_msgs/Pose")|| //TODO: handle application specific message types in application-customized extensions of DefaultRos4EmbeddedMas
-			   type.equals("geometry_msgs/Twist"))		
+			   type.equals("geometry_msgs/Twist")|
+			   type.equals("mrs_msgs/Path"))		
 				try {
 					pub.publish(new ObjectMapper().readTree(s));
 				} catch (JsonMappingException e) {

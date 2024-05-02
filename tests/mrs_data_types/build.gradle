@@ -1,0 +1,70 @@
+defaultTasks 'run'
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+version '1.0'
+group   'org.jacamo'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+   
+   maven { url "https://raw.github.com/jacamo-lang/mvn-repo/master" } 
+   maven { url "https://raw.github.com/embedded-mas/embedded-mas-mvn-repo/master" }
+
+    flatDir {
+       dirs 'lib'
+    }
+
+    mavenCentral()
+
+}
+
+dependencies {
+    implementation 'org.jacamo:jacamo:0.10-SNAPSHOT'
+    implementation "embedded-mas:embedded-mas:0.058-SNAPSHOT" 
+    implementation "javard:javard:0.032-SNAPSHOT"
+
+    //TODO:daqui para baixo, testar se dá pra eliminar quando usar o repositório do embedded-mas em vez de arquivo jar local
+    implementation group: 'org.yaml', name: 'snakeyaml', version: '1.30'
+    implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.13.3'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.3'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.2'  
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.13.2' 
+    implementation group: 'org.eclipse.jetty.websocket', name: 'websocket-server', version: '9.4.46.v20220331'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/env'
+            srcDir 'src/agt'
+            srcDir 'src/org'
+            srcDir 'src/java'
+        }
+        resources {
+            srcDir 'src/resources'
+        }
+    }
+}
+
+task run (type: JavaExec, dependsOn: 'classes') {
+    group       ' JaCaMo'
+    description 'runs the JaCaMo application'
+    doFirst {
+        mkdir 'log'
+    }
+    main 'jacamo.infra.JaCaMoLauncher'
+    args 'perception_action.jcm'
+    classpath sourceSets.main.runtimeClasspath
+}
+
+
+clean {
+    delete 'bin'
+    delete 'build'
+    delete 'log'
+}
+
