@@ -10,7 +10,7 @@ To illustrate actions that consider the service responses, the agent also execut
 
 
 === Requirements
-1. ROS (recommended [ROS Noetic](http://wiki.ros.org/noetic))
+1. ROS (recommended [ROS Noetic](http://wiki.ros.org/noetic) or [ROS 2 Humble](https://docs.ros.org/en/humble/index.html))
 2. [Rosbridge](http://wiki.ros.org/rosbridge_suite/Tutorials/RunningRosbridge)
 3. [Turtlesim](http://wiki.ros.org/turtlesim)
 
