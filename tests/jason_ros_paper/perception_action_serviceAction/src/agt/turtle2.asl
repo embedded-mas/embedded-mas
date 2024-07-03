@@ -213,8 +213,8 @@ robot_position(X,Y) :- robot_position(x(X),y(Y),theta(T),linear_velocity(LV),ang
 
 //--------------
 +!log  : robot_position(x(X),y(Y),theta(T),linear_velocity(LV),angular_velocity(AV))  & positions(L) & .concat(L,[X],NL) 
-        // & velocity(V) & velocities(Vs) & .concat(Vs,[V],NV)
-         //& myEnergy(_) //& energies(Es) & .concat(Es,[E],NE)
+         & velocity(V) & velocities(Vs) & .concat(Vs,[V],NV)
+         & myEnergy(E) & energies(Es) & .concat(Es,[E],NE)
          //& critical(C) & criticals(Cs) & .concat(Cs,[C],NC)
    <- -+positions(NL);
       -+velocities(NV);
@@ -224,4 +224,5 @@ robot_position(X,Y) :- robot_position(x(X),y(Y),theta(T),linear_velocity(LV),ang
       !log.
 
 +!log 
-   <- .wait(robot_position(_,_)).
+   <- .wait(1000);
+      !log.

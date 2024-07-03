@@ -191,6 +191,7 @@ robot_position(X,Y) :- robot_position(x(X),y(Y),theta(T),linear_velocity(LV),ang
       -+critical(1);
       !stay_safe; //activates the goal stay safe
       .wait(security_level(S)[source(percept)] & S\=="critical"); //wait for a non critical state to...
+      .broadcast(untell,security_level("critical"));
       .broadcast(tell,security_level(S)); // broadcast the new state
       .
 

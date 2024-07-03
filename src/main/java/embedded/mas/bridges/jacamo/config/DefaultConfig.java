@@ -54,6 +54,7 @@ import embedded.mas.bridges.jacamo.IExternalInterface;
 import embedded.mas.bridges.jacamo.IPhysicalInterface;
 import embedded.mas.bridges.jacamo.SerialEmbeddedAction;
 import embedded.mas.bridges.javard.Arduino4EmbeddedMas;
+import embedded.mas.bridges.ros.DefaultRos4Bdi;
 import embedded.mas.bridges.ros.DefaultRos4EmbeddedMas;
 import embedded.mas.bridges.ros.ServiceParam;
 import embedded.mas.bridges.ros.ServiceParameters;
@@ -76,6 +77,12 @@ public class DefaultConfig {
 		return new DefaultRos4EmbeddedMas(connectionStr, topics, types, beliefNames);
 
 	}
+	
+	private DefaultRos4Bdi createRos4Bdi(String connectionStr, ArrayList<String> topics, ArrayList<String> types, ArrayList<String> beliefNames) {
+		return new DefaultRos4Bdi(connectionStr, topics, types, beliefNames);
+
+	}
+
 
 	public <T> boolean isExternalInterface(Class<T> className){
 		Class[] classes = className.getInterfaces();
@@ -173,7 +180,8 @@ public class DefaultConfig {
 						}
 					}		
 					else
-						if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4EmbeddedMas")) {
+						if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4EmbeddedMas")|
+						   ((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4Bdi")) { //DefaultRos4Bdi is just an alias class for the names to make more sense in Jason-ROS applications
 							//ArrayList perceptionTopics = (ArrayList) ((LinkedHashMap)item.get("microcontroller")).get("perceptionTopics");
 							ArrayList perceptionTopics = (ArrayList) item.get("perceptionTopics");
 							ArrayList<String> topics = new ArrayList<String>();
@@ -187,7 +195,12 @@ public class DefaultConfig {
 								else
 									beliefNames.add(((LinkedHashMap)perceptionTopics.get(j)).get("beliefName").toString());	
 							}
-							microcontroller= createRos4EmbeddedMas(((LinkedHashMap)item.get("microcontroller")).get("connectionString").toString(),topics,types,beliefNames);
+							
+							if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4EmbeddedMas"))
+							   microcontroller= createRos4EmbeddedMas(((LinkedHashMap)item.get("microcontroller")).get("connectionString").toString(),topics,types,beliefNames);
+							else
+								if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4Bdi"))
+									microcontroller = createRos4Bdi(((LinkedHashMap)item.get("microcontroller")).get("connectionString").toString(),topics,types,beliefNames);
 
 
 							//handle topic writing actions
