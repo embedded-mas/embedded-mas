@@ -14,7 +14,7 @@ These are basic examples of Jason-ROS integration. Advanced examples are availab
 This integration is part of a broader integration framework available [here](https://github.com/embedded-mas/embedded-mas)
 
 Agents are configured in the a .`jcm` file, as usual in JaCaMo. 
-Agents extend the class [`EmbeddedAgent`](https://github.com/embedded-mas/embedded-mas/blob/master/src/main/java/embedded/mas/bridges/jacamo/EmbeddedAgent.java), that extends a [Jason Agent](https://github.com/jason-lang/jason/blob/master/src/main/java/jason/asSemantics/Agent.java). 
+Agents extend the class [`RosBdiAgent`](https://github.com/embedded-mas/embedded-mas/blob/master/src/main/java/embedded/mas/bridges/jacamo/ros/RosBdiAgent.java), that, ultimately, extends a [Jason Agent](https://github.com/jason-lang/jason/blob/master/src/main/java/jason/asSemantics/Agent.java). 
 
 An agent can connect with multiple ROS nodes. The connecton of an agent coded in the file `src/agt/<agent_file>.asl` is specified in the file `src/agt/<agent_file>.yaml`. This specification includes details on the connection with ROS nodes, as well as the mapping from topics to perceptions/beliefs and from topics/services to actions.
 
