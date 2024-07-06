@@ -26,32 +26,22 @@
 
 package embedded.mas.bridges.jacamo.config;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.yaml.snakeyaml.Yaml;
 
-import com.fasterxml.jackson.annotation.JacksonInject.Value;
-import com.fasterxml.jackson.core.exc.StreamReadException;
-import com.fasterxml.jackson.databind.DatabindException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import embedded.mas.bridges.jacamo.DefaultDevice;
 import embedded.mas.bridges.jacamo.EmbeddedAction;
-import embedded.mas.bridges.jacamo.IDevice;
 import embedded.mas.bridges.jacamo.IExternalInterface;
-import embedded.mas.bridges.jacamo.IPhysicalInterface;
 import embedded.mas.bridges.jacamo.SerialEmbeddedAction;
 import embedded.mas.bridges.javard.Arduino4EmbeddedMas;
 import embedded.mas.bridges.ros.DefaultRos4Bdi;
@@ -60,7 +50,6 @@ import embedded.mas.bridges.ros.ServiceParam;
 import embedded.mas.bridges.ros.ServiceParameters;
 import embedded.mas.bridges.ros.ServiceRequestAction;
 import embedded.mas.bridges.ros.TopicWritingAction;
-import jason.asSyntax.Atom;
 
 import static jason.asSyntax.ASSyntax.createAtom;
 
@@ -73,13 +62,13 @@ public class DefaultConfig {
 		return a;
 	}
 
-	private DefaultRos4EmbeddedMas createRos4EmbeddedMas(String connectionStr, ArrayList<String> topics, ArrayList<String> types, ArrayList<String> beliefNames) {
-		return new DefaultRos4EmbeddedMas(connectionStr, topics, types, beliefNames);
+	private DefaultRos4EmbeddedMas createRos4EmbeddedMas(String connectionStr, ArrayList<String> topics, ArrayList<String> types, ArrayList<String> beliefNames, HashMap<String, ArrayList<String>> paramsToIgnore) {
+		return new DefaultRos4EmbeddedMas(connectionStr, topics, types, beliefNames, paramsToIgnore);
 
 	}
 	
-	private DefaultRos4Bdi createRos4Bdi(String connectionStr, ArrayList<String> topics, ArrayList<String> types, ArrayList<String> beliefNames) {
-		return new DefaultRos4Bdi(connectionStr, topics, types, beliefNames);
+	private DefaultRos4Bdi createRos4Bdi(String connectionStr, ArrayList<String> topics, ArrayList<String> types, ArrayList<String> beliefNames, HashMap<String, ArrayList<String>> paramsToIgnore) {
+		return new DefaultRos4Bdi(connectionStr, topics, types, beliefNames, paramsToIgnore);
 
 	}
 
@@ -187,6 +176,7 @@ public class DefaultConfig {
 							ArrayList<String> topics = new ArrayList<String>();
 							ArrayList<String> types = new ArrayList<String>();
 							ArrayList<String> beliefNames = new ArrayList<String>();
+							HashMap<String, ArrayList<String>> ignoreParams = new HashMap<>();
 							for(int j=0;j<perceptionTopics.size();j++) {
 								topics.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicName").toString());
 								types.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicType").toString());
@@ -194,13 +184,15 @@ public class DefaultConfig {
 									beliefNames.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicName").toString());
 								else
 									beliefNames.add(((LinkedHashMap)perceptionTopics.get(j)).get("beliefName").toString());	
+								ArrayList tempParams =  (ArrayList) ((LinkedHashMap)perceptionTopics.get(j)).get("ignoreValues");
+								ignoreParams.put(((LinkedHashMap)perceptionTopics.get(j)).get("topicName").toString(), tempParams);
 							}
 							
 							if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4EmbeddedMas"))
-							   microcontroller= createRos4EmbeddedMas(((LinkedHashMap)item.get("microcontroller")).get("connectionString").toString(),topics,types,beliefNames);
+							   microcontroller= createRos4EmbeddedMas(((LinkedHashMap)item.get("microcontroller")).get("connectionString").toString(),topics,types,beliefNames, ignoreParams);
 							else
 								if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4Bdi"))
-									microcontroller = createRos4Bdi(((LinkedHashMap)item.get("microcontroller")).get("connectionString").toString(),topics,types,beliefNames);
+									microcontroller = createRos4Bdi(((LinkedHashMap)item.get("microcontroller")).get("connectionString").toString(),topics,types,beliefNames, ignoreParams);
 
 
 							//handle topic writing actions
