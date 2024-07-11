@@ -196,39 +196,40 @@ public class DefaultConfig {
 
 
 							//handle topic writing actions
-							if(((LinkedHashMap)item.get("actions")).get("topicWritingActions")!=null) {
-								ArrayList topicWritingActions = (ArrayList) ((LinkedHashMap)item.get("actions")).get("topicWritingActions");
-								for(int j=0;j<topicWritingActions.size();j++) {
-									ServiceParameters params = new ServiceParameters();
-									if(((LinkedHashMap)topicWritingActions.get(j)).get("params")!=null)
-										params = buildServiceParameters( (ArrayList<Object>) ((LinkedHashMap) topicWritingActions.get(j)).get("params"));
-									
-									embeddedActionList.add(new TopicWritingAction(createAtom(((LinkedHashMap) topicWritingActions.get(j)).get("actionName").toString()),
-											((LinkedHashMap) topicWritingActions.get(j)).get("topicName").toString(),
-											((LinkedHashMap) topicWritingActions.get(j)).get("topicType").toString(),null,params));
+							if(item.get("actions")!=null) {
+								if(((LinkedHashMap)item.get("actions")).get("topicWritingActions")!=null) {
+									ArrayList topicWritingActions = (ArrayList) ((LinkedHashMap)item.get("actions")).get("topicWritingActions");
+									for(int j=0;j<topicWritingActions.size();j++) {
+										ServiceParameters params = new ServiceParameters();
+										if(((LinkedHashMap)topicWritingActions.get(j)).get("params")!=null)
+											params = buildServiceParameters( (ArrayList<Object>) ((LinkedHashMap) topicWritingActions.get(j)).get("params"));
+
+										embeddedActionList.add(new TopicWritingAction(createAtom(((LinkedHashMap) topicWritingActions.get(j)).get("actionName").toString()),
+												((LinkedHashMap) topicWritingActions.get(j)).get("topicName").toString(),
+												((LinkedHashMap) topicWritingActions.get(j)).get("topicType").toString(),null,params));
+									}
 								}
+
+								//handle service request actions
+								//if(((LinkedHashMap)((LinkedHashMap)item.get("microcontroller")).get("actions")).get("serviceRequestActions")!=null) {
+								if(((LinkedHashMap)item.get("actions")).get("serviceRequestActions")!=null) {
+									ArrayList serviceRequestActions = (ArrayList) ((LinkedHashMap)item.get("actions")).get("serviceRequestActions");
+									for(int j=0;j<serviceRequestActions.size();j++) {
+										ServiceParameters params = new ServiceParameters();
+										if(((LinkedHashMap)serviceRequestActions.get(j)).get("params")!=null)
+											for(int k=0;k< ((ArrayList)((LinkedHashMap)serviceRequestActions.get(j)).get("params")).size();k++) {
+												ServiceParam p = new ServiceParam(((ArrayList)((LinkedHashMap)serviceRequestActions.get(j)).get("params")).get(k).toString(), 
+														null);
+												params.add(p);
+											}
+										ServiceRequestAction serviceAction = null;
+										serviceAction = new ServiceRequestAction(createAtom(((LinkedHashMap)serviceRequestActions.get(j)).get("actionName").toString()), 
+												((LinkedHashMap)serviceRequestActions.get(j)).get("serviceName").toString(), params);
+										embeddedActionList.add(serviceAction);
+
+									}
+								}	
 							}
-
-							//handle service request actions
-							//if(((LinkedHashMap)((LinkedHashMap)item.get("microcontroller")).get("actions")).get("serviceRequestActions")!=null) {
-							if(((LinkedHashMap)item.get("actions")).get("serviceRequestActions")!=null) {
-								ArrayList serviceRequestActions = (ArrayList) ((LinkedHashMap)item.get("actions")).get("serviceRequestActions");
-								for(int j=0;j<serviceRequestActions.size();j++) {
-									ServiceParameters params = new ServiceParameters();
-									if(((LinkedHashMap)serviceRequestActions.get(j)).get("params")!=null)
-										for(int k=0;k< ((ArrayList)((LinkedHashMap)serviceRequestActions.get(j)).get("params")).size();k++) {
-											ServiceParam p = new ServiceParam(((ArrayList)((LinkedHashMap)serviceRequestActions.get(j)).get("params")).get(k).toString(), 
-													null);
-											params.add(p);
-										}
-									ServiceRequestAction serviceAction = null;
-									serviceAction = new ServiceRequestAction(createAtom(((LinkedHashMap)serviceRequestActions.get(j)).get("actionName").toString()), 
-											((LinkedHashMap)serviceRequestActions.get(j)).get("serviceName").toString(), params);
-									embeddedActionList.add(serviceAction);
-
-								}
-							}	
-
 						}
 					//System.out.println("*** " + microcontroller.getClass().getInterfaces());
 					/*** pegar todas as interfaces do microcontroller  e encontrar uma que estenda IExternalInterface */ 
