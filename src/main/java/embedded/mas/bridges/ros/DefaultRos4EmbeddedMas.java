@@ -40,6 +40,12 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 	 */
 	private HashMap<String, Literal> beliefName = new HashMap<>();
 
+
+	/*
+	 * paramsToIgnore is a map where the key is the name of the topic and the value is a list of params to be ignore
+	 */
+	private HashMap<String, ArrayList<String>> paramsToIgnore = new HashMap<>();
+
 	/* topicValues is a hash where the key is the topic name and the value is the topic value.
 	 * It stores all the current read node values. When a node value changes, it is added to the hash table and updated 
 	 * accordingly.
@@ -55,20 +61,24 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 
 	//TODO: throw exception when topics and types have different sizes	
 	public DefaultRos4EmbeddedMas(String connectionStr, ArrayList<String> topics, ArrayList<String> types) {
-			createDefaultRos4EmbeddedMas(connectionStr, topics, types, null);
+		createDefaultRos4EmbeddedMas(connectionStr, topics, types, null, null);
 	}
 
-	
+
 	//TODO: throw exception when topics and types have different sizes	
 	public DefaultRos4EmbeddedMas(String connectionStr, ArrayList<String> topics, ArrayList<String> types, ArrayList<String>beliefNames) {
-		createDefaultRos4EmbeddedMas(connectionStr, topics, types, beliefNames);
+		createDefaultRos4EmbeddedMas(connectionStr, topics, types, beliefNames, null);
+	}
+
+	public DefaultRos4EmbeddedMas(String connectionStr, ArrayList<String> topics, ArrayList<String> types, ArrayList<String>beliefNames, HashMap<String, ArrayList<String>> ignoreParams) {
+		createDefaultRos4EmbeddedMas(connectionStr, topics, types, beliefNames, ignoreParams);
 	}
 
 
-	private void createDefaultRos4EmbeddedMas(String connectionStr, ArrayList<String> topics, ArrayList<String> types, ArrayList<String>beliefNames) {
+	private void createDefaultRos4EmbeddedMas(String connectionStr, ArrayList<String> topics, ArrayList<String> types, ArrayList<String>beliefNames, HashMap<String, ArrayList<String>> ignoreParams ) {
 		this.connection = connectionStr;
 		bridge.connect(connectionStr, true);
-		
+
 		//TODO: throw exception when topics and belief names have different sizes
 		if(beliefNames==null) {
 			for(String s:topics)
@@ -78,7 +88,8 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 				this.beliefName.put(topics.get(i).replaceAll("/", "_"), createAtom(beliefNames.get(i).replaceAll("/", "_")));
 			}
 		}
-		
+
+		this.paramsToIgnore = ignoreParams;
 
 		listener = new RosListenDelegate() {
 			public void receive(JsonNode data, String stringRep) {
@@ -88,10 +99,15 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 						if(p==null) {
 							Literal functor = beliefName.get(data.get("topic").textValue().replaceAll("/", "_"));
 							String terms;
+							
+							//check interest params
+							ArrayList<String> ignoreParameters = ignoreParams.get(data.get("topic").textValue());
+							
 							if(data.get("msg").size()==1&&data.get("msg").get("data")!=null) //basic case: single data
 								terms = jsonToPredArguments(data.get("msg").get("data"));
 							else	
-								terms = jsonToPredArguments(data.get("msg"));
+								terms = jsonToPredArguments(data.get("msg"), ignoreParameters);
+							System.out.println("[DefaultRos4EmbeddedMas] " + data.get("msg").get("data") + "/" + data.get("msg") + "/" +terms);
 							p = parseLiteral(functor+"("+terms+")");
 						}
 						synchronized (topicValues) {
@@ -114,7 +130,7 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 
 	}
 
-	
+
 
 	@Override
 	public List<Literal> read() {		
@@ -128,7 +144,7 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 			//list.add(l);	
 			return new ArrayList<Literal>(topicValues.values());
 		}
-		
+
 
 	}
 
@@ -149,8 +165,8 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 			pub.publish(new PrimitiveMsg<Integer>(Integer.parseInt(s)));
 		else
 			if(type.equals("geometry_msgs/Pose")|| //TODO: handle application specific message types in application-customized extensions of DefaultRos4EmbeddedMas
-			   type.equals("geometry_msgs/Twist")|
-			   type.equals("mrs_msgs/Path"))		
+					type.equals("geometry_msgs/Twist")|
+					type.equals("mrs_msgs/Path"))		
 				try {
 					pub.publish(new ObjectMapper().readTree(s));
 				} catch (JsonMappingException e) {

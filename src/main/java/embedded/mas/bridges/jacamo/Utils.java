@@ -1,10 +1,13 @@
 package embedded.mas.bridges.jacamo;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 public class Utils {
 
 	public static  String jsonToPredArguments(JsonNode node) {
@@ -35,5 +38,16 @@ public class Utils {
 			}
 		return s;
 	}
+
+
+	public static  String jsonToPredArguments(JsonNode node, ArrayList<String> paramsToIgnore) {
+		if(paramsToIgnore!=null) {
+			ObjectNode object = (ObjectNode) node;
+			for(String s:paramsToIgnore)
+				object.remove(s);		
+		}
+		return  Utils.jsonToPredArguments(node);
+	}
+
 
 }
