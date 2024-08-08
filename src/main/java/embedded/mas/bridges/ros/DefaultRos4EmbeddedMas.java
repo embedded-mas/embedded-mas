@@ -107,7 +107,6 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 								terms = jsonToPredArguments(data.get("msg").get("data"));
 							else	
 								terms = jsonToPredArguments(data.get("msg"), ignoreParameters);
-							System.out.println("[DefaultRos4EmbeddedMas] " + data.get("msg").get("data") + "/" + data.get("msg") + "/" +terms);
 							p = parseLiteral(functor+"("+terms+")");
 						}
 						synchronized (topicValues) {
