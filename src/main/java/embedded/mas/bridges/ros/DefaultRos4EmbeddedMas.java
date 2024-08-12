@@ -106,6 +106,7 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 							if(data.get("msg").size()==1&&data.get("msg").get("data")!=null) //basic case: single data
 								terms = jsonToPredArguments(data.get("msg").get("data"));
 							else	
+								//aqui: incluir interestParams
 								terms = jsonToPredArguments(data.get("msg"), ignoreParameters);
 							p = parseLiteral(functor+"("+terms+")");
 						}
