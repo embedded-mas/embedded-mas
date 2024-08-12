@@ -19,14 +19,17 @@ import java.io.File;
 public class InternalActionGenerator  {
 
 	private static void writeToFile(String deviceId, String actionName, String serviceName, List<String> params) {
-
-		String fileContent = "package jason.stdlib; \n\n" +
-				"import embedded.mas.bridges.jacamo.defaultEmbeddedInternalAction;\n" +
-				"import jason.asSemantics.DefaultInternalAction;\n" +
-				"import jason.asSemantics.TransitionSystem;\n" +
-				"import jason.asSemantics.Unifier;\n" +
-				"import jason.asSyntax.ListTermImpl;\n" +
-				"import jason.asSyntax.Term;\n" +
+		Path filePath = Paths.get("src/java/jason/stdlib/" + actionName + ".java");		
+		if(Files.exists(filePath))
+			System.out.println("*** internal action " + actionName + " already exists in src/java/jason/stdlib and will not be overwritten ***");
+		else {
+			String fileContent = "package jason.stdlib; \n\n" +
+					"import embedded.mas.bridges.jacamo.defaultEmbeddedInternalAction;\n" +
+					"import jason.asSemantics.DefaultInternalAction;\n" +
+					"import jason.asSemantics.TransitionSystem;\n" +
+					"import jason.asSemantics.Unifier;\n" +
+					"import jason.asSyntax.ListTermImpl;\n" +
+					"import jason.asSyntax.Term;\n" +
 
                 "import static jason.asSyntax.ASSyntax.createAtom;\n\n" +
 
@@ -46,17 +49,17 @@ public class InternalActionGenerator  {
                 "        }\n" +
                 "}";
 
-		File directory = new File("src/java/jason/stdlib");
-		if (!directory.exists()) directory.mkdirs();
+			File directory = new File("src/java/jason/stdlib");
+			if (!directory.exists()) directory.mkdirs();
 
-		Path filePath = Paths.get("src/java/jason/stdlib/" + actionName + ".java");
+				
 
-		//List<String> content = Arrays.asList("Hello, this is a text file \n written in Java using NIO.");
 
-		try {
-			Files.write(filePath, fileContent.getBytes(StandardCharsets.UTF_8));
-		} catch (IOException e) {
-			e.printStackTrace();
+			try {
+				Files.write(filePath, fileContent.getBytes(StandardCharsets.UTF_8));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -82,10 +85,7 @@ public class InternalActionGenerator  {
 					for (Map<String, Object> action : serviceRequestActions) {
 						String actionName = (String) action.get("actionName");
 						String serviceName = (String) action.get("serviceName");
-						List<String> params = (List<String>) action.getOrDefault("params", List.of());
-
-						System.out.println(String.format("(%s, %s, %s, %s)", deviceId, actionName, serviceName, params));
-
+						List<String> params = (List<String>) action.getOrDefault("params", List.of());				
 						InternalActionGenerator.writeToFile(deviceId, actionName, serviceName, params);
 					}
 				}
@@ -97,10 +97,7 @@ public class InternalActionGenerator  {
 					for (Map<String, Object> action : topicWritingActions) {
 						String actionName = (String) action.get("actionName");
 						String serviceName = (String) action.get("serviceName");
-						List<String> params = (List<String>) action.getOrDefault("params", List.of());
-
-						System.out.println(String.format("(%s, %s, %s, %s)", deviceId, actionName, serviceName, params));
-
+						List<String> params = (List<String>) action.getOrDefault("params", List.of());						
 						InternalActionGenerator.writeToFile(deviceId, actionName, serviceName, params);
 					}
 				}
