@@ -28,7 +28,7 @@ public class save extends DefaultInternalAction {
           Files.write(file, text.getBytes(charset), StandardOpenOption.APPEND);
        else
           Files.write(file, text.getBytes(charset));
-       
+              
        return true;
     }
 }
