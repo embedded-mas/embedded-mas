@@ -21,6 +21,7 @@ class Communication {
           void beliefAdd(int Int);
           void beliefAdd(float Float);
           void beliefAdd(double Double);
+          void beliefAdd(unsigned long Long);
           void endBelief();
           void sendMessage();
           void publishROSMessage(ros::Publisher chatter, std_msgs::String str_msg);

@@ -50,6 +50,11 @@ void Communication::beliefAdd(double Double){ // adiciona um parametro do tipo d
     _beliefBuffer.concat(',');
 }
 
+void Communication::beliefAdd(unsigned long Long){
+    _beliefBuffer.concat(String(Long));
+    _beliefBuffer.concat(',');
+}    
+
 void Communication::sendMessage(){
     Serial.print(_preamble);
     Serial.print(_allBeliefs.length()+2);
