@@ -18,6 +18,11 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.Atom;
 import jason.asSyntax.Literal;
 
+/**
+ * @deprecated This class is deprecated and will be removed in future versions. *             
+ *             Use {@link JSONQueueWatcherDevice} instead.
+ */
+@Deprecated(since = "0.060", forRemoval = true)
 public class JSONDevice extends SerialDevice implements IDevice {
 
 	
