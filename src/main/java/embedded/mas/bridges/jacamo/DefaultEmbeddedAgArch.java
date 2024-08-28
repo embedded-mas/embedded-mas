@@ -32,8 +32,10 @@ public class DefaultEmbeddedAgArch extends AgArch{
 		else
 			if(sensorData!=null)
 				p = sensorData;
-		return p;
-
+			else
+				 return null;
+				
+		return p;		
 	}
 
 
