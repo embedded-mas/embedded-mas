@@ -54,6 +54,12 @@ public class SerialDevice extends DefaultDevice {
 		if(bel==null) return belief;
 		return bel;
 	}
+
+	@Override
+	public boolean doExecActuation(Atom actuatorId, Atom actuationId, Object[] args, Unifier un) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 	
 }
 

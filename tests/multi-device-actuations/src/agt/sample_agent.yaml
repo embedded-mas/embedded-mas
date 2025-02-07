@@ -1,0 +1,56 @@
+--- # Devices
+- device_id: my_device1
+  className: embedded.mas.bridges.jacamo.DemoDevice
+  microcontroller: 
+      id: arduino1
+      className: DemoDevice      
+  actuators:
+    - actuator_id: act1
+      actuations: 
+        - actuation_id: print
+          parameters:
+            - text
+        - actuation_id: double
+          parameters:
+            - value
+            - result
+    - actuator_id: act2
+      actuations: 
+        - actuation_id: print
+          parameters:
+            - text
+        - actuation_id: double
+          parameters:
+            - value
+            - result
+
+
+- device_id: my_device2
+  className: embedded.mas.bridges.jacamo.DemoDevice
+  microcontroller: 
+      id: arduino2
+      className: DemoDevice      
+  actuators:
+    - actuator_id: act21
+      actuations: 
+        - actuation_id: print
+          parameters:
+            - textz
+        - actuation_id: double
+          parameters:
+            - value
+            - result
+
+- actions:
+  - a0: 
+    - [my_device1.act1.print,my_device1.act2.print,my_device1.act1.print]
+    - [my_device1.act1.print,my_device1.act2.print,my_device1.act1.print]
+  - a1: 
+    - [my_device1.act1.print,my_device1.act2.double]
+    - [my_device2.act21.print, my_device1.act1.double]
+  - a2: [[my_device1.act1.print,my_device2.act21.double],[my_device2.act21.print, my_device1.act1.double]]
+  - a3: 
+    - [my_device1.act1.double,my_device1.act1.double]
+    - [my_device1.act1.double]
+  - a4: 
+    - [my_device1.act1.print,my_device1.act2.double]

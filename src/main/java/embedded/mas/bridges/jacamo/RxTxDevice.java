@@ -39,4 +39,10 @@ public class RxTxDevice extends DefaultDevice implements IDevice{
 		return (IPhysicalInterface) this.microcontroller;
 	}
 
+	@Override
+	public boolean doExecActuation(Atom actuatorId, Atom actuationId, Object[] args, Unifier un) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

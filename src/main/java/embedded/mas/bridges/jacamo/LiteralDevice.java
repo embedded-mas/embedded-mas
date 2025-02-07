@@ -34,6 +34,12 @@ public class LiteralDevice extends DefaultDevice implements IDevice {
 	public ILiteralListInterface getMicrocontroller() {
 		return (ILiteralListInterface) this.microcontroller;
 	}
+
+	@Override
+	public boolean doExecActuation(Atom actuatorId, Atom actuationId, Object[] args, Unifier un) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 	
 
 
