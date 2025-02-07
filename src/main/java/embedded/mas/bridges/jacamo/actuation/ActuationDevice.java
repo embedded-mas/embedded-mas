@@ -19,9 +19,9 @@ public class ActuationDevice {
 		return device;
 	}
 
-	/*public void setDevice(DefaultDevice device) {
+	public void setDevice(DefaultDevice device) {
 		this.device = device;
-	}*/
+	}
 
 	public Actuator getActuator() {
 		return this.actuator;

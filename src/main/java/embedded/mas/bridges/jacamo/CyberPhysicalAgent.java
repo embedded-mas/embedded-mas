@@ -32,12 +32,15 @@ public class CyberPhysicalAgent extends EmbeddedAgent {
 				this.actionMap = conf.getActions(d,(Paths.get("").toAbsolutePath()+"/src/agt/"+getTS().getAgArch().getAgName() + ".yaml"));
 			} catch (InvalidDeviceException e) {
 				// TODO Auto-generated catch block
+				System.err.println(e.getMessage());
 				e.printStackTrace();
 			} catch (InvalidActuationException e) {
 				// TODO Auto-generated catch block
+				System.err.println(e.getMessage());
 				e.printStackTrace();
 			} catch (InvalidActuatorException e) {
 				// TODO Auto-generated catch block
+				System.err.println(e.getMessage());
 				e.printStackTrace();
 			}		
 		}

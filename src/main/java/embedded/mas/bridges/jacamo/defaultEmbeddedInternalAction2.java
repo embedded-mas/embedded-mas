@@ -63,7 +63,7 @@ public class defaultEmbeddedInternalAction2 extends EmbeddedInternalAction {
 							params[i] = (Term) arguments[i];
 						
 						Term[] newParams = new Term[arguments.length-params.length];
-						System.out.println("New params length: " + newParams.length);
+						//System.out.println("New params length: " + newParams.length);
 						for(int i=0;i<newParams.length;i++) {
 							newParams[i] = (Term) arguments[params.length+i]; //((ListTermImpl)args[1]).get(params.length+i);
 						}

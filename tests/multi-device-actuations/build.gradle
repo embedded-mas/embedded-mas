@@ -34,7 +34,11 @@ dependencies {
     //implementation "embedded-mas:embedded-mas:0.056-SNAPSHOT" 
     implementation files('/mnt/1C4C766F4C764414/maiquel/git/embedded-mas-multi-device-actuations/embedded-mas/build/libs/embedded-mas-0.058-SNAPSHOT.jar')
     implementation "javard:javard:0.032-SNAPSHOT"
+    
+    //daqui para baixo, testar se dá pra eliminar quando usar o repositório do embedded-mas em vez de arquivo jar local
     implementation group: 'org.yaml', name: 'snakeyaml', version: '1.30'
+    implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.13.3'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.3'
 }
 
 sourceSets {
