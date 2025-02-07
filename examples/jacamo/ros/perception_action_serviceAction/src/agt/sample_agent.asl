@@ -4,7 +4,7 @@
 
 //testing service request without response
 +!move: .random(X) & .random(Y)
-   <- embedded.mas.bridges.jacamo.defaultEmbeddedInternalAction("sample_roscore","move_turtle", [X,Y]);      
+   <- .move_turtle(X,Y);
       .wait(500);
       !move.
 

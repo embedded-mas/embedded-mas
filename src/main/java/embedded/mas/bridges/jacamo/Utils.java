@@ -1,10 +1,14 @@
 package embedded.mas.bridges.jacamo;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 public class Utils {
 
 	public static  String jsonToPredArguments(JsonNode node) {
@@ -36,4 +40,28 @@ public class Utils {
 		return s;
 	}
 
+
+	public static String jsonToPredArguments(JsonNode node, ArrayList<String> paramsToIgnore) {
+		if(paramsToIgnore!=null) {
+			ObjectNode object = (ObjectNode) node;
+			for(String s:paramsToIgnore)
+				object.remove(s);		
+		}
+		return  Utils.jsonToPredArguments(node);
+	}
+
+	
+	public static String jsonToPredArgumentsWithParamsToInclude(JsonNode node, ArrayList<String> paramsToInclude) {
+		ObjectNode object = (ObjectNode) node;
+		ArrayList<String> paramsToIgnore = new ArrayList<String>();
+		//get a list of params to ignore		
+		Iterator<Map.Entry<String, JsonNode>> fields = node.fields();
+		while(fields.hasNext()) {
+			Map.Entry<String, JsonNode> field = fields.next();
+			String key = field.getKey();
+			if(!paramsToInclude.contains(key))
+				paramsToIgnore.add(key);
+		}
+		return jsonToPredArguments(node, paramsToIgnore);
+	}
 }

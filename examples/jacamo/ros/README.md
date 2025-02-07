@@ -4,5 +4,20 @@ This folder includes examples of Jason agents with ROS. All the examples illustr
 
 1. [perception_action_topicWritingAction](perception_action_topicWritingAction): actions of the agents are based on writing in ROS topics.
 1. [perception_action_serviceAction](perception_action_serviceAction): actions of the agents are based on requesting ROS services.
+2. [nested_topic_parameters](nested_topic_parameters): example where agents' actions are mapped to topic writings that require nested parameters.
 
 These are basic examples of Jason-ROS integration. Advanced examples are available [here](https://github.com/embedded-mas/ros-devs/tree/main/examples).
+
+
+
+## Some notes on the ROS-Jason integration
+This integration is part of a broader integration framework available [here](https://github.com/embedded-mas/embedded-mas)
+
+Agents are configured in the a .`jcm` file, as usual in JaCaMo. 
+Agents extend the class [`RosBdiAgent`](https://github.com/embedded-mas/embedded-mas/blob/master/src/main/java/embedded/mas/bridges/jacamo/ros/RosBdiAgent.java), that, ultimately, extends a [Jason Agent](https://github.com/jason-lang/jason/blob/master/src/main/java/jason/asSemantics/Agent.java). 
+
+An agent can connect with multiple ROS nodes. The connecton of an agent coded in the file `src/agt/<agent_file>.asl` is specified in the file `src/agt/<agent_file>.yaml`. This specification includes details on the connection with ROS nodes, as well as the mapping from topics to perceptions/beliefs and from topics/services to actions.
+
+Values of topics are added to the belief base of the agent as `topic_name(topic_value)`. 
+The agents use the [`defaultEmbeddedInternalAction`](https://github.com/embedded-mas/embedded-mas/blob/master/src/main/java/embedded/mas/bridges/jacamo/defaultEmbeddedInternalAction.java) to trigger actions enabled by physical/simulated actuators managed by ROS topics and services.  
+

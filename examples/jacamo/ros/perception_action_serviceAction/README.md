@@ -10,7 +10,7 @@ To illustrate actions that consider the service responses, the agent also execut
 
 
 === Requirements
-1. ROS (recommended [ROS Noetic](http://wiki.ros.org/noetic))
+1. ROS (recommended [ROS Noetic](http://wiki.ros.org/noetic) or [ROS 2 Humble](https://docs.ros.org/en/humble/index.html))
 2. [Rosbridge](http://wiki.ros.org/rosbridge_suite/Tutorials/RunningRosbridge)
 3. [Turtlesim](http://wiki.ros.org/turtlesim)
 
@@ -44,8 +44,8 @@ sudo docker exec  embedded-mas-example /bin/bash -c "source /opt/ros/noetic/setu
 sudo docker run -d --rm --net=ros --env="DISPLAY_WIDTH=3000" --env="DISPLAY_HEIGHT=1800" --env="RUN_XTERM=no" --name=novnc -p=8080:8080 theasp/novnc:latest  && \
 sudo docker run -d --net=ros --name roscore --rm osrf/ros:noetic-desktop-full roscore && \
 sudo docker run -it --net=ros --env="DISPLAY=novnc:0.0" --env="ROS_MASTER_URI=http://roscore:11311" --rm --name embedded-mas-example -p9090:9090 maiquelb/embedded-mas-ros2:0.5 /bin/bash -c "source /opt/ros/humble/setup.bash && ros2 run turtlesim turtlesim_node" & \
-(until sudo docker exec embedded-mas-example /bin/bash -c "echo '***** ROS container is ready *****'"; do echo "waiting for ROS container to start..."; sleep 1; done  && \
-sudo docker exec -d embedded-mas-example /bin/bash -c "source /opt/ros/humble/setup.bash && ros2 launch rosbridge_server rosbridge_websocket_launch.xml")
+(until sudo docker exec embedded-mas-example /bin/bash -c "echo '***** ROS container is ready *****'" 2>/dev/null; do echo "waiting for ROS container to start..."; sleep 1; done  && \
+sudo docker exec  embedded-mas-example /bin/bash -c "source /opt/ros/humble/setup.bash && ros2 launch rosbridge_server rosbridge_websocket_launch.xml")
 ```
 
 #### 1.2 Local setup: 

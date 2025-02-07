@@ -52,6 +52,7 @@ import embedded.mas.bridges.jacamo.actuation.ActuationSequence;
 import embedded.mas.bridges.jacamo.actuation.ActuationSet;
 import embedded.mas.bridges.jacamo.actuation.Actuator;
 import embedded.mas.bridges.javard.Arduino4EmbeddedMas;
+import embedded.mas.bridges.ros.DefaultRos4Bdi;
 import embedded.mas.bridges.ros.DefaultRos4EmbeddedMas;
 import embedded.mas.bridges.ros.ServiceParam;
 import embedded.mas.bridges.ros.ServiceParameters;
@@ -61,6 +62,7 @@ import embedded.mas.exception.InvalidActuationException;
 import embedded.mas.exception.InvalidActuatorException;
 import embedded.mas.exception.InvalidDeviceException;
 import jason.asSyntax.Atom;
+
 
 import static jason.asSyntax.ASSyntax.createAtom;
 
@@ -73,10 +75,16 @@ public class DefaultConfig {
 		return a;
 	}
 
-	private DefaultRos4EmbeddedMas createRos4EmbeddedMas(String connectionStr, ArrayList<String> topics, ArrayList<String> types, ArrayList<String> beliefNames) {
-		return new DefaultRos4EmbeddedMas(connectionStr, topics, types, beliefNames);
+	private DefaultRos4EmbeddedMas createRos4EmbeddedMas(String connectionStr, ArrayList<String> topics, ArrayList<String> types, ArrayList<String> beliefNames, HashMap<String, ArrayList<String>> paramsToIgnore) {
+		return new DefaultRos4EmbeddedMas(connectionStr, topics, types, beliefNames, paramsToIgnore);
 
 	}
+	
+	private DefaultRos4Bdi createRos4Bdi(String connectionStr, ArrayList<String> topics, ArrayList<String> types, ArrayList<String> beliefNames, HashMap<String, ArrayList<String>> paramsToIgnore) {
+		return new DefaultRos4Bdi(connectionStr, topics, types, beliefNames, paramsToIgnore);
+
+	}
+
 
 	private DemoDevice createDemoDevice(String id) {
 		return new DemoDevice(createAtom(id));
@@ -268,26 +276,38 @@ public class DefaultConfig {
 										createAtom(((LinkedHashMap)actionsArray.get(j)).get("actuationName").toString()));
 								embeddedActionList.add(action);
 
+
+						}
+					}		
+					else
+						if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4EmbeddedMas")|
+						   ((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4Bdi")) { //DefaultRos4Bdi is just an alias class for the names to make more sense in Jason-ROS applications
+							//ArrayList perceptionTopics = (ArrayList) ((LinkedHashMap)item.get("microcontroller")).get("perceptionTopics");
+							ArrayList perceptionTopics = (ArrayList) item.get("perceptionTopics");
+							ArrayList<String> topics = new ArrayList<String>();
+							ArrayList<String> types = new ArrayList<String>();
+							ArrayList<String> beliefNames = new ArrayList<String>();
+							HashMap<String, ArrayList<String>> ignoreParams = new HashMap<>();
+							for(int j=0;j<perceptionTopics.size();j++) {
+								topics.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicName").toString());
+								types.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicType").toString());
+								if(((LinkedHashMap)perceptionTopics.get(j)).get("beliefName")==null)
+									beliefNames.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicName").toString());
+								else
+									beliefNames.add(((LinkedHashMap)perceptionTopics.get(j)).get("beliefName").toString());	
+								ArrayList tempParams =  (ArrayList) ((LinkedHashMap)perceptionTopics.get(j)).get("ignoreValues");
+								ignoreParams.put(((LinkedHashMap)perceptionTopics.get(j)).get("topicName").toString(), tempParams);
 							}
-						}		
-						else
-							if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4EmbeddedMas")) {
-								ArrayList perceptionTopics = (ArrayList) item.get("perceptionTopics");
-								ArrayList<String> topics = new ArrayList<String>();
-								ArrayList<String> types = new ArrayList<String>();
-								ArrayList<String> beliefNames = new ArrayList<String>();
-								for(int j=0;j<perceptionTopics.size();j++) {
-									topics.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicName").toString());
-									types.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicType").toString());
-									if(((LinkedHashMap)perceptionTopics.get(j)).get("beliefName")==null)
-										beliefNames.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicName").toString());
-									else
-										beliefNames.add(((LinkedHashMap)perceptionTopics.get(j)).get("beliefName").toString());	
-								}
-								microcontroller= createRos4EmbeddedMas(((LinkedHashMap)item.get("microcontroller")).get("connectionString").toString(),topics,types,beliefNames);
+							
+							if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4EmbeddedMas"))
+							   microcontroller= createRos4EmbeddedMas(((LinkedHashMap)item.get("microcontroller")).get("connectionString").toString(),topics,types,beliefNames, ignoreParams);
+							else
+								if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4Bdi"))
+									microcontroller = createRos4Bdi(((LinkedHashMap)item.get("microcontroller")).get("connectionString").toString(),topics,types,beliefNames, ignoreParams);
 
 
-								//handle topic writing actions
+							//handle topic writing actions
+							if(item.get("actions")!=null) {
 								if(((LinkedHashMap)item.get("actions")).get("topicWritingActions")!=null) {
 									ArrayList topicWritingActions = (ArrayList) ((LinkedHashMap)item.get("actions")).get("topicWritingActions");
 									for(int j=0;j<topicWritingActions.size();j++) {

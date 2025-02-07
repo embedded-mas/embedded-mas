@@ -1,0 +1,75 @@
+# The root item of the EmbeddedAgent configuration is the Device.
+# An embedded agent can be composed of one to many devices. A device is any external element (physical or virtual) which sensors and actuators are connected to.
+# In this example, the agent is composed of a single device, that is a ROS core identified as "sample_roscore".
+- device_id: sample_roscore #device identifier. It is up to the designer to choose this name.
+  #className: the class that implements the interface between the parception/action systems and the device.
+  #           This class provides means to convert (i) sensor values in perceptions and (ii) action of the agents and actuations performed by the physical actuators.
+  #           Different interfaces can be implemented for different types of devices.
+  #className:  embedded.mas.bridges.ros.RosMaster
+  className:  embedded.mas.bridges.ros.RosMaster
+  # A device contains a microcontroller, that is an interface that provides access to external devices to get percepts and perform actuations
+  # Different microcontrollers have different parameters depending on their nature. For example, serial devices like Arduino require to configure serial ports and baudrates.
+  # In this example, the microcontroller is a Java-ROS interface with parameters related to topics and services.
+  microcontroller: 
+      id: ros1 #microcontroller identifier. It is up to the designer to choose this name.
+      connectionString: ws://localhost:9090 #connection with ROS
+      #className: The class that implements the interface with the microcontroller.
+      #           This class provides means to read from and write to the microcontroller. 
+      #           Different interfaces can be implemented for different types of microcontrollers.
+      #className: DefaultRos4EmbeddedMas  
+      className: DefaultRos4Bdi
+      #perceptionTopics: List of topics whose values are converted into perceptions.
+      #                  Each topic requires to define its name and its type.   
+  perceptionTopics:         
+      - topicName: turtle1/pose
+        topicType: turtlesim/Pose
+        beliefName: robot_position
+      - topicName: turtle1/energy
+        topicType: std_msgs/Int32
+        beliefName: myEnergy
+      - topicName: turtle1/alarm
+        topicType: std_msgs/String
+        beliefName: security_level
+      #- topicName: turtle1/energy
+      #  topicTyme: std_msgs/Int32
+      #  beliefName: myEnergy
+        #actions: An agent acts upon ROS by topic writings and service requests, configured in the items topicWritingActions and serviceRequestActions, respectively.
+  #         This example illustrate only service request actions. 
+  actions:       
+    topicWritingActions:          
+      - actionName: move_robot
+        topicName: /turtle1/cmd_vel
+        topicType: geometry_msgs/Twist 
+        params:
+           - linear:
+              - x
+              - y
+              - z
+           - angular:
+              - x
+              - y
+              - z      
+    #Each topic writing action requires to configure three parameters:
+    # 1. actionName: the name of the action performed by the agent
+    # 2. serviceName: the name of the service to be called
+    # 3. params: a list of the names of parameters required by the service
+    serviceRequestActions:
+        #- actionName: move_robot
+        #  serviceName: /turtle1/teleport_relative
+        #  params:
+        #    - linear
+        #    - angular          
+        - actionName: get_loggers
+          serviceName: /turtlesim/get_loggers          
+          #this action does not have any parameters
+        - actionName: start_economic_mode
+          serviceName: /turtle1/set_pen
+          params:
+             - r
+             - g
+             - b
+             - width
+             - 'off'
+
+            
+
