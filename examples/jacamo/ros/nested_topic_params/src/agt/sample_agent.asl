@@ -4,7 +4,7 @@
 //test service request without response
 +!move: .random(X) & .random(Y) & .random(Z)
    <- //the action move_turtle, triggered below, is defined in sample_agent.yaml
-      embedded.mas.bridges.jacamo.defaultEmbeddedInternalAction("sample_roscore","move_turtle", [[X,Y,Z],[X*2,Y*2,Z*2]] );      
+      .move_turtle([X,Y,Z],[X*2,Y*2,Z*2]);
       .wait(500);
       !move.
 
