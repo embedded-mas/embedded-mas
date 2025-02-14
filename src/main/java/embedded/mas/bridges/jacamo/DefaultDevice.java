@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import embedded.mas.bridges.jacamo.actuation.Actuation;
 import embedded.mas.bridges.jacamo.actuation.Actuator;
+import embedded.mas.bridges.jacamo.actuation.DefaultActuation;
 import embedded.mas.exception.EmbeddedActionException;
 import embedded.mas.exception.EmbeddedActionNotFoundException;
 import embedded.mas.exception.InvalidActuationException;
@@ -149,7 +149,7 @@ public abstract class DefaultDevice implements IDevice {
 		Actuator actuator = this.getActuatorById(actuatorId);
 		if(actuator==null) throw new InvalidActuatorException("Actuator " + this.getId().toString() +"." +actuatorId.toString() + " not found.");
 		
-		Actuation actuation = actuator.getActuationById(actuationId);
+		DefaultActuation actuation = actuator.getActuationById(actuationId);
 		if(actuation==null) throw new InvalidActuationException("Actuation " + this.getId().toString() +"." +actuatorId.toString()+"." + actuationId.toString() + " not found.");
 		
 		

@@ -6,9 +6,9 @@ public class ActuationDevice {
 
 	private DefaultDevice device;
 	private Actuator actuator;
-	private Actuation actuation;
+	private DefaultActuation actuation;
 	
-	public ActuationDevice(DefaultDevice device, Actuator actuator, Actuation actuation) {
+	public ActuationDevice(DefaultDevice device, Actuator actuator, DefaultActuation actuation) {
 		super();
 		this.device = device;
 		this.actuator = actuator;
@@ -33,11 +33,11 @@ public class ActuationDevice {
 
 	
 	
-	public Actuation getActuation() {
+	public DefaultActuation getActuation() {
 		return actuation;
 	}
 
-	public void setActuation(Actuation actuation) {
+	public void setActuation(DefaultActuation actuation) {
 		this.actuation = actuation;
 	}
 	

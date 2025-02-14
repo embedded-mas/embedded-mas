@@ -4,7 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import static embedded.mas.bridges.jacamo.Utils.jsonToPredArguments;
 
 import embedded.mas.bridges.jacamo.EmbeddedAction;
+import embedded.mas.bridges.jacamo.IEmbeddedAction;
+import embedded.mas.bridges.jacamo.ILiteralListInterface;
 import embedded.mas.bridges.jacamo.LiteralDevice;
+import embedded.mas.bridges.jacamo.actuation.ros.ServiceRequestActuation;
+import embedded.mas.bridges.jacamo.actuation.ros.TopicWritingActuation;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Atom;
 import jason.asSyntax.Literal;
@@ -21,6 +25,15 @@ public class RosMaster extends LiteralDevice {
 	public RosMaster(Atom id, IRosInterface microcontroller) {
 		super(id, microcontroller);
 	}
+
+
+
+	@Override
+	public ILiteralListInterface getMicrocontroller() {
+		return (IRosInterface)super.getMicrocontroller();
+	}
+
+
 
 	protected final boolean serviceRequest(String serviceName, ServiceParameters parameters) {
 		if(parameters==null)
@@ -134,6 +147,24 @@ public class RosMaster extends LiteralDevice {
 		}
 		return true;
 	}
+
+	@Override
+	public boolean doExecActuation(Atom actuatorId, Atom actuationId, Object[] args, Unifier un) {
+		if(this.getActuatorById(actuatorId).getActuationById(actuationId) instanceof TopicWritingActuation) {
+			((IRosInterface)this.getMicrocontroller()).write(((TopicWritingActuation) this.getActuatorById(actuatorId).getActuationById(actuationId)).getTopicName(),
+					((TopicWritingActuation) this.getActuatorById(actuatorId).getActuationById(actuationId)).getTopicType(),
+					args[0].toString());
+			return true; //topic writings are assumed to be always successful
+		}
+		if(this.getActuatorById(actuatorId).getActuationById(actuationId) instanceof ServiceRequestActuation) {
+			//System.out.println("[RosMaster] requesting service " + actuationId  );
+			//((IRosInterface)this.getMicrocontroller()).serviceRequest(null, null)
+			return true;
+		}
+		return false;
+
+	}
+
 
 
 }

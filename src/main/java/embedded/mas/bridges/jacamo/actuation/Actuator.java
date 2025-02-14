@@ -8,18 +8,18 @@ import jason.asSyntax.Atom;
 public class Actuator {
 
 	private Atom id;
-	private HashSet<Actuation> actuations = new HashSet<Actuation>();
+	private HashSet<DefaultActuation> actuations = new HashSet<DefaultActuation>();
 	
 	public Actuator(Atom id) {
 		super();
 		this.id = id;
 	}
 
-	public HashSet<Actuation> getActuations() {
+	public HashSet<DefaultActuation> getActuations() {
 		return actuations;
 	}
 
-	public void setActuations(HashSet<Actuation> actuations) {
+	public void setActuations(HashSet<DefaultActuation> actuations) {
 		this.actuations = actuations;
 	}
 
@@ -27,12 +27,12 @@ public class Actuator {
 		return id;
 	}
 	
-	public void addActuation(Actuation actuation) {
+	public void addActuation(DefaultActuation actuation) {
 		this.actuations.add(actuation);
 	}
 	
 	
-	public void removeActuation(Actuation actuation) {
+	public void removeActuation(DefaultActuation actuation) {
 		this.actuations.remove(actuation);
 	}
 	
@@ -42,7 +42,7 @@ public class Actuator {
 	 * @return
 	 */
 	public boolean hasActuation(Atom actuationId) {
-		Iterator<Actuation> actuationIt = this.actuations.iterator();
+		Iterator<DefaultActuation> actuationIt = this.actuations.iterator();
 		if(!actuationIt.hasNext()) return false;
 		while(actuationIt.hasNext())
 			if(actuationIt.next().getId()==actuationId)
@@ -55,11 +55,11 @@ public class Actuator {
 	 * Returns the actuation identified by the parameter actuatorId.
 	 * Returns null if the device does not have such actuation
 	 */
-	public Actuation getActuationById(Atom actuationId) {
+	public DefaultActuation getActuationById(Atom actuationId) {
 		Actuation result = null;
-		Iterator<Actuation> actuationIt = this.getActuations().iterator();
+		Iterator<DefaultActuation> actuationIt = this.getActuations().iterator();
 		while(actuationIt.hasNext()) {
-			Actuation currentActuation = actuationIt.next();
+			DefaultActuation currentActuation = actuationIt.next();
 			if(currentActuation.getId().equals(actuationId))
 				return currentActuation;
 		}
@@ -71,7 +71,7 @@ public class Actuator {
 	public String toString() {
 		String actuationsStr = "";
 		if(actuations.size()>0) {
-		   for(Actuation actuation : actuations)
+		   for(DefaultActuation actuation : actuations)
 			   actuationsStr = actuationsStr.concat(actuation.getId().toString() + ", ");
 		   actuationsStr = actuationsStr.substring(0, actuationsStr.length()-2);
 		}

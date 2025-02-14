@@ -10,11 +10,11 @@ import static jason.asSyntax.ASSyntax.createAtom;
 
 import java.util.Iterator;
 
-import embedded.mas.bridges.jacamo.actuation.Actuation;
 import embedded.mas.bridges.jacamo.actuation.ActuationDevice;
 import embedded.mas.bridges.jacamo.actuation.ActuationSequence;
 import embedded.mas.bridges.jacamo.actuation.ActuationSet;
 import embedded.mas.bridges.jacamo.actuation.Actuator;
+import embedded.mas.bridges.jacamo.actuation.DefaultActuation;
 
 
 
@@ -40,6 +40,7 @@ public class defaultEmbeddedInternalAction2 extends EmbeddedInternalAction {
 	/**
 	 * args:
 	 * 0. ActionName
+	 * 1: Parameters
 	 */
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {  
 		if(ts.getAg() instanceof EmbeddedAgent) {
@@ -56,7 +57,7 @@ public class defaultEmbeddedInternalAction2 extends EmbeddedInternalAction {
 						//1. find the device the action is applyied upon
 						device = currenctActuation.getDevice();
 						Actuator actuator = currenctActuation.getActuator();
-						Actuation actuation = currenctActuation.getActuation();
+						DefaultActuation actuation = currenctActuation.getActuation();
 						
 						Term[] params = new Term[actuation.getParameters().size()];
 						for(int i=0;i<actuation.getParameters().size();i++)
@@ -68,10 +69,6 @@ public class defaultEmbeddedInternalAction2 extends EmbeddedInternalAction {
 							newParams[i] = (Term) arguments[params.length+i]; //((ListTermImpl)args[1]).get(params.length+i);
 						}
 						arguments = newParams;
-						
-						
-						
-						
 						device.execActuation(actuator.getId(), actuation.getId(), params, un);
 
 					}
