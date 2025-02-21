@@ -46,6 +46,7 @@ public class defaultEmbeddedInternalAction2 extends EmbeddedInternalAction {
 		if(ts.getAg() instanceof EmbeddedAgent) {
 			EmbeddedAgent agent = (EmbeddedAgent) ts.getAg();
 			DefaultDevice device = null;
+			int default_param_size = 0;
 			//Case 1: check whether the action is in the agent's repertory (newest approach)	
 			ActuationSequence actuationSequence = agent.getActionMap().get(createAtom(args[0].toString()));
 			if(actuationSequence!=null) { //if the repertory contains the action
@@ -58,17 +59,51 @@ public class defaultEmbeddedInternalAction2 extends EmbeddedInternalAction {
 						device = currenctActuation.getDevice();
 						Actuator actuator = currenctActuation.getActuator();
 						DefaultActuation actuation = currenctActuation.getActuation();
-						
-						Term[] params = new Term[actuation.getParameters().size()];
-						for(int i=0;i<actuation.getParameters().size();i++)
+
+						if(actuation.getDefaultParameterValues()==null) 
+							default_param_size = 0;
+						else {
+							default_param_size = actuation.getDefaultParameterValues().size();
+						}
+
+						Term[] params = new Term[actuation.parameterSize()];
+						/*for(int i=0;i<actuation.parameterSize() - default_param_size;i++)
 							params[i] = (Term) arguments[i];
-						
+
 						Term[] newParams = new Term[arguments.length-params.length];
 						//System.out.println("New params length: " + newParams.length);
 						for(int i=0;i<newParams.length;i++) {
 							newParams[i] = (Term) arguments[params.length+i]; //((ListTermImpl)args[1]).get(params.length+i);
+						}*/
+
+						Term[] actuation_param_values = actuation.getParametersAsArray();
+						int k=0,l=0;							
+						System.out.println("[defaultEmbeddedInternalAction2] processando actuation " + actuation.getId() + " - " + actuation.parameterSize()+"/" +actuation_param_values.length + "/" + arguments.length);
+						for(int i=0;i<actuation.parameterSize();i++)
+							if(actuation_param_values[k]==null) {
+								params[i] = (Term) arguments[l++]; 
+								k++;
+							}
+							else
+								params[i] = actuation_param_values[k++];
+
+						//Term[] newParams = new Term[arguments.length-params.length];
+						System.out.println("[defaultEmbeddedInternalAction2] " + k+";" + l + ";" + arguments.length);
+						Term[] newParams = new Term[arguments.length-l];
+						for(int i=0;i<newParams.length;i++) {
+							newParams[i] = (Term) arguments[l+i]; //((ListTermImpl)args[1]).get(params.length+i);
 						}
+
+
+
 						arguments = newParams;
+
+						//Term[] params = new Term[((ListTermImpl)args[1]).size()];
+						//for(int i=0;i<params.length;i++)
+						//	params[i] = (Term) arguments[i];
+
+						//params  = actuation.getParameterValuesAsArrayOfTerms(params);
+
 						device.execActuation(actuator.getId(), actuation.getId(), params, un);
 
 					}

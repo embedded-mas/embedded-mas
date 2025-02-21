@@ -7,7 +7,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.io.FileWriter;
 
@@ -17,10 +17,15 @@ import org.junit.Test;
 import org.yaml.snakeyaml.Yaml;
 
 import embedded.mas.bridges.jacamo.DefaultDevice;
+import embedded.mas.bridges.jacamo.actuation.ActuationSequence;
 import embedded.mas.bridges.jacamo.actuation.Actuator;
 import embedded.mas.bridges.jacamo.actuation.ros.ServiceRequestActuation;
 import embedded.mas.bridges.jacamo.actuation.ros.TopicWritingActuation;
 import embedded.mas.bridges.jacamo.config.DefaultConfig;
+import embedded.mas.exception.InvalidActuationException;
+import embedded.mas.exception.InvalidActuatorException;
+import embedded.mas.exception.InvalidDeviceException;
+import jason.asSyntax.Atom;
 
 import static jason.asSyntax.ASSyntax.createAtom;
 
@@ -53,18 +58,6 @@ public class TestDefaultConfig {
 			// Create directories if they don't exist
 			file.getParentFile().mkdirs();
 
-			// File content
-			/*String fileContent = "- device_id: arduino1 \n" +
-					"  className: embedded.mas.bridges.jacamo.JSONWatcherDevice \n" +
-					"  microcontroller:  \n" +
-					"      id: arduino1 \n" +
-					"      className: Arduino4EmbeddedMas \n" +
-					"      serial: \"/dev/ttyUSB0\" \n" +
-					"      baudRate: 9600        \n" +
-					"  serialActions: \n" +
-					"      - actionName: lightOn \n" +
-					"        actuationName: light_on \n";
-			 */
 			String fileContent = 
 					"- device_id: my_device1\n" +
 							"  className: embedded.mas.bridges.jacamo.DemoDevice\n" +
@@ -117,8 +110,13 @@ public class TestDefaultConfig {
 							"    - [my_device2.act21.printx, my_device1.act1.double]\n" +
 							"  - a2: [[my_device1.act1.print, my_device2.act21.double], [my_device2.act21.printx, my_device1.act1.double]]\n" +
 							"  - a3:\n" +
-							"    - [my_device1.act1.double, my_device1.act1.double]\n" +
-							"    - [my_device1.act1.double]\n" +
+							"    - \n" +
+							"      - actuation: my_device1.act1.double \n" +
+							"        default_param_values: \n" +
+							"          - value: 2\n" +
+							"          - result: 5\n" +
+							"      - my_device1.act1.print\n" +
+							"    - [my_device1.act1.print]\n" +
 							"  - a4:\n" +
 							"    - [my_device1.act1.print, my_device1.act2.double]\n";
 
@@ -160,20 +158,8 @@ public class TestDefaultConfig {
 			// Create directories if they don't exist
 			file.getParentFile().mkdirs();
 
-			// File content
-			/*String fileContent = "- device_id: arduino1 \n" +
-					"  className: embedded.mas.bridges.jacamo.JSONWatcherDevice \n" +
-					"  microcontroller:  \n" +
-					"      id: arduino1 \n" +
-					"      className: Arduino4EmbeddedMas \n" +
-					"      serial: \"/dev/ttyUSB0\" \n" +
-					"      baudRate: 9600        \n" +
-					"  serialActions: \n" +
-					"      - actionName: lightOn \n" +
-					"        actuationName: light_on \n";
-			 */
 			String fileContent = 
-					          "- device_id: my_device1\n"
+					"- device_id: my_device1\n"
 							+ "  className: embedded.mas.bridges.ros.RosHost\n"
 							+ "  microcontroller:\n"
 							+ "      id: arduino1\n"
@@ -194,8 +180,8 @@ public class TestDefaultConfig {
 							+ "        - actuation_id: act122\n" 
 							+ "          serviceName: /turtle1/teleport_relative\n"
 							+ "          parameters:\n"
-					        + "             - linear\n"
-					        + "             - angular \n"
+							+ "             - linear\n"
+							+ "             - angular \n"
 							+ "- device_id: my_device2\n"
 							+ "  className: embedded.mas.bridges.ros.RosHost\n"
 							+ "  microcontroller:\n"
@@ -255,37 +241,7 @@ public class TestDefaultConfig {
 		}
 	}
 
-	/*@Test
-	public void test_InternalAction_Generation() {		
-		DefaultConfig config = new DefaultConfig();
-		String appPath = null;
-		try {
-			appPath = new File(".").getCanonicalPath();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
-		// Define the complete path of the file
-		String filePath = appPath + "/src/java/jason/stdlib/teste.yaml";
-
-		config.loadFromYaml(filePath);
-		//System.out.println("size: " + devices.size());
-
-
-		File file = new File(appPath + "/src/java/jason/stdlib/lightOn.java");
-
-		assertTrue(file.exists());
-
-	}
-
-	@Test
-	public void test_addInternalActionToClassPath() {
-		System.out.println(isClassInClasspath("jason.stdlib.lightOn"));
-		System.out.println("*** Classpath ***");
-		System.out.println(System.getProperty("java.class.path"));
-	}
-	 */
 
 	//TODO: check why the directory is not deleted
 	@AfterClass
@@ -333,7 +289,6 @@ public class TestDefaultConfig {
 	public void testProcessRosActuators() {
 		DefaultConfig config = new DefaultConfig();
 		try {
-			//List<DefaultDevice> l = config.loadFromYaml(new File(".").getCanonicalPath() + "/testeRos.yaml");
 			Yaml yaml = new Yaml();
 			Iterable<Object> itr = yaml.loadAll(new FileInputStream(new File(".").getCanonicalPath() + "/testeRos.yaml"));
 			for (Object o : itr) { 
@@ -349,9 +304,6 @@ public class TestDefaultConfig {
 				assertEquals(act.get(0).getActuations().size(), 1);
 							
 				assertEquals(act.get(1).getId().toString(), "actuator12");				
-				assertEquals(act.get(1).getActuations().size(), 2);
-				
-				
 				assertNotNull(act.get(1).getActuationById(createAtom("act122")));
 				assertEquals(((ServiceRequestActuation)act.get(1).getActuationById(createAtom("act122"))).getServiceName(), "/turtle1/teleport_relative");
 				assertEquals(((ServiceRequestActuation)act.get(1).getActuationById(createAtom("act122"))).getParameters().size(), 2);
@@ -367,16 +319,15 @@ public class TestDefaultConfig {
 				assertNotNull(act.get(0).getActuationById(createAtom("act211")));
 				assertEquals(((TopicWritingActuation)act.get(0).getActuationById(createAtom("act211"))).getTopicName(), "/value1");
 				assertEquals(((TopicWritingActuation)act.get(0).getActuationById(createAtom("act211"))).getTopicType(), "std_msgs/Int32");
-				assertEquals(((TopicWritingActuation)act.get(0).getActuationById(createAtom("act211"))).getParameters().size(), 1);
-				
+				assertEquals(((TopicWritingActuation)act.get(0).getActuationById(createAtom("act211"))).getParameters().toString(), "value");
+
 
 				assertNotNull(act.get(0).getActuationById(createAtom("act212")));
 				assertEquals(((TopicWritingActuation)act.get(0).getActuationById(createAtom("act212"))).getTopicName(), "/current_time");
 				assertEquals(((TopicWritingActuation)act.get(0).getActuationById(createAtom("act212"))).getTopicType(), "std_msgs/String");
-				//assertNull(((TopicWritingActuation)act.get(0).getActuationById(createAtom("act212"))).getParameters());
-				assertEquals(((TopicWritingActuation)act.get(0).getActuationById(createAtom("act212"))).getParameters().size(),1);
-				
-		
+				assertEquals(((TopicWritingActuation)act.get(0).getActuationById(createAtom("act212"))).getParameters().toString(),"value");
+
+
 
 			}
 		} catch (IOException e) {
@@ -386,6 +337,43 @@ public class TestDefaultConfig {
 
 		assertTrue(true);
 
+	}
+
+	@Test
+	public void testGetActions() {
+		DefaultConfig config = new DefaultConfig();
+		try {
+			List<DefaultDevice> l = config.loadFromYaml(new File(".").getCanonicalPath() + "/teste.yaml");
+			HashMap<Atom, ActuationSequence> actionMap = config.getActions(l, new File(".").getCanonicalPath() + "/teste.yaml");
+			ActuationSequence sequence = actionMap.get(createAtom("a3"));
+			assertEquals(sequence.size(), 2);
+			assertEquals(sequence.get(0).size(), 2);
+			assertEquals(sequence.get(1).size(), 1);
+			assertEquals(sequence.get(0).get(0).getDevice().getId().toString(),"my_device1");
+			assertEquals(sequence.get(0).get(0).getActuator().getId().toString(),"act1");
+			assertEquals(sequence.get(0).get(0).getActuation().getId().toString(),"double");
+			assertEquals(sequence.get(0).get(0).getActuation().getDefaultParameterValues().size(), 2);
+			assertEquals(sequence.get(0).get(1).getDevice().getId().toString(),"my_device1");
+			assertEquals(sequence.get(0).get(1).getActuator().getId().toString(),"act1");
+			assertEquals(sequence.get(0).get(1).getActuation().getId().toString(),"print");
+			assertNull(sequence.get(0).get(1).getActuation().getDefaultParameterValues());
+			assertEquals(sequence.get(1).get(0).getDevice().getId().toString(),"my_device1");
+			assertEquals(sequence.get(1).get(0).getActuator().getId().toString(),"act1");
+			assertEquals(sequence.get(1).get(0).getActuation().getId().toString(),"print");
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidDeviceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidActuationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidActuatorException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

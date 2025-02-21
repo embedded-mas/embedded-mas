@@ -152,7 +152,7 @@ public class DefaultConfig {
 						LinkedHashMap actions = (LinkedHashMap) l.get(i);
 						if((actions.get("actions") instanceof ArrayList)) { //if there are some actions 
 							ArrayList actionList = (ArrayList) actions.get("actions"); 
-							for(int i1=0;i1<actionList.size();i1++) { //for each action...
+							for(int i1=0;i1<actionList.size();i1++) { //for each action...										
 								LinkedHashMap actionItem = (LinkedHashMap) actionList.get(i1);
 								Iterator it = actionItem.keySet().iterator();
 								if(it.hasNext()) {
@@ -161,13 +161,28 @@ public class DefaultConfig {
 									ActuationSequence currentActuationSequence = new ActuationSequence(); //start a new actuation sequence
 									String regex = "([^.]+)\\.([^.]+)\\.([^.]+)";
 									Pattern pattern;
-									Matcher matcher;
+									Matcher matcher = null;
 									for(int k=0;k<actuationSequence.size();k++) { //for each actuation set
 										ArrayList actuationSet = (ArrayList) actuationSequence.get(k);
 										ActuationSet currentActuationSet = new ActuationSet(); //start a new actuation set
 										for(int n=0;n<actuationSet.size();n++){// for each element in the actuation set
 											pattern = Pattern.compile(regex);
-											matcher = pattern.matcher(actuationSet.get(n).toString());
+											HashMap<String, Object> def_params = null;
+											if(actuationSet.get(n) instanceof LinkedHashMap) {
+												matcher = pattern.matcher(((LinkedHashMap)actuationSet.get(n)).get("actuation").toString());
+												if(((LinkedHashMap)actuationSet.get(n)).get("default_param_values")!=null)
+												    def_params = new HashMap<>();
+												    ArrayList<LinkedHashMap<String, Object>> default_parameters = ((ArrayList)(((LinkedHashMap)actuationSet.get(n)).get("default_param_values") ) );
+												    for(LinkedHashMap<String, Object> p: default_parameters)
+												    	for(Map.Entry<String, Object> e : p.entrySet()) 
+												    		def_params.put(e.getKey(), e.getValue());
+												    	
+												    	
+											}
+											else
+												matcher = pattern.matcher(actuationSet.get(n).toString());
+
+
 											while (matcher.find()) {
 												//find the device
 												DefaultDevice currentDevice = null;
@@ -184,13 +199,14 @@ public class DefaultConfig {
 														if(currentActuator.getId().toString().equals(matcher.group(2))) { //check whether the device has an actuator that matches with the specified in the action
 															actuatorFound = true;
 															//check whether the actuator includes the actuation specified
-															Iterator<DefaultActuation> actuationIt = currentActuator.getActuations().iterator();
+															Iterator<DefaultActuation> actuationIt = currentActuator.getActuations().iterator(); 
 															boolean actuationFound = false;
 															while(actuationIt.hasNext()) {
-																DefaultActuation currentActuation = actuationIt.next();
+																DefaultActuation currentActuation = actuationIt.next().clone();
 																if(currentActuation.getId().toString().equals(matcher.group(3))){
 																	actuationFound = true;
 																	ActuationDevice act = new ActuationDevice(currentDevice, currentActuator,currentActuation);
+																	act.getActuation().setDefaultParameterValues(def_params);
 																	currentActuationSet.add(act);
 																}
 															}
@@ -239,7 +255,7 @@ public class DefaultConfig {
 					if(currentActuation.get("parameters")!=null) {
 						ArrayList parametersList = (ArrayList)currentActuation.get("parameters");
 						for(int k=0;k<parametersList.size();k++)
-							actuation.addParameter(createAtom(parametersList.get(k).toString()));
+							actuation.getParameters().add(createAtom(parametersList.get(k).toString()));
 					}
 					actuator.addActuation(actuation);					   
 				}
@@ -279,25 +295,20 @@ public class DefaultConfig {
 
 				//for each service actuation
 				if(serviceActuationsList!=null)
-					for(LinkedHashMap serviceActuation: serviceActuationsList) {
-						System.out.println("[DefaultConfig] processando servico" + serviceActuation);
+					for(LinkedHashMap serviceActuation: serviceActuationsList) {						
+						ServiceParameters p = new ServiceParameters();
+						if(serviceActuation.get("parameters")!=null)
+							for(int j=0;j<((ArrayList)serviceActuation.get("parameters")).size();j++) 
+								p.add(new ServiceParam(((ArrayList)serviceActuation.get("parameters")).get(j).toString(), null));
+
+
+
 						ServiceRequestActuation actuation = new ServiceRequestActuation(createAtom(serviceActuation.get("actuation_id").toString()), 
 								serviceActuation.get("serviceName").toString(), 
-								(ArrayList)serviceActuation.get("parameters"));
+								p);
 						actuator.addActuation(actuation);
 					}
 
-
-				/*for(int j = 0;j<actuationsList.size();j++) {
-					LinkedHashMap currentActuation =  (LinkedHashMap) actuationsList.get(j);
-					Actuation actuation = new Actuation(createAtom(currentActuation.get("actuation_id").toString()));
-					if(currentActuation.get("parameters")!=null) {
-						ArrayList parametersList = (ArrayList)currentActuation.get("parameters");
-						for(int k=0;k<parametersList.size();k++)
-							actuation.addParameter(createAtom(parametersList.get(k).toString()));
-					}
-					actuator.addActuation(actuation);					   
-				}*/
 				result.add(actuator);
 
 			}
@@ -425,7 +436,7 @@ public class DefaultConfig {
 
 							List<Actuator> actuators;
 							if(item.get("className").equals("embedded.mas.bridges.ros.RosHost")|
-								item.get("className").equals("embedded.mas.bridges.ros.RosMaster"))
+									item.get("className").equals("embedded.mas.bridges.ros.RosMaster"))
 								actuators = processRosActuators((ArrayList) item.get("actuators"));
 							else
 								actuators = processActuators((ArrayList) item.get("actuators")); 

@@ -10,7 +10,7 @@
 
 +!test1
    <- .print("testing 1...");
-       embedded.mas.bridges.jacamo.defaultEmbeddedInternalAction2(a1,["teste1",2,X, "teste2", 55, Y]);
+         embedded.mas.bridges.jacamo.defaultEmbeddedInternalAction2(a1,["teste1",X, "teste2", 55, Y]);
        .print(X, ",", Y).
 
 +!test2

@@ -158,7 +158,11 @@ public class RosMaster extends LiteralDevice {
 		}
 		if(this.getActuatorById(actuatorId).getActuationById(actuationId) instanceof ServiceRequestActuation) {
 			//System.out.println("[RosMaster] requesting service " + actuationId  );
-			//((IRosInterface)this.getMicrocontroller()).serviceRequest(null, null)
+			int i=0;
+			for(ServiceParam p : ((ServiceRequestActuation)this.getActuatorById(actuatorId).getActuationById(actuationId)).getParameters())
+				p.setParamValue(args[i++]);
+			((IRosInterface)this.getMicrocontroller()).serviceRequest(((ServiceRequestActuation)this.getActuatorById(actuatorId).getActuationById(actuationId)).getServiceName(),
+					((ServiceRequestActuation)this.getActuatorById(actuatorId).getActuationById(actuationId)).getParameters().toJson());
 			return true;
 		}
 		return false;

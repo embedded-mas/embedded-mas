@@ -46,7 +46,11 @@
     - [my_device1.act1.print,my_device1.act2.print,my_device1.act1.print]
     - [my_device1.act1.print,my_device1.act2.print,my_device1.act1.print]
   - a1: 
-    - [my_device1.act1.print,my_device1.act2.double]
+    - 
+      - my_device1.act1.print
+      - actuation: my_device1.act2.double
+        default_param_values:
+          - value: 12
     - [my_device2.act21.print, my_device1.act1.double]
   - a2: [[my_device1.act1.print,my_device2.act21.double],[my_device2.act21.print, my_device1.act1.double]]
   - a3: 
