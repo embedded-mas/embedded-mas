@@ -133,7 +133,6 @@ public class DefaultConfig {
 		System.out.println("[getInterface] " + c.getClass().getName());
 		Class[] classes = c.getInterfaces();
 		for(int i=0;i<classes.length;i++) {
-			System.out.println(classes[i].getClass().getName());
 		}
 		return null;
 	}
@@ -168,16 +167,10 @@ public class DefaultConfig {
 										for(int n=0;n<actuationSet.size();n++){// for each element in the actuation set
 											pattern = Pattern.compile(regex);
 											HashMap<String, Object> def_params = null;
-											if(actuationSet.get(n) instanceof LinkedHashMap) {
+											if(actuationSet.get(n) instanceof LinkedHashMap) { 
 												matcher = pattern.matcher(((LinkedHashMap)actuationSet.get(n)).get("actuation").toString());
-												if(((LinkedHashMap)actuationSet.get(n)).get("default_param_values")!=null)
-												    def_params = new HashMap<>();
-												    ArrayList<LinkedHashMap<String, Object>> default_parameters = ((ArrayList)(((LinkedHashMap)actuationSet.get(n)).get("default_param_values") ) );
-												    for(LinkedHashMap<String, Object> p: default_parameters)
-												    	for(Map.Entry<String, Object> e : p.entrySet()) 
-												    		def_params.put(e.getKey(), e.getValue());
-												    	
-												    	
+												if(((LinkedHashMap)actuationSet.get(n)).get("default_param_values")!=null)													
+													def_params = (HashMap<String, Object>) ((LinkedHashMap)actuationSet.get(n)).get("default_param_values");	
 											}
 											else
 												matcher = pattern.matcher(actuationSet.get(n).toString());
@@ -199,7 +192,7 @@ public class DefaultConfig {
 														if(currentActuator.getId().toString().equals(matcher.group(2))) { //check whether the device has an actuator that matches with the specified in the action
 															actuatorFound = true;
 															//check whether the actuator includes the actuation specified
-															Iterator<DefaultActuation> actuationIt = currentActuator.getActuations().iterator(); 
+															Iterator<DefaultActuation> actuationIt = currentActuator.getActuations().iterator();
 															boolean actuationFound = false;
 															while(actuationIt.hasNext()) {
 																DefaultActuation currentActuation = actuationIt.next().clone();
@@ -210,7 +203,7 @@ public class DefaultConfig {
 																	currentActuationSet.add(act);
 																}
 															}
-															if(!actuationFound) throw new InvalidActuationException("Actuator " + matcher.group(1)+"."+matcher.group(2)+"."+ matcher.group(3) + " not found.");
+															if(!actuationFound) throw new InvalidActuationException("Actuation " + matcher.group(1)+"."+matcher.group(2)+"."+ matcher.group(3) + " not found.");
 
 
 
@@ -282,12 +275,16 @@ public class DefaultConfig {
 				//for each topic actuation
 				if(topicActuationsList!=null)
 					for(LinkedHashMap topicActuation: topicActuationsList) {
-						Atom parameter;
-						parameter = createAtom("value"); //topic-writing actuations have always a single parameter (i.e. the value write)
+						ServiceParameters p = new ServiceParameters();
+						if(topicActuation.get("parameters")!=null) {							
+							p = buildServiceParameters( (ArrayList<Object>)topicActuation.get("parameters"));
+						}
+						else
+							p.add(new ServiceParam("value",null));
 						TopicWritingActuation actuation = new TopicWritingActuation(createAtom(topicActuation.get("actuation_id").toString()),
 								topicActuation.get("topicName").toString(),
 								topicActuation.get("topicType").toString(),
-								parameter
+								p
 								);
 						actuator.addActuation(actuation);									
 					}

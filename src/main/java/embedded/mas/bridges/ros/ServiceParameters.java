@@ -62,16 +62,68 @@ public class ServiceParameters extends ArrayList<ServiceParam> {
 		return true;
 	}
 
+
+	/**
+	 * Return the number of parameters.
+	 * It may be different of the size attribute in the case of nested parameters
+	 */
+	public int paramCount() {
+		return this.privateParamCount(0);
+
+	}
+
+
+	private int privateParamCount(int count) {
+		for(ServiceParam p : this)
+			if(p.getParamValue() instanceof ServiceParameters)
+				count = count + ((ServiceParameters)p.getParamValue()).paramCount();
+			else
+				count++;
+		return count;
+	}
+
 	@Override
 	public String toString() {
-		String s = "ServiceParameters ";
-		for(int i=0;i<this.size();i++)
+		String s = "";
+		for(int i=0;i<this.size();i++) {
 			s = s.concat(this.get(i).getParamName());
+			if(this.get(i).getParamValue() != null) {
+				if(this.get(i).getParamValue() instanceof ServiceParameters)
+					s = s.concat("[").concat(this.get(i).getParamValue().toString().concat("]"));
+				else
+					s = s.concat("/").concat(this.get(i).getParamValue().toString());
+			}
+			if(i<this.size()-1) 
+				s = s.concat(", ");
+		}
 		return s;
 	}
 
 
+	/**
+	 * Fill the parameter values with values from an plain array of object.
+	 * @param array - plain array  (i.e. no nested arrays)  of terms to be assigned to the parameter values
+	 * @return true if success, false otherwise
+	 */
+	public boolean setValuesFromArray(Object[] array) {
+		return internal_setValuesFromArray(array, 0)!=-1;
+	}
+	
+	
+	public int internal_setValuesFromArray(Object[] array, int index) {
+		//TODO: check whether the array size does not match the parameter count
+		for(ServiceParam p : this) //for each service param
+			if(p.getParamValue() instanceof ServiceParameters) {
+				index = ((ServiceParameters)p.getParamValue()).internal_setValuesFromArray(array, index);
+				if(index==-1) 
+					return -1;									
+			}
+			else {
+				p.setParamValue(array[index++]);
+			}
 
+		return index;
+	}
 
 
 }

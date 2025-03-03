@@ -151,13 +151,14 @@ public class RosMaster extends LiteralDevice {
 	@Override
 	public boolean doExecActuation(Atom actuatorId, Atom actuationId, Object[] args, Unifier un) {
 		if(this.getActuatorById(actuatorId).getActuationById(actuationId) instanceof TopicWritingActuation) {
+			((TopicWritingActuation) this.getActuatorById(actuatorId).getActuationById(actuationId)).getParameters().setValuesFromArray(args);
 			((IRosInterface)this.getMicrocontroller()).write(((TopicWritingActuation) this.getActuatorById(actuatorId).getActuationById(actuationId)).getTopicName(),
 					((TopicWritingActuation) this.getActuatorById(actuatorId).getActuationById(actuationId)).getTopicType(),
-					args[0].toString());
-			return true; //topic writings are assumed to be always successful
+					((TopicWritingActuation) this.getActuatorById(actuatorId).getActuationById(actuationId)).getParameters().toJson().toString()
+					);
+			return true; 
 		}
 		if(this.getActuatorById(actuatorId).getActuationById(actuationId) instanceof ServiceRequestActuation) {
-			//System.out.println("[RosMaster] requesting service " + actuationId  );
 			int i=0;
 			for(ServiceParam p : ((ServiceRequestActuation)this.getActuatorById(actuatorId).getActuationById(actuationId)).getParameters())
 				p.setParamValue(args[i++]);

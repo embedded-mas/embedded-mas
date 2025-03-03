@@ -22,6 +22,7 @@ import embedded.mas.bridges.jacamo.actuation.Actuator;
 import embedded.mas.bridges.jacamo.actuation.ros.ServiceRequestActuation;
 import embedded.mas.bridges.jacamo.actuation.ros.TopicWritingActuation;
 import embedded.mas.bridges.jacamo.config.DefaultConfig;
+import embedded.mas.bridges.ros.ServiceParameters;
 import embedded.mas.exception.InvalidActuationException;
 import embedded.mas.exception.InvalidActuatorException;
 import embedded.mas.exception.InvalidDeviceException;
@@ -48,7 +49,6 @@ public class TestDefaultConfig {
 			String filePath = appPath + "/teste.yaml";
 			File file = new File(filePath);
 
-			System.out.println("gerando " + filePath);
 
 			// If the file already exists, return true without overwriting it
 			if (file.exists()) {
@@ -113,8 +113,8 @@ public class TestDefaultConfig {
 							"    - \n" +
 							"      - actuation: my_device1.act1.double \n" +
 							"        default_param_values: \n" +
-							"          - value: 2\n" +
-							"          - result: 5\n" +
+							"          value: 2\n" +
+							"          result: 5\n" +
 							"      - my_device1.act1.print\n" +
 							"    - [my_device1.act1.print]\n" +
 							"  - a4:\n" +
@@ -148,7 +148,6 @@ public class TestDefaultConfig {
 			String filePath = appPath + "/testeRos.yaml";
 			File file = new File(filePath);
 
-			System.out.println("gerando " + filePath);
 
 			// If the file already exists, return true without overwriting it
 			if (file.exists()) {
@@ -159,44 +158,73 @@ public class TestDefaultConfig {
 			file.getParentFile().mkdirs();
 
 			String fileContent = 
-					"- device_id: my_device1\n"
-							+ "  className: embedded.mas.bridges.ros.RosHost\n"
-							+ "  microcontroller:\n"
-							+ "      id: arduino1\n"
-							+ "      className: DefaultRos4Bdi\n"
-							+ "      connectionString: ws://localhost:9090\n" 
-							+ "  actuators:\n"
-							+ "    - actuator_id: actuator11\n"
-							+ "      topicWritingActuations:\n"
-							+ "        - actuation_id: act111\n"
-							+ "          topicName: /value1\n"
-							+ "          topicType: std_msgs/Int32\n"
-							+ "    - actuator_id: actuator12\n"
-							+ "      topicWritingActuations:\n"
-							+ "        - actuation_id: act121\n"
-							+ "          topicName: /value2\n"
-							+ "          topicType: std_msgs/Int32\n"
-							+ "      serviceRequestActuations:\n"
-							+ "        - actuation_id: act122\n" 
-							+ "          serviceName: /turtle1/teleport_relative\n"
-							+ "          parameters:\n"
-							+ "             - linear\n"
-							+ "             - angular \n"
-							+ "- device_id: my_device2\n"
-							+ "  className: embedded.mas.bridges.ros.RosHost\n"
-							+ "  microcontroller:\n"
-							+ "      id: arduino1\n"
-							+ "      className: DefaultRos4Bdi\n"
-							+ "      connectionString: ws://localhost:9090\n" 
-							+ "  actuators:\n"
-							+ "    - actuator_id: actuator21\n"
-							+ "      topicWritingActuations:\n"
-							+ "        - actuation_id: act211\n"
-							+ "          topicName: /value1\n"
-							+ "          topicType: std_msgs/Int32\n"
-							+ "        - actuation_id: act212\n"
-							+ "          topicName: /current_time\n"
-							+ "          topicType: std_msgs/String";  
+					"- device_id: my_device1\n" +
+							"  className: embedded.mas.bridges.ros.RosHost\n" +
+							"  microcontroller:\n" +
+							"      id: arduino1\n" +
+							"      className: DefaultRos4Bdi\n" +
+							"      connectionString: ws://localhost:9090\n" +
+							"  actuators:\n" +
+							"    - actuator_id: actuator11\n" +
+							"      topicWritingActuations:\n" +
+							"        - actuation_id: act111\n" +
+							"          topicName: /value1\n" +
+							"          topicType: std_msgs/Int32\n" +
+							"    - actuator_id: actuator12\n" +
+							"      topicWritingActuations:\n" +
+							"        - actuation_id: act121\n" +
+							"          topicName: /value2\n" +
+							"          topicType: std_msgs/Int32\n" +
+							"      serviceRequestActuations:\n" +
+							"        - actuation_id: act122\n" +
+							"          serviceName: /turtle1/teleport_relative\n" +
+							"          parameters:\n" +
+							"             - linear\n" +
+							"             - angular\n" +
+							"- device_id: my_device2\n" +
+							"  className: embedded.mas.bridges.ros.RosHost\n" +
+							"  microcontroller:\n" +
+							"      id: arduino1\n" +
+							"      className: DefaultRos4Bdi\n" +
+							"      connectionString: ws://localhost:9090\n" +
+							"  actuators:\n" +
+							"    - actuator_id: actuator21\n" +
+							"      topicWritingActuations:\n" +
+							"        - actuation_id: act211\n" +
+							"          topicName: /value1\n" +
+							"          topicType: std_msgs/Int32\n" +
+							"        - actuation_id: act212\n" +
+							"          topicName: /current_time\n" +
+							"          topicType: std_msgs/String\n" +
+							"        - actuation_id: move_robot\n" +
+							"          topicName: /cmd_vel\n" +
+							"          topicType: geometry_msgs/Twist\n" +
+							"          parameters:\n" +
+							"            - linear:\n" +
+							"                - x\n" +
+							"                - y\n" +
+							"                - z\n" +
+							"            - angular:\n" +
+							"                - x\n" +
+							"                - y\n" +
+							"                - z\n" +
+							"- actions:\n" +
+							"  - front:\n" +
+							"    -\n" +
+							"      - actuation: ros_device_1.actuator1.move_robot\n"+
+							"        default_param_values: \n"+
+							"          - linear:\n"+
+							"            x: 0.2\n"+
+							"            y: 0.3\n"+
+							"            z: 0.4\n"+
+
+							"          - angular:\n"+
+							"            x: 0.5\n"+
+							"            y: 0.6\n"+
+							"            z: 0.7"
+
+							;
+
 
 
 			// Try writing the file
@@ -307,25 +335,47 @@ public class TestDefaultConfig {
 				assertNotNull(act.get(1).getActuationById(createAtom("act122")));
 				assertEquals(((ServiceRequestActuation)act.get(1).getActuationById(createAtom("act122"))).getServiceName(), "/turtle1/teleport_relative");
 				assertEquals(((ServiceRequestActuation)act.get(1).getActuationById(createAtom("act122"))).getParameters().size(), 2);
-				
-				
+				assertEquals(((ServiceRequestActuation)act.get(1).getActuationById(createAtom("act122"))).parameterSize(), 2);
+				assertEquals(((ServiceRequestActuation)act.get(1).getActuationById(createAtom("act122"))).getParameters().get(0).getParamName(), "linear");
+				assertEquals(((ServiceRequestActuation)act.get(1).getActuationById(createAtom("act122"))).getParameters().get(1).getParamName(), "angular");
+
+
 				//2nd device
 				actuators = (ArrayList) ((LinkedHashMap<?, ?>) devices.get(1)).get("actuators");
 				act =  config.processRosActuators(actuators);
 				assertEquals(act.size(), 1);
 				assertEquals(act.get(0).getId().toString(), "actuator21");
-				assertEquals(act.get(0).getActuations().size(), 2);
-				
+				assertEquals(act.get(0).getActuations().size(), 3);
+
+
+
 				assertNotNull(act.get(0).getActuationById(createAtom("act211")));
 				assertEquals(((TopicWritingActuation)act.get(0).getActuationById(createAtom("act211"))).getTopicName(), "/value1");
-				assertEquals(((TopicWritingActuation)act.get(0).getActuationById(createAtom("act211"))).getTopicType(), "std_msgs/Int32");
-				assertEquals(((TopicWritingActuation)act.get(0).getActuationById(createAtom("act211"))).getParameters().toString(), "value");
+				assertEquals(((TopicWritingActuation)act.get(0).getActuationById(createAtom("act211"))).getTopicType(), "std_msgs/Int32");				
+				assertEquals(((TopicWritingActuation)act.get(0).getActuationById(createAtom("act211"))).parameterSize(), 1);
+
 
 
 				assertNotNull(act.get(0).getActuationById(createAtom("act212")));
 				assertEquals(((TopicWritingActuation)act.get(0).getActuationById(createAtom("act212"))).getTopicName(), "/current_time");
 				assertEquals(((TopicWritingActuation)act.get(0).getActuationById(createAtom("act212"))).getTopicType(), "std_msgs/String");
-				assertEquals(((TopicWritingActuation)act.get(0).getActuationById(createAtom("act212"))).getParameters().toString(),"value");
+
+				assertNotNull(act.get(0).getActuationById(createAtom("move_robot")));
+				assertEquals(((TopicWritingActuation)act.get(0).getActuationById(createAtom("move_robot"))).getParameters().get(0).getParamName(), "linear");
+				assertTrue(((TopicWritingActuation)act.get(0).getActuationById(createAtom("move_robot"))).getParameters().get(0).getParamValue() instanceof ServiceParameters);
+				assertEquals(((ServiceParameters)((TopicWritingActuation)act.get(0).getActuationById(createAtom("move_robot"))).getParameters().get(0).getParamValue()).size(), 3);
+				assertEquals(((ServiceParameters)((TopicWritingActuation)act.get(0).getActuationById(createAtom("move_robot"))).getParameters().get(0).getParamValue()).get(0).getParamName(), "x");
+				assertEquals(((ServiceParameters)((TopicWritingActuation)act.get(0).getActuationById(createAtom("move_robot"))).getParameters().get(0).getParamValue()).get(1).getParamName(), "y");
+				assertEquals(((ServiceParameters)((TopicWritingActuation)act.get(0).getActuationById(createAtom("move_robot"))).getParameters().get(0).getParamValue()).get(2).getParamName(), "z");
+
+				assertEquals(((TopicWritingActuation)act.get(0).getActuationById(createAtom("move_robot"))).getParameters().get(1).getParamName(), "angular");
+				assertTrue(((TopicWritingActuation)act.get(0).getActuationById(createAtom("move_robot"))).getParameters().get(1).getParamValue() instanceof ServiceParameters);
+				assertEquals(((ServiceParameters)((TopicWritingActuation)act.get(0).getActuationById(createAtom("move_robot"))).getParameters().get(1).getParamValue()).size(), 3);
+				assertEquals(((ServiceParameters)((TopicWritingActuation)act.get(0).getActuationById(createAtom("move_robot"))).getParameters().get(1).getParamValue()).get(0).getParamName(), "x");
+				assertEquals(((ServiceParameters)((TopicWritingActuation)act.get(0).getActuationById(createAtom("move_robot"))).getParameters().get(1).getParamValue()).get(1).getParamName(), "y");
+				assertEquals(((ServiceParameters)((TopicWritingActuation)act.get(0).getActuationById(createAtom("move_robot"))).getParameters().get(1).getParamValue()).get(2).getParamName(), "z");
+
+
 
 
 
