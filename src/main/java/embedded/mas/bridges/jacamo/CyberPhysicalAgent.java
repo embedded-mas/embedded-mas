@@ -16,6 +16,7 @@ import embedded.mas.bridges.jacamo.config.DefaultConfig;
 import embedded.mas.exception.InvalidActuationException;
 import embedded.mas.exception.InvalidActuatorException;
 import embedded.mas.exception.InvalidDeviceException;
+import jason.asSyntax.Literal;
 
 
 public class CyberPhysicalAgent extends EmbeddedAgent {
@@ -30,6 +31,10 @@ public class CyberPhysicalAgent extends EmbeddedAgent {
 			
 			try {
 				this.actionMap = conf.getActions(d,(Paths.get("").toAbsolutePath()+"/src/agt/"+getTS().getAgArch().getAgName() + ".yaml"));
+				List<Literal> perceptionRules = conf.getPerceptionRules((Paths.get("").toAbsolutePath()+"/src/agt/"+getTS().getAgArch().getAgName() + ".yaml"));
+				if(perceptionRules!=null)
+					for(Literal s: perceptionRules)
+						this.getBB().add(s);
 			} catch (InvalidDeviceException e) {
 				// TODO Auto-generated catch block
 				System.err.println(e.getMessage());

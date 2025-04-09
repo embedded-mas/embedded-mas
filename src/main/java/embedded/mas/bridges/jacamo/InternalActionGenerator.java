@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.Path;
@@ -21,7 +22,7 @@ public class InternalActionGenerator  {
 	private static void writeToFile(String deviceId, String actionName, String serviceName, List<String> params) {
 		Path filePath = Paths.get("src/java/jason/stdlib/" + actionName + ".java");		
 		if(Files.exists(filePath))
-			System.out.println("*** internal action " + actionName + " already exists in src/java/jason/stdlib and will not be overwritten ***");
+			System.out.println("*** [information] internal action " + actionName + " already exists in src/java/jason/stdlib and will not be overwritten ***");
 		else {
 			String fileContent = "package jason.stdlib; \n\n" +
 					"import embedded.mas.bridges.jacamo.defaultEmbeddedInternalAction;\n" +
@@ -63,7 +64,19 @@ public class InternalActionGenerator  {
 		}
 	}
 
-	
+
+	private static List<Path> listYamlFiles(Path dir) {
+           List<Path> yamlFiles = new ArrayList<>();
+           try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir, "*.yaml")) {
+              for (Path entry : stream) {
+                 yamlFiles.add(entry);
+              }
+           } catch (IOException e) {
+              e.printStackTrace();
+           }
+           return yamlFiles;
+        }
+        
 	private static void writeToFile_MultiActuation(String actionName) {
 		Path filePath = Paths.get("src/java/jason/stdlib/" + actionName + ".java");		
 		if(Files.exists(filePath))
@@ -138,23 +151,22 @@ public class InternalActionGenerator  {
 		return listaDeArquivos;
 	}
 
-
+	
 	public static void main(String[] args) {
-		List<String> yamlFiles = getFilesByExtension("src/agt/", "yaml");
-		//List<String> yamlFiles = getFilesByExtension("/mnt/1C4C766F4C764414/maiquel/git/embedded-mas/examples/jacamo/serial_device/perception_action/src/agt/", "yaml");
+		Path directoryPath = Paths.get("src/agt");
 
-		for(String s : yamlFiles) {
-			Yaml yaml = new Yaml();
+        	List<Path> yamlFiles = listYamlFiles(directoryPath);
+	        for(Path f: yamlFiles){
+   		   Yaml yaml = new Yaml();
 
-			InputStream inputStream = InternalActionGenerator.class
-					.getClassLoader()
-					//.getResourceAsStream("robot1.yaml");
-					.getResourceAsStream(s);
+		   InputStream inputStream = InternalActionGenerator.class
+				.getClassLoader()
+				.getResourceAsStream(f.getFileName().toString());
 
-			if (inputStream == null) {
-				throw new IllegalArgumentException("File not found! Check the file path.");
-			}
-			List<Map<String, Object>> yamlData = yaml.load(inputStream);
+		   if (inputStream == null) {
+		 	throw new IllegalArgumentException("File not found! Check the file path.");
+		   }
+		   List<Map<String, Object>> yamlData = yaml.load(inputStream);
 
 
 

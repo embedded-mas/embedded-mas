@@ -65,9 +65,12 @@ import embedded.mas.exception.InvalidActuationException;
 import embedded.mas.exception.InvalidActuatorException;
 import embedded.mas.exception.InvalidDeviceException;
 import jason.asSyntax.Atom;
-
+import jason.asSyntax.Literal;
+import jason.asSyntax.parser.ParseException;
+import jason.asSyntax.parser.TokenMgrError;
 
 import static jason.asSyntax.ASSyntax.createAtom;
+import static jason.asSyntax.ASSyntax.parseRule;
 
 public class DefaultConfig {
 	private List<DefaultDevice> devices = new ArrayList<DefaultDevice>();
@@ -234,6 +237,35 @@ public class DefaultConfig {
 	}
 
 
+	public List<Literal> getPerceptionRules(String fileName) {
+		Yaml yaml = new Yaml();
+		ArrayList<Literal> rules = new ArrayList<>();
+		try {
+			Iterable<Object> itr = yaml.loadAll(new FileInputStream(fileName));
+			for (Object o : itr) { 
+				ArrayList l = (ArrayList) o; //"l" is a list of JSON where each element is a single device configuration
+				for(int i=0;i<l.size();i++) 
+					if(((LinkedHashMap) l.get(i)).containsKey("perception_rules")) {
+						ArrayList<String> sRules = (ArrayList) ((LinkedHashMap) l.get(i)).get("perception_rules");
+						for(String s:sRules)
+							rules.add(parseRule(s));							
+					}
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TokenMgrError e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return rules;
+
+	}
+
+	
 	public List<Actuator> processActuators(List actuatorYaml){		
 		ArrayList<Actuator> result = new ArrayList<Actuator>();		
 		if(actuatorYaml!=null) {
@@ -280,7 +312,7 @@ public class DefaultConfig {
 							p = buildServiceParameters( (ArrayList<Object>)topicActuation.get("parameters"));
 						}
 						else
-							p.add(new ServiceParam("value",null));
+							p.add(new ServiceParam("data",null));
 						TopicWritingActuation actuation = new TopicWritingActuation(createAtom(topicActuation.get("actuation_id").toString()),
 								topicActuation.get("topicName").toString(),
 								topicActuation.get("topicType").toString(),

@@ -33,8 +33,29 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 
 	private RosListenDelegate listener = null;
 	private ArrayList<Literal> mensagens = new ArrayList<Literal>();
-	
-	
+
+	private static final Set<String> PRIMITIVE_TYPES = new HashSet<>(Set.of(
+			"std_msgs/Bool", "std_msgs/msg/Bool",
+			"std_msgs/Byte", "std_msgs/msg/UInt8",
+			"std_msgs/Char", "std_msgs/msg/Int8",			
+			"std_msgs/Float32", "std_msgs/msg/Float32",
+			"std_msgs/Float64", "std_msgs/msg/Float64",
+			"std_msgs/String", "std_msgs/msg/String",
+			"std_msgs/Time", "builtin_interfaces/msg/Time",
+			"std_msgs/Duration", "builtin_interfaces/msg/Duration"
+			));
+
+	private static final Set<String> INTEGER_TYPES = new HashSet<>(Set.of(
+			"std_msgs/Int8", "std_msgs/msg/Int8",
+			"std_msgs/UInt8", "std_msgs/msg/UInt8",
+			"std_msgs/Int16", "std_msgs/msg/Int16",
+			"std_msgs/UInt16", "std_msgs/msg/UInt16",
+			"std_msgs/Int32", "std_msgs/msg/Int32",
+			"std_msgs/UInt32", "std_msgs/msg/UInt32",
+			"std_msgs/Int64", "std_msgs/msg/Int64",
+			"std_msgs/UInt64", "std_msgs/msg/UInt64"
+			));
+
 	/*
 	 * beliefName is a map where the key is the name of the topic and the value is the corresponding belief functor
 	 */
@@ -161,12 +182,12 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 
 	public void rosWrite(String topic, String type, String s){
 		Publisher pub = new Publisher(topic, type, bridge);
-		if(type.equals("std_msgs/Int32"))
+		if(INTEGER_TYPES.contains(type))
 			pub.publish(new PrimitiveMsg<Integer>(Integer.parseInt(s)));
 		else
-			if(type.equals("geometry_msgs/Pose")|| //TODO: handle application specific message types in application-customized extensions of DefaultRos4EmbeddedMas
-					type.equals("geometry_msgs/Twist")|
-					type.equals("mrs_msgs/Path"))		
+			if(PRIMITIVE_TYPES.contains(type))
+				pub.publish(new PrimitiveMsg<String>(s));
+			else
 				try {
 					pub.publish(new ObjectMapper().readTree(s));
 				} catch (JsonMappingException e) {
@@ -174,8 +195,7 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 				} catch (JsonProcessingException e) {
 					e.printStackTrace();
 				}
-			else
-				pub.publish(new PrimitiveMsg<String>(s));
+
 	}
 
 	@Override

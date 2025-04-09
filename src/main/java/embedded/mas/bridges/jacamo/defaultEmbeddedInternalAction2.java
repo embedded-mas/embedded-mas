@@ -67,7 +67,7 @@ public class defaultEmbeddedInternalAction2 extends EmbeddedInternalAction {
 						}
 
 						Term[] params = new Term[actuation.parameterSize()];
-												Term[] actuation_param_values = actuation.getParametersAsArray();
+						Term[] actuation_param_values = actuation.getParametersAsArray();
 						int k=0,l=0;											
 						for(int i=0;i<actuation.parameterSize();i++)
 							if(actuation_param_values[k]==null) {
