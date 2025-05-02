@@ -28,8 +28,10 @@ repositories {
 
 dependencies {
     implementation 'org.jacamo:jacamo:1.2.3'
-    implementation "embedded-mas:embedded-mas:0.060-SNAPSHOT" 
+    //implementation "embedded-mas:embedded-mas:0.060-SNAPSHOT" 
+    implementation files('/mnt/1C4C766F4C764414/maiquel/git/embedded-mas-multi-device-actuations/embedded-mas/build/libs/embedded-mas-0.060-SNAPSHOT.jar')
     implementation 'org.yaml:snakeyaml:2.0'
+    implementation 'org.eclipse.jetty.websocket:websocket-client:9.4.57.v20241219'
 }
 
 sourceSets {

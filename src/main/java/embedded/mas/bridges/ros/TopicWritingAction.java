@@ -44,7 +44,7 @@ public class TopicWritingAction extends RosAction {
 	}
 
 
-	public void setValue(Object value) {
+	public void setParamValues(Object value) {
 		if(this.parameters!=null) { //if this action uses the ServiceParameters class
 			this.parameters.setValues((Object[])value);
 		}

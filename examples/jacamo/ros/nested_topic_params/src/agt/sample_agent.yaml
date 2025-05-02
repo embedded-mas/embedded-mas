@@ -22,24 +22,23 @@
       - topicName: turtle1/pose
         topicType: turtlesim/Pose
         beliefName: turtle_position
-  #actions: An agent acts upon ROS by topic writings and service requests, configured in the items topicWritingActions and serviceRequestActions, respectively.
-  #         This example illustrate only topic writing actions. 
-  actions:       
-    topicWritingActions:          
-      - actionName: move_turtle
-        topicName: /turtle1/cmd_vel
-        topicType: geometry_msgs/Twist
-        # the params "linear" and "angular" are both composed of a set of three other parameters.
-        params:
-           - linear:
+  actuators:
+    - actuator_id: actuator1       
+      topicWritingActuations:
+        - actuation_id: move_robot
+          topicName: turtle1/cmd_vel
+          topicType: geometry_msgs/Twist
+          parameters:
+            - linear:
               - x
               - y
               - z
-           - angular:
+            - angular:
               - x
               - y
-              - z
+              - z 
 
 
-            
-
+- actions:
+  - move_turtle:
+      - [sample_roscore.actuator1.move_robot]

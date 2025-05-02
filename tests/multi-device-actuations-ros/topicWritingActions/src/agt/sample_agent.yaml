@@ -48,3 +48,4 @@
       - [ros_device_1.actuator1.act1]
    - a2:
       - [ros_device_1.actuator1.act2, ros_device_1.actuator1.time]
+      #- [ros_device_1.actuator1.act2]

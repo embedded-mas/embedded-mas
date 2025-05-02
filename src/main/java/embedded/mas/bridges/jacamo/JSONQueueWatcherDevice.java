@@ -55,4 +55,9 @@ public class JSONQueueWatcherDevice extends SerialDevice implements IDevice {
 	}
 	
 	
+	@Override
+	public boolean doExecActuation(Atom actuatorId, Atom actuationId, Object[] args, Unifier un) {
+		return  this.getMicrocontroller().write(actuatorId.toString().concat(".").concat(actuationId.toString()));		
+	}
+	
 }

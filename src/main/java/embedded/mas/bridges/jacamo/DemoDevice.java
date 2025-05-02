@@ -4,7 +4,10 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.Set;
 
+import embedded.mas.bridges.jacamo.actuation.ActuationDevice;
 import embedded.mas.exception.InvalidActuatorException;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Atom;
@@ -111,11 +114,37 @@ public class DemoDevice extends DefaultDevice  {
 		return false;
 	}
 
+	
+	public boolean doExecActuation(ActuationDevice actuation,Object[] args,int argInitialIndex, Unifier un) {
+		if(actuation.getActuation().getId().toString().equals("print"))
+			return doEmbeddedPrint(actuation.getActuation().getParameters().toString());
+		else
+			if(actuation.getActuation().getId().toString().equals("double")) { 
+				double r = Double.parseDouble(actuation.getActuation().getParameters().toString()) * 2;
+				NumberTerm result = new NumberTermImpl(r);
+				return un.unifies(result, (Term) args[argInitialIndex+1]);			
+
+			}
+			
+		return false;
+	}
+
 
 	//************************* Implementations to test the actuation model that is based on actuators x actuations
 	private boolean doEmbeddedPrint(Atom actuatorId, String text) {
 		System.out.println("[" + this.id + "." + actuatorId  + ".print] " + text);
 		return true;
+	}
+
+	@Override
+	public boolean execActuationSet(Set<ActuationDevice> actuations, Object[] args, int argInitialIndex, Unifier un) {
+		Iterator<ActuationDevice> it = actuations.iterator();
+		while(it.hasNext()) {
+			ActuationDevice act = it.next();
+ 			this.doExecActuation(act, args, argInitialIndex, un);
+		}
+		return true;
+			
 	}
 	
 	

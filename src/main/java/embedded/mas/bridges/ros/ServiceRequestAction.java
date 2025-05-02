@@ -23,6 +23,10 @@ public class ServiceRequestAction extends RosAction {
 		return serviceParameters;
 	}
 
+	public void setParamValues(Object value) {
+		this.serviceParameters.setValues((Object[])value);
+	}
+	
 	@Override
 	public String toString() {
 		return "ServiceRequestAction [serviceName=" + serviceName + ", serviceParameters=" + serviceParameters + "]";

@@ -112,20 +112,18 @@ public class RosMaster extends LiteralDevice {
 
 
 	@Override
-	public boolean execEmbeddedAction(Atom actionName,Object[] args, Unifier un) {
-		if(!checkArrayArguments(args))
-			return false;
+	public boolean execEmbeddedAction(Atom actionName,Object[] args, Unifier un) {	
+//		if(!checkArrayArguments(args))
+//			return false;
 		EmbeddedAction action = this.getEmbeddedActions().get(actionName);
 		if(action!=null)
 			if(action instanceof TopicWritingAction) {
-				((TopicWritingAction)action).setValue(args);
+				((TopicWritingAction)action).setParamValues(args);
 				this.getMicrocontroller().execEmbeddedAction(action);
 			}	
 			else
 				if(action instanceof ServiceRequestAction) {
-					for(int i=0;i<args.length;i++) { //set service params
-						((ServiceRequestAction)action).getServiceParameters().get(i).setParamValue(args[i]);						
-					}					
+					((ServiceRequestAction)action).setParamValues(args);										
 					this.getMicrocontroller().execEmbeddedAction(action);
 				}
 		return true;
@@ -133,7 +131,7 @@ public class RosMaster extends LiteralDevice {
 
 
 	/**
-	 * Check wheter the arguments are consistent.
+	 * Check whether the arguments are consistent.
 	 */
 	private boolean checkArrayArguments(Object[] args) {
 		for(int i=0;i<args.length;i++) {

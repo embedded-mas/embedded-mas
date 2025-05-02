@@ -42,7 +42,7 @@ public class JSONWatcherDevice extends SerialDevice implements IDevice {
 				listOfBeliefs.clear();
 			}
 		}
-		try {Thread.sleep((long)(Math.random() * 1000)); } catch (InterruptedException e) { } //espera um tempo aleatório antes de continuar
+		//try {Thread.sleep((long)(Math.random() * 1000)); } catch (InterruptedException e) { } //espera um tempo aleatório antes de continuar
 	return percepts;
 	}
 
@@ -55,6 +55,18 @@ public class JSONWatcherDevice extends SerialDevice implements IDevice {
 	@Override
 	public IPhysicalInterface getMicrocontroller() {
 		return (IPhysicalInterface) this.microcontroller;
+	}
+	
+	@Override
+	public boolean doExecActuation(Atom actuatorId, Atom actuationId, Object[] args, Unifier un) {
+//		try {
+//			Thread.sleep(1000);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		return  this.getMicrocontroller().write(actuatorId.toString().concat(".").concat(actuationId.toString()));
+		//return  this.getMicrocontroller().write("light1.off;light2.off");		
 	}
 	
 	

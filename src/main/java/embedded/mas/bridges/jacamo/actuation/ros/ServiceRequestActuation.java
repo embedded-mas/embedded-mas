@@ -7,7 +7,7 @@ import jason.asSyntax.Atom;
 import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Term;
 
-public class ServiceRequestActuation extends DefaultActuation<ServiceParameters>  {
+public class ServiceRequestActuation extends ROSActuation {
 
 	private String serviceName;
 	
@@ -40,10 +40,10 @@ public class ServiceRequestActuation extends DefaultActuation<ServiceParameters>
 	}
 
 
-	@Override
-	public int parameterSize() {
-		return this.getParameters().size();
-	}
+//	@Override
+//	public int parameterSize() {
+//		return this.getParameters().size();
+//	}
 
 
 	@Override
@@ -53,21 +53,27 @@ public class ServiceRequestActuation extends DefaultActuation<ServiceParameters>
 
 
 	@Override
-	public Term[] getParametersAsArray() {
-		Term[] params = new Term[this.getParameters().size()];
-		int i = 0;
-		for(ServiceParam a : getParameters()) {			
-			if(getDefaultParameterValues()==null || getDefaultParameterValues().get(a.getParamName().toString())==null) 					
-				params[i++] = null;							
-			else {
-				Object defaultValue = getDefaultParameterValues().get(a.getParamName().toString());
-				if (defaultValue instanceof Integer)
-					params[i++] = new NumberTermImpl(defaultValue.toString());
-				else
-				   params[i++] = (Term) defaultValue;
-			}
-		}
-		return params;
+	public int setParamValues(Object[] p, int initialPosition) {
+		return this.getParameters().setParamValues(p, initialPosition);
 	}
+
+
+//	@Override
+//	public Term[] getParametersAsArray() {
+//		Term[] params = new Term[this.getParameters().size()];
+//		int i = 0;
+//		for(ServiceParam a : getParameters()) {			
+//			if(getDefaultParameterValues()==null || getDefaultParameterValues().get(a.getParamName().toString())==null) 					
+//				params[i++] = null;							
+//			else {
+//				Object defaultValue = getDefaultParameterValues().get(a.getParamName().toString());
+//				if (defaultValue instanceof Integer)
+//					params[i++] = new NumberTermImpl(defaultValue.toString());
+//				else
+//				   params[i++] = (Term) defaultValue;
+//			}
+//		}
+//		return params;
+//	}
 
 }

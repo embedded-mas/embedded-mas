@@ -5,6 +5,7 @@
       .wait(100);
       //execute the action "update_value2". Such action is translated to a rostopic pub
       .a2(V+1, Msg).
+      //.a2(V+1).
 
 +value2(V)
    <- .print("Read topic 2: ", V);
