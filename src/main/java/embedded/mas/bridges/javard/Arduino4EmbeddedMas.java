@@ -18,12 +18,23 @@ public class Arduino4EmbeddedMas extends Arduino implements IPhysicalInterface{
 	private String preamble = "==";
 	private String startMessage = "::";
 	private String endMessage = "--";
+	private String endSendMessage = "__eom__";
 	private boolean connected = false;
+	private String latestActuation = "";
 
 
 	public Arduino4EmbeddedMas(String portDescription, int baud_rate) {
 		super(portDescription, baud_rate);
 		this.openConnection();
+		
+		
+		//clean the serial port
+		int available = this.getSerialPort().bytesAvailable();
+
+		if (available > 0) {
+		    byte[] dump = new byte[available];
+		    this.getSerialPort().readBytes(dump, dump.length); // Lê e ignora os dados
+		}
 	}
 	
 
@@ -35,9 +46,11 @@ public class Arduino4EmbeddedMas extends Arduino implements IPhysicalInterface{
 	
 	@Override
 	public boolean write(String s) {
-		//System.out.println("[Arduino4EmbeddedMas] going to write " + s);
+		if(s.equals(latestActuation)) return true;
+		System.out.println("[Arduino4EmbeddedMas] going to write " + s + endSendMessage + " - " + this.getSerialPort().bytesAvailable());
 		try {			
-			serialWrite(s);
+			serialWrite(s + endSendMessage);
+			latestActuation = s;
 			return true;
 		}catch (Exception e) {
 			return false;

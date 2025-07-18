@@ -1,5 +1,6 @@
 package embedded.mas.bridges.jacamo;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
@@ -32,6 +33,19 @@ public interface IDevice {
 	
 	public boolean hasActuator(Atom actuatorId);
 	
-	public boolean execActuationSet(Set<ActuationDevice> actuations, Object[] args, int argInitialIndex, Unifier un);
+	/**
+	 * 
+	 * @param actuations: Set of actuations to be executed (implemented through ArrayList to be faster than Set implementations)
+	 * @param args: Array of parameters to be used in actuations (may be larger than the required by the actuation set) 
+	 * @param argInitialIndex: Initial position to be considered in the array of parameters
+	 * @param un
+	 * @return Latest considered position in the array of parameters
+	 */
+	
+
+	//public boolean execActuationSet(ArrayList<ActuationDevice> actuations, Object[] args, int argInitialIndex, Unifier un);
+	public boolean execActuationSet(ArrayList<ActuationDevice> actuations, Unifier un);
+	
+	public boolean doExecActuation(ActuationDevice actuation, Unifier un);
 
 }

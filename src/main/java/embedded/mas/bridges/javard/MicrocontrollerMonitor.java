@@ -83,7 +83,6 @@ public void decode() throws PerceivingException {
 					}
 					belief = belief + ")";
 
-					//System.out.println(belief);
 					percepts.add(Literal.parseLiteral(belief));
 				}
 				this.lista.add(percepts);

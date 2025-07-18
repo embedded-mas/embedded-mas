@@ -7,6 +7,7 @@ import embedded.mas.bridges.jacamo.EmbeddedAction;
 import embedded.mas.bridges.jacamo.IEmbeddedAction;
 import embedded.mas.bridges.jacamo.ILiteralListInterface;
 import embedded.mas.bridges.jacamo.LiteralDevice;
+import embedded.mas.bridges.jacamo.actuation.ActuationDevice;
 import embedded.mas.bridges.jacamo.actuation.ros.ServiceRequestActuation;
 import embedded.mas.bridges.jacamo.actuation.ros.TopicWritingActuation;
 import jason.asSemantics.Unifier;
@@ -167,6 +168,32 @@ public class RosMaster extends LiteralDevice {
 		return false;
 
 	}
+
+
+
+	@Override
+	public boolean doExecActuation(ActuationDevice actuation, Unifier un) {		
+		if(actuation.getActuation() instanceof TopicWritingActuation) {
+			((IRosInterface)this.getMicrocontroller()).write(
+					((TopicWritingActuation)actuation.getActuation()).getTopicName(), 
+					((TopicWritingActuation)actuation.getActuation()).getTopicType(), 
+					((TopicWritingActuation)actuation.getActuation()).getParameters().toJson().toString()
+					);
+			return true;
+		}
+		else
+			if(actuation.getActuation() instanceof ServiceRequestActuation) {
+				((IRosInterface)this.getMicrocontroller()).serviceRequest(
+						((ServiceRequestActuation)actuation.getActuation()).getServiceName(), 
+						((ServiceRequestActuation)actuation.getActuation()).getParameters().toJson()
+						);
+				return true;
+			}
+
+		return false;
+	}
+
+
 
 
 

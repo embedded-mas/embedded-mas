@@ -21,7 +21,7 @@ Use the following commands to launch the nodes either in ROS 1 or in ROS 2:
 ##### 1.1.1 ROS 1: 
 
    ```
-   sudo docker run -it -p9090:9090 --rm --net=ros --name noetic maiquelb/embedded-mas-ros:0.5 \
+   sudo docker run -it -p9090:9090 --rm --net=ros --name noetic maiquelb/embedded-mas-ros:latest \
    /bin/bash -c "source /opt/ros/noetic/setup.bash && roslaunch rosbridge_server rosbridge_websocket.launch & \
                  while ! rostopic list | grep '/value1'; do \
                  source /opt/ros/noetic/setup.bash; \
@@ -34,7 +34,7 @@ Use the following commands to launch the nodes either in ROS 1 or in ROS 2:
 ##### 1.1.2 ROS 2:
 
 ```
-sudo docker run -it -p9090:9090 --rm --net=ros --name noetic maiquelb/embedded-mas-ros2:0.6 \
+sudo docker run -it -p9090:9090 --rm --net=ros --name noetic maiquelb/embedded-mas-ros2:latest \
 /bin/bash -c "ros2 launch rosbridge_server rosbridge_websocket_launch.xml & (\
               while ! ros2 topic list | grep '/value1'; do \
               ros2 topic pub --once /value1 std_msgs/Int32 \"{\"data\": 0}\" ; \

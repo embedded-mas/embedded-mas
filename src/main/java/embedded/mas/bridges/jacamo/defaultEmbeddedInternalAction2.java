@@ -8,6 +8,7 @@ import jason.asSyntax.Term;
 
 import static jason.asSyntax.ASSyntax.createAtom;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -39,68 +40,6 @@ public class defaultEmbeddedInternalAction2 extends EmbeddedInternalAction {
 		return arguments;
 	}
 
-	@Override
-	/**
-	 * args:
-	 * 0. ActionName
-	 * 1: Parameters
-	 */
-//	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {  
-//		if(ts.getAg() instanceof EmbeddedAgent) {
-//			EmbeddedAgent agent = (EmbeddedAgent) ts.getAg();
-//			DefaultDevice device = null;
-//			int default_param_size = 0;
-//			//Case 1: check whether the action is in the agent's repertory (newest approach)	
-//			ActuationSequence actuationSequence = agent.getActionMap().get(createAtom(args[0].toString()));
-//			if(actuationSequence!=null) { //if the repertory contains the action
-//				Object[] arguments = ((ListTermImpl)args[1]).toArray();								
-//				for(ActuationSet actuationSet:actuationSequence.getActuations()) { //for each set of actuations of the sequence
-//					Iterator<ActuationDevice> it = actuationSet.iterator(); 
-//					while(it.hasNext()) { //for each actuation in the set
-//						ActuationDevice currenctActuation = it.next();
-//						//1. find the device the action is applyied upon
-//						device = currenctActuation.getDevice();
-//						Actuator actuator = currenctActuation.getActuator();
-//						DefaultActuation actuation = currenctActuation.getActuation();
-//
-//						
-//						
-//						if(actuation.getDefaultParameterValues()==null) 
-//							default_param_size = 0;
-//						else {
-//							default_param_size = actuation.getDefaultParameterValues().size();
-//						}
-//
-//						Term[] params = new Term[actuation.parameterSize()];
-//						Term[] actuation_param_values = actuation.getParametersAsArray();
-//						int k=0,l=0;											
-//						for(int i=0;i<actuation.parameterSize();i++)
-//							if(actuation_param_values[k]==null) {
-//								params[i] = (Term) arguments[l++]; 
-//								k++;
-//							}
-//							else
-//								params[i] = actuation_param_values[k++];
-//
-//						Term[] newParams = new Term[arguments.length-l];
-//						for(int i=0;i<newParams.length;i++) {
-//							newParams[i] = (Term) arguments[l+i]; //((ListTermImpl)args[1]).get(params.length+i);
-//						}
-//						arguments = newParams;
-//						//System.out.println("[defaultEmbeddedInternalAction2] going to actuate " + actuator.getId()+"." +actuation.getId());
-//						device.execActuation(actuator.getId(), actuation.getId(), params, un);
-//
-//					}
-//					un.compose(un);
-//				}
-//				return true; //returns true if all the actuations have been done
-//			}
-//
-//
-//		}
-//		//TODO: insert the old code here
-//		return false;
-//	}
 	
 	
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {  
@@ -111,6 +50,7 @@ public class defaultEmbeddedInternalAction2 extends EmbeddedInternalAction {
 			
 			//get the actuation sequence that realize the action of the parameter args[0]
 			ActuationSequence actuationSequence = agent.getActionMap().get(createAtom(args[0].toString())); 
+				
 			if(actuationSequence!=null) { //if the repertory contains the action
 				
 				
@@ -123,65 +63,25 @@ public class defaultEmbeddedInternalAction2 extends EmbeddedInternalAction {
 				
 				actuationSequence.setParameters(termArguments);
 				
-				System.out.println("[defaultEmbeddedInternalAction2] action sequence " + actuationSequence );
-				
+				/**
+				 * TODO: Make the execution of sets actually parallel.
+				 * 
+				 * While the execution of all the sets is conceptually parallel, this impementation is based on an iteraction over the sets.
+				 */
 				for(ActuationSet actuationSet:actuationSequence.getActuations()) { //for each set of actuations of the sequence
 					
 					//split the set into subsets grouped by device
-					HashMap<IDevice, HashSet<ActuationDevice>> subsets = actuationSet.toActuationSetsByDevice(); 
+					HashMap<IDevice, ArrayList<ActuationDevice>> subsets = actuationSet.toActuationSetsByDevice(); 
 					
 					
 					
-					for(Map.Entry<IDevice, HashSet<ActuationDevice>> map : subsets.entrySet()) { //for each device
-						System.out.println("... " + map.getKey()+"/" + map.getValue());
-						map.getKey().execActuation(null, null, args, un)
+					for(Map.Entry<IDevice, ArrayList<ActuationDevice>> map : subsets.entrySet()) { //for each device
+						//System.out.println("... " + map.getKey()+"/" + map.getValue());						
+						map.getKey().execActuationSet(map.getValue(),  un);
 					}
 						
 					
-//					continuar daqui.. 
-//					    dividir em subsets por device e enviar as atuações a cada device (feito acima)
-//					    atribuir parâmetros às atuações antes de dividir em subsets (considerando que os parâmetros vão ser passados na ordem em que aparecem nas sequencias/sets)
-//					
 					
-					
-					
-					Iterator<ActuationDevice> it = actuationSet.iterator(); 
-					while(it.hasNext()) { //for each actuation in the set
-						ActuationDevice currenctActuation = it.next();
-						//1. find the device the action is applyied upon
-						device = currenctActuation.getDevice();
-						Actuator actuator = currenctActuation.getActuator();
-						DefaultActuation actuation = currenctActuation.getActuation();
-
-						
-//						
-//						if(actuation.getDefaultParameterValues()==null) 
-//							default_param_size = 0;
-//						else {
-//							default_param_size = actuation.getDefaultParameterValues().size();
-//						}
-
-						Term[] params = new Term[actuation.parameterSize()];
-						Term[] actuation_param_values = actuation.getParametersAsArray();
-						int k=0,l=0;											
-						for(int i=0;i<actuation.parameterSize();i++)
-							if(actuation_param_values[k]==null) {
-								params[i] = (Term) arguments[l++]; 
-								k++;
-							}
-							else
-								params[i] = actuation_param_values[k++];
-
-						Term[] newParams = new Term[arguments.length-l];
-						for(int i=0;i<newParams.length;i++) {
-							newParams[i] = (Term) arguments[l+i]; //((ListTermImpl)args[1]).get(params.length+i);
-						}
-						arguments = newParams;
-						//System.out.println("[defaultEmbeddedInternalAction2] going to actuate " + actuator.getId()+"." +actuation.getId());
-						device.execActuation(actuator.getId(), actuation.getId(), params, un);
-
-					}
-					un.compose(un);
 				}
 				return true; //returns true if all the actuations have been done
 			}

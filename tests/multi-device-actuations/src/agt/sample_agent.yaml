@@ -35,7 +35,7 @@
       actuations: 
         - actuation_id: print
           parameters:
-            - textz
+            - text
         - actuation_id: double
           parameters:
             - value

@@ -3,6 +3,7 @@
  JSONWatcherDevice only receive data/beliefs when it sends a request to the microcontroller*/
 
 package embedded.mas.bridges.jacamo;
+import embedded.mas.bridges.jacamo.actuation.ActuationDevice;
 import embedded.mas.bridges.javard.MicrocontrollerMonitor;
 
 import java.io.ByteArrayInputStream;
@@ -68,6 +69,31 @@ public class JSONWatcherDevice extends SerialDevice implements IDevice {
 		return  this.getMicrocontroller().write(actuatorId.toString().concat(".").concat(actuationId.toString()));
 		//return  this.getMicrocontroller().write("light1.off;light2.off");		
 	}
-	
-	
+
+	@Override
+	public boolean execActuationSet(ArrayList<ActuationDevice> actuations, Unifier un) {		
+		StringBuilder s = new StringBuilder();
+
+		for (int i = 0; i < actuations.size(); i++) {
+			ActuationDevice act = actuations.get(i);
+			s.append(act.getActuator().getId())
+			.append(".")
+			.append(act.getActuation().getId());
+
+			if (i < actuations.size() - 1) {
+				s.append(";");
+			}
+		}
+		return this.getMicrocontroller().write(s.toString());
+	}
+
+	@Override
+	public boolean doExecActuation(ActuationDevice actuation, Unifier un) {
+		return this.getMicrocontroller().write(actuation.getActuator().getId().toString().concat(".").concat(actuation.getActuation().getId().toString()));
+	}
+
+
+
+
+
 }

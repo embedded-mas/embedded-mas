@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import embedded.mas.bridges.jacamo.actuation.ActuationDevice;
+import embedded.mas.bridges.jacamo.actuation.Actuation;
 import embedded.mas.exception.InvalidActuatorException;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Atom;
@@ -16,6 +17,7 @@ import jason.asSyntax.NumberTerm;
 import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Term;
 
+import static jason.asSyntax.ASSyntax.createAtom;
 
 
 /*
@@ -115,14 +117,24 @@ public class DemoDevice extends DefaultDevice  {
 	}
 
 	
-	public boolean doExecActuation(ActuationDevice actuation,Object[] args,int argInitialIndex, Unifier un) {
-		if(actuation.getActuation().getId().toString().equals("print"))
-			return doEmbeddedPrint(actuation.getActuation().getParameters().toString());
+	public boolean doExecActuation(ActuationDevice actuation, Unifier un) {
+		System.out.println("[DemoDevice] going to exec actuation " + actuation.getActuation());
+		if(actuation.getActuation().getId().toString().equals("print")) {
+			Actuation a = (Actuation) actuation.getActuation();
+			doEmbeddedPrint(a.getParameterValue(createAtom("text")).toString());
+			return true;
+		}
 		else
-			if(actuation.getActuation().getId().toString().equals("double")) { 
-				double r = Double.parseDouble(actuation.getActuation().getParameters().toString()) * 2;
+			if(actuation.getActuation().getId().toString().equals("double")) {
+				Actuation a = (Actuation) actuation.getActuation();			
+				//double r = Double.parseDouble(actuation.getActuation().getParameters()) * 2;
+				double r = Double.parseDouble(a.getParameterValue(createAtom("value")).toString()) * 2;
 				NumberTerm result = new NumberTermImpl(r);
-				return un.unifies(result, (Term) args[argInitialIndex+1]);			
+				//if(un.unifies(result, (Term) args[argInitialIndex]))
+				if(un.unifies(result,(Term)a.getParameterValue(createAtom("result"))))
+					return true;
+				else
+					return false;
 
 			}
 			
@@ -137,13 +149,14 @@ public class DemoDevice extends DefaultDevice  {
 	}
 
 	@Override
-	public boolean execActuationSet(Set<ActuationDevice> actuations, Object[] args, int argInitialIndex, Unifier un) {
+	public boolean execActuationSet(ArrayList<ActuationDevice> actuations,  Unifier un) {
+		boolean result = true;
 		Iterator<ActuationDevice> it = actuations.iterator();
-		while(it.hasNext()) {
+		while(it.hasNext()&&result==true) {
 			ActuationDevice act = it.next();
- 			this.doExecActuation(act, args, argInitialIndex, un);
+ 			this.doExecActuation(act, un);
 		}
-		return true;
+		return result;
 			
 	}
 	

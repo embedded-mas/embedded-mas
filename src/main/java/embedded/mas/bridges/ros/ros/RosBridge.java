@@ -518,7 +518,7 @@ public class RosBridge {
 		JsonGenerator jsonGenerator;
 		ObjectMapper objectMapper = new ObjectMapper();
 
-		try {
+		try {			
 			jsonGenerator = jsonFactory.createGenerator(writer);
 			objectMapper.writeValue(jsonGenerator, jsonMsg);
 		} catch(Exception e){

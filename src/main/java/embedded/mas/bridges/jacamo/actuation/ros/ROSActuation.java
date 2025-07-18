@@ -73,18 +73,19 @@ public abstract class ROSActuation extends DefaultActuation<ServiceParameters> {
 	}
 
 	private boolean internal_setDefaultParameterValues(HashMap<String, Object> defaultValues, ServiceParameters parameters) {
-		for(Map.Entry<String, Object> item : defaultValues.entrySet()) {
-			if(parameters.getServiceParamByName(item.getKey()) == null) //if there is not a parameter that matches the defaulta param name
-				return false;
-			if(item.getValue() instanceof HashMap<?, ?> && parameters.getServiceParamByName(item.getKey()).getParamValue() instanceof ServiceParameters) {
-				if(internal_setDefaultParameterValues((HashMap<String, Object>) item.getValue(), (ServiceParameters)parameters.getServiceParamByName(item.getKey()).getParamValue()) == false )
+		if(defaultValues!=null)
+			for(Map.Entry<String, Object> item : defaultValues.entrySet()) {
+				if(parameters.getServiceParamByName(item.getKey()) == null) //if there is not a parameter that matches the defaulta param name
 					return false;
+				if(item.getValue() instanceof HashMap<?, ?> && parameters.getServiceParamByName(item.getKey()).getParamValue() instanceof ServiceParameters) {
+					if(internal_setDefaultParameterValues((HashMap<String, Object>) item.getValue(), (ServiceParameters)parameters.getServiceParamByName(item.getKey()).getParamValue()) == false )
+						return false;
+				}
+				else {
+					parameters.getServiceParamByName(item.getKey()).setParamValue(item.getValue());
+					parameters.getServiceParamByName(item.getKey()).setChangeable(false);
+				}
 			}
-			else {
-				parameters.getServiceParamByName(item.getKey()).setParamValue(item.getValue());
-				parameters.getServiceParamByName(item.getKey()).setChangeable(false);
-			}
-		}
 		return true;
 
 	}
