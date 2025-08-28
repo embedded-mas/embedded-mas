@@ -101,24 +101,7 @@ public class DemoDevice extends DefaultDevice  {
 		return false;
 	}
 
-	@Override
-	public boolean doExecActuation(Atom actuatorId, Atom actuationId, Object[] args, Unifier un) {
-		if(actuationId.toString().equals("print"))
-			return doEmbeddedPrint(actuatorId, args[0].toString());
-		else
-			if(actuationId.toString().equals("double")) { 
-				double r = Double.parseDouble(args[0].toString()) * 2;
-				NumberTerm result = new NumberTermImpl(r);
-				return un.unifies(result, (Term) args[1]);			
-
-			}
-			
-		return false;
-	}
-
-	
-	public boolean doExecActuation(ActuationDevice actuation, Unifier un) {
-		System.out.println("[DemoDevice] going to exec actuation " + actuation.getActuation());
+	public boolean doExecSpecificActuation(ActuationDevice actuation, Unifier un) {
 		if(actuation.getActuation().getId().toString().equals("print")) {
 			Actuation a = (Actuation) actuation.getActuation();
 			doEmbeddedPrint(a.getParameterValue(createAtom("text")).toString());

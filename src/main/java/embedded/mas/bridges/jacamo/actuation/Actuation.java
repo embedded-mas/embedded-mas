@@ -9,7 +9,7 @@ import jason.asSyntax.Atom;
 import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Term;
 
-public class Actuation extends DefaultActuation<List<Atom>> {
+public class Actuation extends DefaultActuation<ArrayList<Atom>> {
 
 	private HashMap<Atom, Object> parameterValues = new HashMap<Atom, Object>();
 
@@ -18,7 +18,7 @@ public class Actuation extends DefaultActuation<List<Atom>> {
 		this(id, new ArrayList<Atom>());
 	}
 
-	public Actuation(Atom id, List<Atom> parameters) {
+	public Actuation(Atom id, ArrayList<Atom> parameters) {
 		super(id, parameters);
 	}
 
@@ -91,8 +91,8 @@ public class Actuation extends DefaultActuation<List<Atom>> {
 	}
 
 	@Override
-	public DefaultActuation<List<Atom>> clone() {
-		return new Actuation(this.getId(), this.getParameters());
+	public DefaultActuation<ArrayList<Atom>> clone() {
+		return new Actuation(this.getId(), (ArrayList<Atom>) this.getParameters().clone());
 	}
 
 	@Override
@@ -103,7 +103,7 @@ public class Actuation extends DefaultActuation<List<Atom>> {
 			if(getDefaultParameterValues()==null || getDefaultParameterValues().get(a.toString())==null) {
 				if(this.getParameterValue(a)!=null) {
 					Object paramValue = this.getParameterValue(a);
-					if (paramValue instanceof Integer)
+					if (paramValue instanceof Integer | paramValue instanceof Float | paramValue instanceof Double)
 						params[i++] = new NumberTermImpl(paramValue.toString());
 					else
 						params[i++] = (Term) paramValue;

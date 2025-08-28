@@ -3,19 +3,15 @@
  JSONWatcherDevice only receive data/beliefs when it sends a request to the microcontroller*/
 
 package embedded.mas.bridges.jacamo;
+
 import embedded.mas.bridges.jacamo.actuation.ActuationDevice;
 import embedded.mas.bridges.javard.MicrocontrollerMonitor;
 
-import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
 
 import embedded.mas.exception.PerceivingException;
 import jason.asSemantics.Unifier;
@@ -59,18 +55,6 @@ public class JSONWatcherDevice extends SerialDevice implements IDevice {
 	}
 	
 	@Override
-	public boolean doExecActuation(Atom actuatorId, Atom actuationId, Object[] args, Unifier un) {
-//		try {
-//			Thread.sleep(1000);
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-		return  this.getMicrocontroller().write(actuatorId.toString().concat(".").concat(actuationId.toString()));
-		//return  this.getMicrocontroller().write("light1.off;light2.off");		
-	}
-
-	@Override
 	public boolean execActuationSet(ArrayList<ActuationDevice> actuations, Unifier un) {		
 		StringBuilder s = new StringBuilder();
 
@@ -87,10 +71,7 @@ public class JSONWatcherDevice extends SerialDevice implements IDevice {
 		return this.getMicrocontroller().write(s.toString());
 	}
 
-	@Override
-	public boolean doExecActuation(ActuationDevice actuation, Unifier un) {
-		return this.getMicrocontroller().write(actuation.getActuator().getId().toString().concat(".").concat(actuation.getActuation().getId().toString()));
-	}
+	
 
 
 

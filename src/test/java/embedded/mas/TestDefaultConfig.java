@@ -23,6 +23,7 @@ import embedded.mas.bridges.jacamo.actuation.ros.ServiceRequestActuation;
 import embedded.mas.bridges.jacamo.actuation.ros.TopicWritingActuation;
 import embedded.mas.bridges.jacamo.config.DefaultConfig;
 import embedded.mas.bridges.ros.ServiceParameters;
+import embedded.mas.exception.EmbeddedActionException;
 import embedded.mas.exception.InvalidActuationException;
 import embedded.mas.exception.InvalidActuatorException;
 import embedded.mas.exception.InvalidDeviceException;
@@ -421,6 +422,9 @@ public class TestDefaultConfig {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvalidActuatorException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (EmbeddedActionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

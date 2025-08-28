@@ -3,6 +3,7 @@
  JSONWatcherDevice only receive data/beliefs when it sends a request to the microcontroller*/
 
 package embedded.mas.bridges.jacamo;
+import embedded.mas.bridges.jacamo.actuation.ActuationDevice;
 import embedded.mas.bridges.javard.MicrocontrollerMonitor;
 
 import java.io.ByteArrayInputStream;
@@ -54,10 +55,5 @@ public class JSONQueueWatcherDevice extends SerialDevice implements IDevice {
 		return (IPhysicalInterface) this.microcontroller;
 	}
 	
-	
-	@Override
-	public boolean doExecActuation(Atom actuatorId, Atom actuationId, Object[] args, Unifier un) {
-		return  this.getMicrocontroller().write(actuatorId.toString().concat(".").concat(actuationId.toString()));		
-	}
 	
 }

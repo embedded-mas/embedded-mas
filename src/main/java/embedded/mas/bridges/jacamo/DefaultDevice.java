@@ -1,21 +1,24 @@
 package embedded.mas.bridges.jacamo;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import embedded.mas.bridges.jacamo.actuation.Actuation;
+import embedded.mas.bridges.jacamo.actuation.ActuationDevice;
 import embedded.mas.bridges.jacamo.actuation.Actuator;
-import embedded.mas.bridges.jacamo.actuation.DefaultActuation;
 import embedded.mas.exception.EmbeddedActionException;
 import embedded.mas.exception.EmbeddedActionNotFoundException;
-import embedded.mas.exception.InvalidActuationException;
-import embedded.mas.exception.InvalidActuatorException;
 import embedded.mas.exception.PerceivingException;
 
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Atom;
 import jason.asSyntax.Literal;
+import jason.asSyntax.NumberTermImpl;
+
+import static jason.asSyntax.ASSyntax.createAtom;
 
 /*
  * The base implementation of sensor between agent and sensor.
@@ -32,6 +35,7 @@ public abstract class DefaultDevice implements IDevice {
 	protected IExternalInterface microcontroller;
 	private HashMap<Atom, EmbeddedAction> embeddedActions = new HashMap<Atom, EmbeddedAction>();
 	private HashSet<Actuator> actuators = new HashSet<Actuator>();
+	private Actuation waitActuation = addWaitActuation();
 
 	public DefaultDevice(Atom id, IExternalInterface microcontroller) {
 		this.id = id;
@@ -90,7 +94,11 @@ public abstract class DefaultDevice implements IDevice {
 	public void removeActuator(Actuator actuator) {
 		this.actuators.remove(actuator);
 	}
-	
+
+	public Actuation getWaitActuation(){
+		return this.waitActuation;
+	}
+
 	/**
 	 * Returns true if the device contains an actuator identified by the parameter actuatorId
 	 * @param actuatorId
@@ -138,33 +146,51 @@ public abstract class DefaultDevice implements IDevice {
 
 	public abstract boolean execEmbeddedAction(String actionName, Object[] args, Unifier un) throws EmbeddedActionNotFoundException,EmbeddedActionException;
 
-    @Override
+	@Override
 	public boolean execEmbeddedAction(Atom actionName, Object[] args, Unifier un) {		
 		return false;
 	}
-	
-	
-    @Override
-	public final boolean execActuation(Atom actuatorId, Atom actuationId, Object[] args, Unifier un) throws InvalidActuatorException, InvalidActuationException {
-		Actuator actuator = this.getActuatorById(actuatorId);
-		if(actuator==null) throw new InvalidActuatorException("Actuator " + this.getId().toString() +"." +actuatorId.toString() + " not found.");
-		
-		DefaultActuation actuation = actuator.getActuationById(actuationId);
-		if(actuation==null) throw new InvalidActuationException("Actuation " + this.getId().toString() +"." +actuatorId.toString()+"." + actuationId.toString() + " not found.");
-		
-		
-		return doExecActuation(actuatorId, actuationId, args, un);
+
+
+	/**
+	 * Implements the actual execution of the actuation send as parameter	 * 
+	 * @return true if the actuation is successful, false otherwise
+	 */
+	public final boolean doExecActuation(ActuationDevice actuation, Unifier un) {
+		if(actuation.getActuation().getId().toString().equals("wait")) {			
+			return doWait((long) ((NumberTermImpl)actuation.getActuation().getParametersAsArray()[0]).solve());
+		}
+		else return doExecSpecificActuation(actuation,un);
 	}
-    
-    
-    /**
-     * Implements the actual execution of the actuation actuationId in the actuator actuatorId.
-     * @param actuatorId
-     * @param actuationId
-     * @param args
-     * @return
-     */
-    protected abstract boolean doExecActuation(Atom actuatorId, Atom actuationId, Object[] args, Unifier un);
-	
+
+
+	private boolean doWait(long millis) {
+		try {
+			Thread.sleep(millis);
+			System.out.println("[DefaultDevice] executed wait... " + millis);
+			return true;
+		} catch (InterruptedException e) {			
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	/**
+	 * Implements the actual execution of the actuations that are specific of 
+	 * @param actuatorId
+	 * @param actuationId
+	 * @param args
+	 * @return
+	 */
+	protected abstract boolean doExecSpecificActuation(ActuationDevice actuation, Unifier un);
+
+
+	private Actuation addWaitActuation() {
+		Actuation actuation = new Actuation(createAtom("wait"));
+		ArrayList<Atom> parameters = new ArrayList<>();
+		parameters.add(createAtom("millis"));
+		actuation.setParameters(parameters);
+		return actuation;
+	}
 
 }

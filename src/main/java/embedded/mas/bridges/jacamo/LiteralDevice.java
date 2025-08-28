@@ -15,7 +15,7 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.Atom;
 import jason.asSyntax.Literal;
 
-public class LiteralDevice extends DefaultDevice implements IDevice {
+public abstract class LiteralDevice extends DefaultDevice implements IDevice {
 
 		
 	public LiteralDevice(Atom id, ILiteralListInterface microcontroller) {
@@ -39,12 +39,6 @@ public class LiteralDevice extends DefaultDevice implements IDevice {
 	}
 
 	@Override
-	public boolean doExecActuation(Atom actuatorId, Atom actuationId, Object[] args, Unifier un) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
 	public boolean execActuationSet(ArrayList<ActuationDevice> actuations, Unifier un) {
 		boolean result = true;
 		Iterator<ActuationDevice> it = actuations.iterator();
@@ -55,12 +49,6 @@ public class LiteralDevice extends DefaultDevice implements IDevice {
 		return result;
 	}
 
-	@Override
-	public boolean doExecActuation(ActuationDevice actuation, Unifier un) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-	
 
 
 }

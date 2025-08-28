@@ -48,7 +48,7 @@ public class ServiceRequestActuation extends ROSActuation {
 
 	@Override
 	public DefaultActuation<ServiceParameters> clone() {
-		return new ServiceRequestActuation(this.getId(), this.serviceName, this.getParameters());
+		return new ServiceRequestActuation(this.getId(), this.serviceName, this.getParameters().clone());
 	}
 
 

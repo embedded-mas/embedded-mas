@@ -70,22 +70,6 @@ public class RosMaster extends LiteralDevice {
 
 	@Override
 	public boolean execEmbeddedAction(String actionName, Object[] args, Unifier un) {
-		/*EmbeddedAction action = this.embeddedActions.get(createAtom(actionName));
-
-		if(action!=null)
-			if(action instanceof TopicWritingAction) {
-				((TopicWritingAction)action).setValue(args[0]);
-				this.getMicrocontroller().execEmbeddedAction(action);
-			}	
-			else
-				if(action instanceof ServiceRequestAction) {
-					for(int i=0;i<args.length;i++) { //set service params
-						//TODO: implement service response handling
-						((ServiceRequestAction)action).getServiceParameters().get(i).setParamValue(args[i]);						
-					}					
-					this.getMicrocontroller().execEmbeddedAction(action);
-				}
-		return true;*/
 		return false;
 	}
 
@@ -147,32 +131,10 @@ public class RosMaster extends LiteralDevice {
 		return true;
 	}
 
-	@Override
-	public boolean doExecActuation(Atom actuatorId, Atom actuationId, Object[] args, Unifier un) {
-		if(this.getActuatorById(actuatorId).getActuationById(actuationId) instanceof TopicWritingActuation) {
-			((TopicWritingActuation) this.getActuatorById(actuatorId).getActuationById(actuationId)).getParameters().setValuesFromArray(args);
-			((IRosInterface)this.getMicrocontroller()).write(((TopicWritingActuation) this.getActuatorById(actuatorId).getActuationById(actuationId)).getTopicName(),
-					((TopicWritingActuation) this.getActuatorById(actuatorId).getActuationById(actuationId)).getTopicType(),
-					((TopicWritingActuation) this.getActuatorById(actuatorId).getActuationById(actuationId)).getParameters().toJson().toString()
-					);
-			return true; 
-		}
-		if(this.getActuatorById(actuatorId).getActuationById(actuationId) instanceof ServiceRequestActuation) {
-			int i=0;
-			for(ServiceParam p : ((ServiceRequestActuation)this.getActuatorById(actuatorId).getActuationById(actuationId)).getParameters())
-				p.setParamValue(args[i++]);
-			((IRosInterface)this.getMicrocontroller()).serviceRequest(((ServiceRequestActuation)this.getActuatorById(actuatorId).getActuationById(actuationId)).getServiceName(),
-					((ServiceRequestActuation)this.getActuatorById(actuatorId).getActuationById(actuationId)).getParameters().toJson());
-			return true;
-		}
-		return false;
-
-	}
-
 
 
 	@Override
-	public boolean doExecActuation(ActuationDevice actuation, Unifier un) {		
+	public boolean doExecSpecificActuation(ActuationDevice actuation, Unifier un) {		
 		if(actuation.getActuation() instanceof TopicWritingActuation) {
 			((IRosInterface)this.getMicrocontroller()).write(
 					((TopicWritingActuation)actuation.getActuation()).getTopicName(), 

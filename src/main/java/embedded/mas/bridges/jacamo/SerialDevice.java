@@ -58,19 +58,13 @@ public class SerialDevice extends DefaultDevice {
 	}
 
 	@Override
-	public boolean doExecActuation(Atom actuatorId, Atom actuationId, Object[] args, Unifier un) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
 	public boolean execActuationSet(ArrayList<ActuationDevice> actuations, Unifier un) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public boolean doExecActuation(ActuationDevice actuation, Unifier un) {
+	protected boolean doExecSpecificActuation(ActuationDevice actuation, Unifier un) {
 		// TODO Auto-generated method stub
 		return false;
 	}

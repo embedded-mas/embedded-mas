@@ -52,7 +52,7 @@ public class TopicWritingActuation extends ROSActuation {
 
 	@Override
 	public DefaultActuation<ServiceParameters> clone() {
-		return new TopicWritingActuation(this.getId(), this.topicName, this.topicType, this.getParameters());
+		return new TopicWritingActuation(this.getId(), this.topicName, this.topicType, this.getParameters().clone());
 	}
 
 	@Override

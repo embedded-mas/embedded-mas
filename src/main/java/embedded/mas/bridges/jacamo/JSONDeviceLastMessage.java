@@ -13,6 +13,7 @@ import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 
+import embedded.mas.bridges.jacamo.actuation.ActuationDevice;
 import embedded.mas.exception.PerceivingException;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Atom;
@@ -88,8 +89,8 @@ public class JSONDeviceLastMessage extends SerialDevice implements IDevice {
 	}
 
 	@Override
-	public IPhysicalInterface getMicrocontroller() {
-		return (IPhysicalInterface) this.microcontroller;
+	public boolean doExecSpecificActuation(ActuationDevice actuation, Unifier un) {
+		return this.getMicrocontroller().write(actuation.getActuator().getId().toString().concat(".").concat(actuation.getActuation().getId().toString()));
 	}
 
 

@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import embedded.mas.bridges.jacamo.config.DefaultConfig;
+import embedded.mas.exception.EmbeddedActionException;
 import embedded.mas.exception.InvalidActuationException;
 import embedded.mas.exception.InvalidActuatorException;
 import embedded.mas.exception.InvalidDeviceException;
@@ -46,6 +47,9 @@ public class CyberPhysicalAgent extends EmbeddedAgent {
 			} catch (InvalidActuatorException e) {
 				// TODO Auto-generated catch block
 				System.err.println(e.getMessage());
+				e.printStackTrace();
+			} catch (EmbeddedActionException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}		
 		}

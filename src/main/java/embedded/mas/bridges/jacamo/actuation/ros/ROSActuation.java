@@ -82,6 +82,7 @@ public abstract class ROSActuation extends DefaultActuation<ServiceParameters> {
 						return false;
 				}
 				else {
+					parameters.getServiceParamByName(item.getKey()).setChangeable(true);
 					parameters.getServiceParamByName(item.getKey()).setParamValue(item.getValue());
 					parameters.getServiceParamByName(item.getKey()).setChangeable(false);
 				}
