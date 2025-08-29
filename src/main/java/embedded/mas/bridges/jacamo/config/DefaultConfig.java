@@ -45,6 +45,7 @@ import embedded.mas.bridges.jacamo.DefaultDevice;
 import embedded.mas.bridges.jacamo.DemoDevice;
 import embedded.mas.bridges.jacamo.EmbeddedAction;
 import embedded.mas.bridges.jacamo.IExternalInterface;
+import embedded.mas.bridges.jacamo.SerialEmbeddedAction;
 import embedded.mas.bridges.jacamo.actuation.Actuation;
 import embedded.mas.bridges.jacamo.actuation.ActuationDevice;
 import embedded.mas.bridges.jacamo.actuation.ActuationSequence;
@@ -54,6 +55,7 @@ import embedded.mas.bridges.jacamo.actuation.DefaultActuation;
 import embedded.mas.bridges.jacamo.actuation.ros.ServiceRequestActuation;
 import embedded.mas.bridges.jacamo.actuation.ros.TopicWritingActuation;
 import embedded.mas.bridges.javard.Arduino4EmbeddedMas;
+import embedded.mas.bridges.javard.NRJ4EmbeddedMas;
 import embedded.mas.bridges.ros.DefaultRos4Bdi;
 import embedded.mas.bridges.ros.DefaultRos4EmbeddedMas;
 import embedded.mas.bridges.ros.ServiceParam;
@@ -64,6 +66,9 @@ import embedded.mas.exception.EmbeddedActionException;
 import embedded.mas.exception.InvalidActuationException;
 import embedded.mas.exception.InvalidActuatorException;
 import embedded.mas.exception.InvalidDeviceException;
+import gnu.io.NoSuchPortException;
+import gnu.io.PortInUseException;
+import gnu.io.UnsupportedCommOperationException;
 import jason.asSyntax.Atom;
 import jason.asSyntax.Literal;
 import jason.asSyntax.parser.ParseException;
@@ -78,6 +83,23 @@ public class DefaultConfig {
 
 	private Arduino4EmbeddedMas createArduino4EmbeddedMas(String serialPort, int baudRate) {
 		Arduino4EmbeddedMas a = new Arduino4EmbeddedMas(serialPort, baudRate);
+		return a;
+	}
+
+	private NRJ4EmbeddedMas createNRJ4EmbeddedMas(String serialPort, int baudRate) {
+		NRJ4EmbeddedMas a = null;
+		try {
+			a = new NRJ4EmbeddedMas(serialPort, baudRate);
+		} catch (NoSuchPortException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (PortInUseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedCommOperationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return a;
 	}
 
@@ -169,23 +191,15 @@ public class DefaultConfig {
 										ArrayList actuationSet = (ArrayList) actuationSequence.get(k);
 										ActuationSet currentActuationSet = new ActuationSet(); //start a new actuation set
 										for(int n=0;n<actuationSet.size();n++){// for each element in the actuation set
-											//if the current action is the standard action "wait" with default parameters...
 											if(actuationSet.get(n) instanceof LinkedHashMap && ((LinkedHashMap)actuationSet.get(n)).get("actuation").toString().equals("wait")) {
 												if(((LinkedHashMap)actuationSet.get(n)).get("default_param_values")!=null)
 													throw new EmbeddedActionException("The wait actuation does not allow default parameters");
-//													if(((LinkedHashMap)((LinkedHashMap)actuationSet.get(n)).get("default_param_values")).get("millis")!=null) {
-//														HashMap<String, Object> def_params = (HashMap<String, Object>) ((LinkedHashMap)actuationSet.get(n)).get("default_param_values");																										
-//														ActuationDevice waitActuation = new ActuationDevice(devices.get(0), null, devices.get(0).getWaitActuation());														
-//														waitActuation.getActuation().setDefaultParameterValues(def_params);														
-//														currentActuationSet.add(waitActuation);
-//
-//													}
 											}												
 											else
 												//if the current action is the standard action "wait" without default parameters...
 												if(actuationSet.get(n).toString().equals("wait")) 
 													currentActuationSet.add(new ActuationDevice(devices.get(0), null, devices.get(0).getWaitActuation()));
-												//if the current action is a device-actuator-specific one (default case)
+											//if the current action is a device-actuator-specific one (default case)
 												else {
 													pattern = Pattern.compile(regex);
 													HashMap<String, Object> def_params = null;
@@ -253,7 +267,7 @@ public class DefaultConfig {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}	
-		
+
 
 		return actionsMap;
 	}
@@ -416,78 +430,82 @@ public class DefaultConfig {
 								((LinkedHashMap)item.get("microcontroller")).get("className").equals("SerialReader")) {
 							microcontroller= createArduino4EmbeddedMas(((LinkedHashMap)item.get("microcontroller")).get("serial").toString(),
 									Integer.parseInt(((LinkedHashMap)item.get("microcontroller")).get("baudRate").toString()));
-							//							ArrayList actionsArray = (ArrayList) item.get("serialActions");
-							//							for(int j=0;j<actionsArray.size();j++) {
-							//								SerialEmbeddedAction action  = new SerialEmbeddedAction(createAtom(((LinkedHashMap)actionsArray.get(j)).get("actionName").toString() ), 
-							//										createAtom(((LinkedHashMap)actionsArray.get(j)).get("actuationName").toString()));
-							//								embeddedActionList.add(action);
-							//							}
 						}		
-						else
-							if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4EmbeddedMas")|
-									((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4Bdi")) { //DefaultRos4Bdi is just an alias class for the names to make more sense in Jason-ROS applications
-								//ArrayList perceptionTopics = (ArrayList) ((LinkedHashMap)item.get("microcontroller")).get("perceptionTopics");
-								ArrayList perceptionTopics = (ArrayList) item.get("perceptionTopics");
-								ArrayList<String> topics = new ArrayList<String>();
-								ArrayList<String> types = new ArrayList<String>();
-								ArrayList<String> beliefNames = new ArrayList<String>();
-								HashMap<String, ArrayList<String>> ignoreParams = new HashMap<>();
-								if(perceptionTopics!=null)
-									for(int j=0;j<perceptionTopics.size();j++) {
-										topics.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicName").toString());
-										types.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicType").toString());
-										if(((LinkedHashMap)perceptionTopics.get(j)).get("beliefName")==null)
-											beliefNames.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicName").toString());
-										else
-											beliefNames.add(((LinkedHashMap)perceptionTopics.get(j)).get("beliefName").toString());	
-										ArrayList tempParams =  (ArrayList) ((LinkedHashMap)perceptionTopics.get(j)).get("ignoreValues");
-										ignoreParams.put(((LinkedHashMap)perceptionTopics.get(j)).get("topicName").toString(), tempParams);
-									}
-
-								if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4EmbeddedMas"))
-									microcontroller= createRos4EmbeddedMas(((LinkedHashMap)item.get("microcontroller")).get("connectionString").toString(),topics,types,beliefNames, ignoreParams);
-								else
-									if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4Bdi"))
-										microcontroller = createRos4Bdi(((LinkedHashMap)item.get("microcontroller")).get("connectionString").toString(),topics,types,beliefNames, ignoreParams);
+						else if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("NRJ4EmbeddedMas")) {
+							microcontroller= createNRJ4EmbeddedMas(((LinkedHashMap)item.get("microcontroller")).get("serial").toString(),
+									Integer.parseInt(((LinkedHashMap)item.get("microcontroller")).get("baudRate").toString()));
+							ArrayList actionsArray = (ArrayList) item.get("serialActions");
+							for(int j=0;j<actionsArray.size();j++) {
+								SerialEmbeddedAction action  = new SerialEmbeddedAction(createAtom(((LinkedHashMap)actionsArray.get(j)).get("actionName").toString() ), 
+										createAtom(((LinkedHashMap)actionsArray.get(j)).get("actuationName").toString()));
+								embeddedActionList.add(action);
 
 
-								//handle topic writing actions
-								if(item.get("actions")!=null) {
-									if(((LinkedHashMap)item.get("actions")).get("topicWritingActions")!=null) {
-										ArrayList topicWritingActions = (ArrayList) ((LinkedHashMap)item.get("actions")).get("topicWritingActions");
-										for(int j=0;j<topicWritingActions.size();j++) {
-											ServiceParameters params = new ServiceParameters();
-											if(((LinkedHashMap)topicWritingActions.get(j)).get("params")!=null)
-												params = buildServiceParameters( (ArrayList<Object>) ((LinkedHashMap) topicWritingActions.get(j)).get("params"));
-
-											embeddedActionList.add(new TopicWritingAction(createAtom(((LinkedHashMap) topicWritingActions.get(j)).get("actionName").toString()),
-													((LinkedHashMap) topicWritingActions.get(j)).get("topicName").toString(),
-													((LinkedHashMap) topicWritingActions.get(j)).get("topicType").toString(),null,params));
-										}
-									}
-
-									//handle service request actions
-									//if(((LinkedHashMap)((LinkedHashMap)item.get("microcontroller")).get("actions")).get("serviceRequestActions")!=null) {
-									if(((LinkedHashMap)item.get("actions")).get("serviceRequestActions")!=null) {
-										ArrayList serviceRequestActions = (ArrayList) ((LinkedHashMap)item.get("actions")).get("serviceRequestActions");
-										for(int j=0;j<serviceRequestActions.size();j++) {
-											ServiceParameters params = new ServiceParameters();
-											if(((LinkedHashMap)serviceRequestActions.get(j)).get("params")!=null)
-												params = buildServiceParameters( (ArrayList<Object>) ((LinkedHashMap) serviceRequestActions.get(j)).get("params"));
-											ServiceRequestAction serviceAction = null; 
-											serviceAction = new ServiceRequestAction(createAtom(((LinkedHashMap)serviceRequestActions.get(j)).get("actionName").toString()), 
-													((LinkedHashMap)serviceRequestActions.get(j)).get("serviceName").toString(), params);
-											embeddedActionList.add(serviceAction);
-
-										}
-									}	
-
-								}
 							}
+						}
+
+						else if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4EmbeddedMas")|
+								((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4Bdi")) { //DefaultRos4Bdi is just an alias class for the names to make more sense in Jason-ROS applications
+							ArrayList perceptionTopics = (ArrayList) item.get("perceptionTopics");
+							ArrayList<String> topics = new ArrayList<String>();
+							ArrayList<String> types = new ArrayList<String>();
+							ArrayList<String> beliefNames = new ArrayList<String>();
+							HashMap<String, ArrayList<String>> ignoreParams = new HashMap<>();
+							if(perceptionTopics!=null)
+								for(int j=0;j<perceptionTopics.size();j++) {
+									topics.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicName").toString());
+									types.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicType").toString());
+									if(((LinkedHashMap)perceptionTopics.get(j)).get("beliefName")==null)
+										beliefNames.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicName").toString());
+									else
+										beliefNames.add(((LinkedHashMap)perceptionTopics.get(j)).get("beliefName").toString());	
+									ArrayList tempParams =  (ArrayList) ((LinkedHashMap)perceptionTopics.get(j)).get("ignoreValues");
+									ignoreParams.put(((LinkedHashMap)perceptionTopics.get(j)).get("topicName").toString(), tempParams);
+								}
+
+							if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4EmbeddedMas"))
+								microcontroller= createRos4EmbeddedMas(((LinkedHashMap)item.get("microcontroller")).get("connectionString").toString(),topics,types,beliefNames, ignoreParams);
 							else
-								if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DemoDevice")) {
-									//do nothing (so far)
-								}		
+								if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4Bdi"))
+									microcontroller = createRos4Bdi(((LinkedHashMap)item.get("microcontroller")).get("connectionString").toString(),topics,types,beliefNames, ignoreParams);
+
+
+							//handle topic writing actions
+							if(item.get("actions")!=null) {
+								if(((LinkedHashMap)item.get("actions")).get("topicWritingActions")!=null) {
+									ArrayList topicWritingActions = (ArrayList) ((LinkedHashMap)item.get("actions")).get("topicWritingActions");
+									for(int j=0;j<topicWritingActions.size();j++) {
+										ServiceParameters params = new ServiceParameters();
+										if(((LinkedHashMap)topicWritingActions.get(j)).get("params")!=null)
+											params = buildServiceParameters( (ArrayList<Object>) ((LinkedHashMap) topicWritingActions.get(j)).get("params"));
+
+										embeddedActionList.add(new TopicWritingAction(createAtom(((LinkedHashMap) topicWritingActions.get(j)).get("actionName").toString()),
+												((LinkedHashMap) topicWritingActions.get(j)).get("topicName").toString(),
+												((LinkedHashMap) topicWritingActions.get(j)).get("topicType").toString(),null,params));
+									}
+								}
+
+								//handle service request actions
+								//if(((LinkedHashMap)((LinkedHashMap)item.get("microcontroller")).get("actions")).get("serviceRequestActions")!=null) {
+								if(((LinkedHashMap)item.get("actions")).get("serviceRequestActions")!=null) {
+									ArrayList serviceRequestActions = (ArrayList) ((LinkedHashMap)item.get("actions")).get("serviceRequestActions");
+									for(int j=0;j<serviceRequestActions.size();j++) {
+										ServiceParameters params = new ServiceParameters();
+										if(((LinkedHashMap)serviceRequestActions.get(j)).get("params")!=null)
+											params = buildServiceParameters( (ArrayList<Object>) ((LinkedHashMap) serviceRequestActions.get(j)).get("params"));
+										ServiceRequestAction serviceAction = null; 
+										serviceAction = new ServiceRequestAction(createAtom(((LinkedHashMap)serviceRequestActions.get(j)).get("actionName").toString()), 
+												((LinkedHashMap)serviceRequestActions.get(j)).get("serviceName").toString(), params);
+										embeddedActionList.add(serviceAction);
+
+									}
+								}	
+
+							}
+						}
+						else if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DemoDevice")) {
+							//do nothing (so far)
+						}		
 
 
 						DefaultDevice device = null;
