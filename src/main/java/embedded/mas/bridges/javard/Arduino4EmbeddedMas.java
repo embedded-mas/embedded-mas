@@ -18,7 +18,7 @@ public class Arduino4EmbeddedMas extends Arduino implements IPhysicalInterface{
 	private String preamble = "==";
 	private String startMessage = "::";
 	private String endMessage = "--";
-	private String endSendMessage = "__eom__";
+	private String endSendMessage = ";__eom__";
 	private boolean connected = false;
 	private String latestActuation = "";
 
