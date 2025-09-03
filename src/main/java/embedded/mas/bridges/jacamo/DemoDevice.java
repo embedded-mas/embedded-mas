@@ -4,7 +4,11 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.Set;
 
+import embedded.mas.bridges.jacamo.actuation.ActuationDevice;
+import embedded.mas.bridges.jacamo.actuation.Actuation;
 import embedded.mas.exception.InvalidActuatorException;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Atom;
@@ -13,6 +17,7 @@ import jason.asSyntax.NumberTerm;
 import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Term;
 
+import static jason.asSyntax.ASSyntax.createAtom;
 
 
 /*
@@ -96,15 +101,23 @@ public class DemoDevice extends DefaultDevice  {
 		return false;
 	}
 
-	@Override
-	public boolean doExecActuation(Atom actuatorId, Atom actuationId, Object[] args, Unifier un) {
-		if(actuationId.toString().equals("print"))
-			return doEmbeddedPrint(actuatorId, args[0].toString());
+	public boolean doExecSpecificActuation(ActuationDevice actuation, Unifier un) {
+		if(actuation.getActuation().getId().toString().equals("print")) {
+			Actuation a = (Actuation) actuation.getActuation();
+			doEmbeddedPrint(a.getParameterValue(createAtom("text")).toString());
+			return true;
+		}
 		else
-			if(actuationId.toString().equals("double")) { 
-				double r = Double.parseDouble(args[0].toString()) * 2;
+			if(actuation.getActuation().getId().toString().equals("double")) {
+				Actuation a = (Actuation) actuation.getActuation();			
+				//double r = Double.parseDouble(actuation.getActuation().getParameters()) * 2;
+				double r = Double.parseDouble(a.getParameterValue(createAtom("value")).toString()) * 2;
 				NumberTerm result = new NumberTermImpl(r);
-				return un.unifies(result, (Term) args[1]);			
+				//if(un.unifies(result, (Term) args[argInitialIndex]))
+				if(un.unifies(result,(Term)a.getParameterValue(createAtom("result"))))
+					return true;
+				else
+					return false;
 
 			}
 			
@@ -116,6 +129,18 @@ public class DemoDevice extends DefaultDevice  {
 	private boolean doEmbeddedPrint(Atom actuatorId, String text) {
 		System.out.println("[" + this.id + "." + actuatorId  + ".print] " + text);
 		return true;
+	}
+
+	@Override
+	public boolean execActuationSet(ArrayList<ActuationDevice> actuations,  Unifier un) {
+		boolean result = true;
+		Iterator<ActuationDevice> it = actuations.iterator();
+		while(it.hasNext()&&result==true) {
+			ActuationDevice act = it.next();
+ 			this.doExecActuation(act, un);
+		}
+		return result;
+			
 	}
 	
 	

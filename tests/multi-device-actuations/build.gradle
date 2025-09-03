@@ -13,26 +13,26 @@ apply plugin: 'eclipse'
 version '1.0'
 group   'org.jacamo'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+// sourceCompatibility = 1.8
+// targetCompatibility = 1.8
 
 repositories {
-    maven { url "https://raw.github.com/jacamo-lang/mvn-repo/master" }
-    maven { url "https://repo.gradle.org/gradle/libs-releases-local" }
+    maven { url "https://raw.githubusercontent.com/jacamo-lang/mvn-repo/master" }
+    maven { url "https://repo.gradle.org/gradle/libs-releases" }
     maven { url "https://raw.github.com/embedded-mas/embedded-mas-mvn-repo/master" }
 
 
-    flatDir {
-       dirs 'lib'
-    }
+
+    flatDir { dirs 'lib' }
 
     mavenCentral()
+
 }
 
 dependencies {
-    implementation 'org.jacamo:jacamo:0.10-SNAPSHOT'
+    implementation 'org.jacamo:jacamo:1.2.3'
     //implementation "embedded-mas:embedded-mas:0.056-SNAPSHOT" 
-    implementation files('/mnt/1C4C766F4C764414/maiquel/git/embedded-mas-multi-device-actuations/embedded-mas/build/libs/embedded-mas-0.058-SNAPSHOT.jar')
+    implementation files('/mnt/1C4C766F4C764414/maiquel/git/embedded-mas-multi-device-actuations/embedded-mas/build/libs/embedded-mas-0.060-SNAPSHOT.jar')
     implementation "javard:javard:0.032-SNAPSHOT"
     
     //daqui para baixo, testar se dá pra eliminar quando usar o repositório do embedded-mas em vez de arquivo jar local
@@ -55,46 +55,50 @@ sourceSets {
     }
 }
 
-task run (type: JavaExec, dependsOn: 'classes') {
+// task run (type: JavaExec, dependsOn: 'classes') {
+//     group       ' JaCaMo'
+//     description 'runs the JaCaMo application'
+//     doFirst {
+//         mkdir 'log'
+//     }
+//     main 'jacamo.infra.JaCaMoLauncher'
+//     args 'perception_action.jcm'
+//     classpath sourceSets.main.runtimeClasspath
+// }
+
+
+task run (type: JavaExec, dependsOn: ['compileGeneratedInternalActions','classes']) {
     group       ' JaCaMo'
     description 'runs the JaCaMo application'
-    doFirst {
-        mkdir 'log'
-    }
-    main 'jacamo.infra.JaCaMoLauncher'
+    mainClass = 'jacamo.infra.JaCaMoLauncher'
     args 'perception_action.jcm'
+    // jvmArgs '-Xss15m'
     classpath sourceSets.main.runtimeClasspath
 }
 
 
-task uberJar(type: Jar, dependsOn: 'classes') {
-    group      ' JaCaMo'
-    description 'creates a single runnable jar file with all dependencies'
-
-    manifest {
-        attributes 'Main-Class': 'jacamo.infra.JaCaMoLauncher'
-    }
-    baseName = 'jacamo-architecture_1' // the name must start with jacamo so that jacamo...jar is found in the classpath
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    from (project.projectDir.absolutePath) {
-        include '**/*.asl'
-        include '**/*.xml'
-        include '**/*.jcm'
-        include '*.properties'
-    }
-    from (project.buildDir.absolutePath + '/jcm') {
-        include '**/*'
-    }
-    with jar
-
-    doFirst {
-        copy {
-            from 'architecture_1.jcm'
-            rename 'architecture_1.jcm','default.jcm'
-            into project.buildDir.absolutePath + '/jcm'
-        }
-    }
+// Generate internal actions corresponding to actions specified in the yaml files
+task generateInternalActions(type: JavaExec) {
+    group = 'Application'
+    description = 'Generate internal actions corresponding to actions specidied in the yaml files'
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'embedded.mas.bridges.jacamo.InternalActionGenerator'
+    outputs.dir 'src/java/jason/stdlib'
 }
+
+
+// Compile internal actions
+task compileGeneratedInternalActions(type: JavaCompile, dependsOn: ['generateInternalActions']) {
+    // Specifies the source files to compile after the generation task has run
+    source = fileTree("src/java/jason/stdlib/") {
+        include '**/*.java' // Include Java files from the generated sources
+    }
+    classpath = sourceSets.main.compileClasspath    
+    destinationDir = destinationDir = file("$buildDir/classes/java/main") // Target directory for compilation
+}
+
+
+
 
 clean {
     delete 'bin'

@@ -4,15 +4,18 @@
 
 package embedded.mas.bridges.jacamo;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
+import embedded.mas.bridges.jacamo.actuation.ActuationDevice;
 import embedded.mas.exception.PerceivingException;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Atom;
 import jason.asSyntax.Literal;
 
-public class LiteralDevice extends DefaultDevice implements IDevice {
+public abstract class LiteralDevice extends DefaultDevice implements IDevice {
 
 		
 	public LiteralDevice(Atom id, ILiteralListInterface microcontroller) {
@@ -36,11 +39,16 @@ public class LiteralDevice extends DefaultDevice implements IDevice {
 	}
 
 	@Override
-	public boolean doExecActuation(Atom actuatorId, Atom actuationId, Object[] args, Unifier un) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean execActuationSet(ArrayList<ActuationDevice> actuations, Unifier un) {
+		boolean result = true;
+		Iterator<ActuationDevice> it = actuations.iterator();
+		while(it.hasNext()&&result==true) {
+			ActuationDevice act = it.next();
+ 			this.doExecActuation(act, un);
+		}
+		return result;
 	}
-	
+
 
 
 }

@@ -10,7 +10,6 @@ import embedded.mas.bridges.ros.RosMaster;
 public class TestRosMaster {
 
 
-
 //	@Test
 //	public void testExecEmbeddedActionAtomObjectArrayUnifier_checkArrayConsistency() {
 //		String s = "test";

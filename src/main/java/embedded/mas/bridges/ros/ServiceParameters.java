@@ -1,6 +1,7 @@
 package embedded.mas.bridges.ros;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -8,9 +9,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jason.asSyntax.ListTermImpl;
+import jason.asSyntax.Term;
 
 public class ServiceParameters extends ArrayList<ServiceParam> {
-	
+
+	HashMap<String, Object> defaultParamValues = new HashMap<String, Object>(); 
+
 	public JsonNode toJson() {
 		String s = "";
 		for(ServiceParam p:this) {
@@ -62,18 +66,141 @@ public class ServiceParameters extends ArrayList<ServiceParam> {
 		return true;
 	}
 
+
+	/**
+	 * Return the number of parameters.
+	 * It may be different of the size attribute in the case of nested parameters
+	 */
+	public int paramCount() {
+		return this.privateParamCount(0);
+
+	}
+
+
+	private int privateParamCount(int count) {
+		for(ServiceParam p : this)
+			if(p.getParamValue() instanceof ServiceParameters)
+				count = count + ((ServiceParameters)p.getParamValue()).paramCount();
+			else
+				count++;
+		return count;
+	}
+
 	@Override
 	public String toString() {
-		String s = " ";
+		String s = "";
 		for(int i=0;i<this.size();i++) {
-			s = s.concat(this.get(i).getParamName()).concat(" ");
-			if(this.get(i).getParamValue() instanceof ServiceParameters)
-				s = s.concat("[").concat(((ServiceParameters)this.get(i).getParamValue() ).toString().concat("]"));
+			s = s.concat(this.get(i).getParamName());
+			if(this.get(i).getParamValue() != null) {
+				if(this.get(i).getParamValue() instanceof ServiceParameters)
+					s = s.concat("[").concat(this.get(i).getParamValue().toString().concat("]"));
+				else
+					s = s.concat("/").concat(this.get(i).getParamValue().toString());
+			}
+			else
+				s = s.concat("/null");
+			if(i<this.size()-1) 
+				s = s.concat(", ");
 		}
 		return s;
 	}
 
 
+	/**
+	 * Fill the parameter values with values from an plain array of object.
+	 * @param array - plain array  (i.e. no nested arrays)  of terms to be assigned to the parameter values. Parameters with default values must be ignored in this array (i.e. must not have corresponding value)
+	 * @return true if success, false otherwise
+	 */
+	public boolean setValuesFromArray(Object[] array) {
+		//return internal_setValuesFromArray(array, 0)!=-1;
+		return setParamValues(array, 0)==array.length-1;
+	}
+
+
+	private int internal_setValuesFromArray(Object[] array, int index) {
+		//TODO: check whether the array size does not match the parameter count
+		for(ServiceParam p : this) //for each service param
+			if(p.getParamValue() instanceof ServiceParameters) { //if the current param is a set of nested parameters
+				index = ((ServiceParameters)p.getParamValue()).internal_setValuesFromArray(array, index);
+				if(index==-1) 
+					return -1;									
+			}
+			else 
+				if(p.isChangeable())
+					p.setParamValue(array[index++]);
+				else
+					index++;
+
+
+		return index;
+	}
+
+
+	public ServiceParam getServiceParamByName(String paramName) {
+		for(ServiceParam p : this)
+			if(p.getParamName().equals(paramName))
+				return p;
+		return null;
+	}
+
+	public void setToDefaultState() {
+		for(ServiceParam p : this) //for each service para,
+			if(p.getParamValue() instanceof ServiceParameters) { //if the current param is a set of nested parameters
+				((ServiceParameters)p.getParamValue()).setToDefaultState(); //recursively set the nested parameters to the default state
+			}
+			else
+				if(p.isChangeable()) //if the parameter is not a default one (it is changeable)
+					p.setParamValue(null); //set param value to null		
+	}
+
+	/**
+	 * 
+	 * @param p array of parameters
+	 * @param initialPosition initial position to be considered in the array of parameters
+	 * @return the index of the latest parameter taken from the input array
+	 * 
+	 * For instance, let 
+	 *   (i) p=[a,b,c,d,e,f,g] and 
+	 *   (ii) an actuation with three parameters s.t. one of them is non-changeable
+	 *   (iii) initialPosition = 3
+	 *   
+	 * In this case, the taken parameters must be [d,e] and the return must be 4.
+	 */
+
+
+	public int setParamValues(Object[] p, int initialPosition) {
+		int valuesPosition = initialPosition; //current position in the given parameters array
+
+		for(ServiceParam param : this) //for each service para,
+			if(param.getParamValue() instanceof ServiceParameters) { //if the current param is a set of nested parameters
+				valuesPosition = ((ServiceParameters)param.getParamValue()).setParamValues(p, valuesPosition)+1; //recursively set the nested parameters to the default state
+			}
+			else
+				if(param.isChangeable()) { //if the parameter is not a default one (it is changeable)
+					param.setParamValue(p[valuesPosition++]); //set param value to null		
+				}
+		return --valuesPosition;
+	}
+
+	@Override
+	public ServiceParameters clone() {
+		ServiceParameters parameters = new ServiceParameters();
+		for(ServiceParam p:this) {
+			ServiceParam newP = new ServiceParam(p.getParamName(), null, p.isChangeable());
+			if(p.getParamValue() instanceof ServiceParameters)
+				newP.setParamValue(((ServiceParameters)p.getParamValue()).clone());
+			else
+				if(!p.isChangeable()) { //if it is a default parameters
+					newP.setChangeable(true);
+					newP.setParamValue(p.getParamValue());
+					newP.setChangeable(false);
+				}
+
+			parameters.add(newP);
+
+		}
+		return parameters;
+	}
 
 
 

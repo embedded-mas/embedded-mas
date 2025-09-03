@@ -4,7 +4,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import static embedded.mas.bridges.jacamo.Utils.jsonToPredArguments;
 
 import embedded.mas.bridges.jacamo.EmbeddedAction;
+import embedded.mas.bridges.jacamo.IEmbeddedAction;
+import embedded.mas.bridges.jacamo.ILiteralListInterface;
 import embedded.mas.bridges.jacamo.LiteralDevice;
+import embedded.mas.bridges.jacamo.actuation.ActuationDevice;
+import embedded.mas.bridges.jacamo.actuation.ros.ServiceRequestActuation;
+import embedded.mas.bridges.jacamo.actuation.ros.TopicWritingActuation;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Atom;
 import jason.asSyntax.Literal;
@@ -21,6 +26,15 @@ public class RosMaster extends LiteralDevice {
 	public RosMaster(Atom id, IRosInterface microcontroller) {
 		super(id, microcontroller);
 	}
+
+
+
+	@Override
+	public ILiteralListInterface getMicrocontroller() {
+		return (IRosInterface)super.getMicrocontroller();
+	}
+
+
 
 	protected final boolean serviceRequest(String serviceName, ServiceParameters parameters) {
 		if(parameters==null)
@@ -56,22 +70,6 @@ public class RosMaster extends LiteralDevice {
 
 	@Override
 	public boolean execEmbeddedAction(String actionName, Object[] args, Unifier un) {
-		/*EmbeddedAction action = this.embeddedActions.get(createAtom(actionName));
-
-		if(action!=null)
-			if(action instanceof TopicWritingAction) {
-				((TopicWritingAction)action).setValue(args[0]);
-				this.getMicrocontroller().execEmbeddedAction(action);
-			}	
-			else
-				if(action instanceof ServiceRequestAction) {
-					for(int i=0;i<args.length;i++) { //set service params
-						//TODO: implement service response handling
-						((ServiceRequestAction)action).getServiceParameters().get(i).setParamValue(args[i]);						
-					}					
-					this.getMicrocontroller().execEmbeddedAction(action);
-				}
-		return true;*/
 		return false;
 	}
 
@@ -132,6 +130,33 @@ public class RosMaster extends LiteralDevice {
 		}
 		return true;
 	}
+
+
+
+	@Override
+	public boolean doExecSpecificActuation(ActuationDevice actuation, Unifier un) {		
+		if(actuation.getActuation() instanceof TopicWritingActuation) {
+			((IRosInterface)this.getMicrocontroller()).write(
+					((TopicWritingActuation)actuation.getActuation()).getTopicName(), 
+					((TopicWritingActuation)actuation.getActuation()).getTopicType(), 
+					((TopicWritingActuation)actuation.getActuation()).getParameters().toJson().toString()
+					);
+			return true;
+		}
+		else
+			if(actuation.getActuation() instanceof ServiceRequestActuation) {
+				((IRosInterface)this.getMicrocontroller()).serviceRequest(
+						((ServiceRequestActuation)actuation.getActuation()).getServiceName(), 
+						((ServiceRequestActuation)actuation.getActuation()).getParameters().toJson()
+						);
+				return true;
+			}
+
+		return false;
+	}
+
+
+
 
 
 }

@@ -55,6 +55,25 @@ public class TestServiceParam {
 	}
 	
 	
+	@Test
+	public void testSetParamValue() {
+		//test whether the parameter is changeable by default
+		ServiceParam p1 = new ServiceParam("p1", 1);				
+		assertTrue(p1.isChangeable());
+		
+		//test whether the parameter is correctly created as not changeable
+		ServiceParam p2 = new ServiceParam("p2", 2, false);				
+		assertFalse(p2.isChangeable());
+		
+		//test whether param changed is correctly blocked
+		p2.setParamValue(3);
+		assertEquals(p2.getParamValue(), 2);
+		
+		//test if the param changing is correctly unblocked
+		p2.setChangeable(true);
+		p2.setParamValue(3);
+		assertEquals(p2.getParamValue(), 3);
+	}
 
 
 }

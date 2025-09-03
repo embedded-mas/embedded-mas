@@ -1,7 +1,10 @@
 package embedded.mas.bridges.jacamo;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Set;
 
+import embedded.mas.bridges.jacamo.actuation.ActuationDevice;
 import embedded.mas.exception.InvalidActuationException;
 import embedded.mas.exception.InvalidActuatorException;
 import embedded.mas.exception.PerceivingException;
@@ -26,8 +29,16 @@ public interface IDevice {
 	
 	public boolean execEmbeddedAction(Atom actionName, Object[] args, Unifier un);
 	
-	public boolean execActuation(Atom actuatorId, Atom actuationId, Object[] args,  Unifier un) throws InvalidActuatorException, InvalidActuationException;
-	
 	public boolean hasActuator(Atom actuatorId);
+	
+	/**
+	 * 
+	 * @param actuations: Set of actuations to be executed (implemented through ArrayList to be faster than Set implementations)
+	 * @param un
+	 * @return true whether the execution is successful, false otherwise
+	 */
+	public boolean execActuationSet(ArrayList<ActuationDevice> actuations, Unifier un);
+	
+	public boolean doExecActuation(ActuationDevice actuation, Unifier un);
 
 }

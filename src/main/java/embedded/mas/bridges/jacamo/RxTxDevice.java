@@ -3,6 +3,7 @@ package embedded.mas.bridges.jacamo;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import embedded.mas.bridges.jacamo.actuation.ActuationDevice;
 import embedded.mas.exception.PerceivingException;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Atom;
@@ -40,8 +41,14 @@ public class RxTxDevice extends DefaultDevice implements IDevice{
 	}
 
 	@Override
-	public boolean doExecActuation(Atom actuatorId, Atom actuationId, Object[] args, Unifier un) {
+	public boolean execActuationSet(ArrayList<ActuationDevice> actuations, Unifier un) {
 		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	protected boolean doExecSpecificActuation(ActuationDevice actuation, Unifier un) {
+		System.out.println("[RxTxDevice] method doExecSpecificActuation not implemented!");
 		return false;
 	}
 

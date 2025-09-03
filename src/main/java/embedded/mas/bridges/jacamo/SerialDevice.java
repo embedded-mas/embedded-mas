@@ -1,8 +1,10 @@
 package embedded.mas.bridges.jacamo;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
+import embedded.mas.bridges.jacamo.actuation.ActuationDevice;
 import embedded.mas.exception.EmbeddedActionException;
 import embedded.mas.exception.EmbeddedActionNotFoundException;
 import embedded.mas.exception.PerceivingException;
@@ -56,7 +58,13 @@ public class SerialDevice extends DefaultDevice {
 	}
 
 	@Override
-	public boolean doExecActuation(Atom actuatorId, Atom actuationId, Object[] args, Unifier un) {
+	public boolean execActuationSet(ArrayList<ActuationDevice> actuations, Unifier un) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	protected boolean doExecSpecificActuation(ActuationDevice actuation, Unifier un) {
 		// TODO Auto-generated method stub
 		return false;
 	}

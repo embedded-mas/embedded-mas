@@ -11,7 +11,12 @@
 package embedded.mas.bridges.jacamo.actuation;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+
+import embedded.mas.bridges.jacamo.DefaultDevice;
+import embedded.mas.bridges.jacamo.IDevice;
 
 
 
@@ -27,6 +32,23 @@ public class ActuationSet extends ArrayList<ActuationDevice>{
 		}
 		s = s.concat("}");
 		return s;
+	}
+	
+	
+	/*
+	 * Divide the set in subsets, group by device.
+	 * The result is a hashtable where the key is the device and the value is a set of actuations.
+	 * 
+	 * The set of actuations is recorded in an ArrayList as it is faster than objects implementing the Set interface.
+	 * 
+	 */
+	public HashMap<IDevice, ArrayList<ActuationDevice>> toActuationSetsByDevice(){
+		HashMap<IDevice, ArrayList<ActuationDevice>> result = new HashMap<IDevice, ArrayList<ActuationDevice>>(); 
+		for(ActuationDevice a:this) {
+			if(result.get(a.getDevice())==null) result.put(a.getDevice(), new ArrayList<ActuationDevice>());
+			result.get(a.getDevice()).add(a);						
+		}		
+		return result;
 	}
 
 	

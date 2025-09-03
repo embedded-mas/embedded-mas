@@ -5,16 +5,23 @@ import java.util.Arrays;
 
 public class ServiceParam {
 
+
 	protected String paramName;
 	protected Object paramValue;
+	private boolean changeable; //true if the paramValue can be changed
 
 
-
-	public ServiceParam(String paramName, Object paramValue){
+	public ServiceParam(String paramName, Object paramValue, boolean changeable){
 		super();
 		this.paramName = paramName;
-		this.paramValue = paramValue;				
+		this.paramValue = paramValue;
+		this.setChangeable(changeable);
 	}
+
+	public ServiceParam(String paramName, Object paramValue){
+		this(paramName, paramValue, true);				
+	}
+
 
 	public String getParamName() {
 		return paramName;
@@ -29,7 +36,16 @@ public class ServiceParam {
 	}
 
 	public void setParamValue(Object paramValue) {
-		this.paramValue = paramValue;
+		if(this.isChangeable())
+			this.paramValue = paramValue;
+	}
+
+	public boolean isChangeable() {
+		return changeable;
+	}
+
+	public void setChangeable(boolean changeable) {
+		this.changeable = changeable;
 	}
 
 	/**
@@ -86,6 +102,12 @@ public class ServiceParam {
 	@Override
 	public String toString() {
 		return "ServiceParam [paramName=" + paramName + ", paramValue=" + paramValue + "]";
+	}
+
+	@Override
+	protected ServiceParam clone() {
+		 
+		return new ServiceParam(paramName, paramValue, changeable);
 	}
 
 

@@ -3,6 +3,7 @@
  JSONWatcherDevice only receive data/beliefs when it sends a request to the microcontroller*/
 
 package embedded.mas.bridges.jacamo;
+import embedded.mas.bridges.jacamo.actuation.ActuationDevice;
 import embedded.mas.bridges.javard.MicrocontrollerMonitor;
 
 import java.io.ByteArrayInputStream;

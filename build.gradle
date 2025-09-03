@@ -57,8 +57,13 @@ dependencies {
 	implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.13.3'
 	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.3'
 	
-	//implementation group: 'org.yaml', name: 'snakeyaml', version: '1.30'
-	api group: 'org.yaml', name: 'snakeyaml', version: '1.30'
+
+
+	implementation group: 'org.yaml', name: 'snakeyaml', version: '1.30'
+	
+	api 'org.eclipse.jetty.websocket:websocket-client:9.4.57.v20241219'
+ 
+	
 
 
     // This dependency is exported to consumers, that is to say found on their compile classpath.
