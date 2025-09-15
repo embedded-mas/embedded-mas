@@ -9,11 +9,33 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Atom;
 import jason.asSyntax.ListTermImpl;
+import jason.asSyntax.Literal;
 import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Term;
 
 public class concurrentEmbeddedInternalAction extends ConcurrentInternalAction {
+	
+	
+	private Object[] listToArguments(ListTermImpl args) {
+		Object[] arguments = new Object[args.size()];			
+		for(int i=0;i<args.size();i++) {
+			if(args.get(i) instanceof ListTermImpl)
+				arguments[i] = listToArguments((ListTermImpl) args.get(i));
+			else
+				if(args.get(i) instanceof NumberTermImpl)
+					arguments[i] = args.get(i);
+				else
+					if(args.get(i)==Literal.LTrue)
+						arguments[i] = Boolean.TRUE;
+					else
+						if(args.get(i)==Literal.LFalse)
+							arguments[i] = Boolean.FALSE;
+						else
+							arguments[i] = args.get(i).toString().replaceAll("\"(.+)\"", "$1");
+		}		
+		return arguments;
+	}
 
 	@Override
 	/**
@@ -40,53 +62,54 @@ public class concurrentEmbeddedInternalAction extends ConcurrentInternalAction {
 							device = dev;
 							break;
 						}
-					}						
-					//if(device==null) { throw new Exception("Device " + deviceName + " not found."); }
-					
+					}					
+					if(device==null) throw new RuntimeException("Device " + deviceName + " not found.");
 
-					try {
-						EmbeddedAction action = device.getEmbeddedAction(createAtom(args[1].toString().replaceAll("\"(.+)\"", "$1")));	
-						Atom actionName = createAtom(args[1].toString().replaceAll("\"(.+)\"", "$1"));			
-						if(action!=null) { 	//Case 1. The device has an EmbeddedAction
-							if(args[2] instanceof ListTermImpl){ //if arguments in args[2] are a list 
-								Object[] arguments = new Object[((ListTermImpl)args[2]).size()];			
-								for(int i=0;i<((ListTermImpl)args[2]).size();i++) {
-									if(((ListTermImpl)args[2]).get(i) instanceof NumberTermImpl)
-										arguments[i] = ((ListTermImpl)args[2]).get(i);
-									else
-										arguments[i] = ((ListTermImpl)args[2]).get(i).toString().replaceAll("\"(.+)\"", "$1");
-								}
+					EmbeddedAction action = device.getEmbeddedAction(createAtom(args[1].toString().replaceAll("\"(.+)\"", "$1")));	
+					Atom actionName = createAtom(args[1].toString().replaceAll("\"(.+)\"", "$1"));			
+					if(action!=null) { 	//Case 1. The device has an EmbeddedAction
+						if(args[2] instanceof ListTermImpl){ //if arguments in args[2] are a list 
+							Object[] arguments = listToArguments((ListTermImpl)args[2]);
 
-								//Check whether the current device class is adapted to execute embedded actions. 
-								//New kinds of devices must be adapted here to execute embedded actions
-								if(SerialDevice.class.isAssignableFrom(device.getClass())||
-										LiteralDevice.class.isAssignableFrom(device.getClass())) {
-									r = device.execEmbeddedAction(actionName,arguments,un);
-								}else throw new Exception("Embedded action " + actionName + "not available in " + deviceName);
-							}
-							else r =  device.execEmbeddedAction(actionName, new Object[] {args[2]},un);
+							//Check whether the current device class is adapted to execute embedded actions. 
+							//New kinds of devices must be adapted here to execute embedded actions
+							if(SerialDevice.class.isAssignableFrom(device.getClass())||
+									LiteralDevice.class.isAssignableFrom(device.getClass())) {
+								r =  device.execEmbeddedAction(actionName,arguments,un);
+							}else throw new RuntimeException("Embedded action " + actionName + "not available in " + deviceName);
 						}
+						else r =  device.execEmbeddedAction(actionName, new Object[] {args[2]},un);
+					}
 
 
-						else {//Case 2. The action is implemented as java code in the device (old style)				
-							if(args[2] instanceof ListTermImpl){ //if arguments in args[2] are a list 
-								String[] arguments = new String[((ListTermImpl)args[2]).size()];			
-								for(int i=0;i<((ListTermImpl)args[2]).size();i++) {
-									arguments[i] = adaptTerm(((ListTermImpl)args[2]).get(i)).toString();
-								}
-								r = device.execEmbeddedAction(args[1].toString().replaceAll("\"(.+)\"", "$1"), arguments);
+					else {//Case 2. The action is implemented as java code in the device (old style)				
+						if(args[2] instanceof ListTermImpl){ //if arguments in args[2] are a list 
+							Term[] arguments = new Term[((ListTermImpl)args[2]).size()];			
+							for(int i=0;i<((ListTermImpl)args[2]).size();i++) {
+								arguments[i] = adaptTerm(((ListTermImpl)args[2]).get(i));
 							}
-							else { //default condition
-								r = device.execEmbeddedAction(args[1].toString().replaceAll("\"(.+)\"", "$1"), new String[]{args[2].toString().replaceAll("\"(.+)\"", "$1")});
+							try {
+								r =  device.execEmbeddedAction(args[1].toString().replaceAll("\"(.+)\"", "$1"), arguments,un);
+							} catch (EmbeddedActionNotFoundException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (EmbeddedActionException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
 							}
 						}
-					} catch (EmbeddedActionNotFoundException e) {
-						e.printStackTrace();
-					} catch (EmbeddedActionException e) {
-						e.printStackTrace();
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						else { //default condition
+							try {
+								r =  device.execEmbeddedAction(args[1].toString().replaceAll("\"(.+)\"", "$1"), new String[]{args[2].toString().replaceAll("\"(.+)\"", "$1")},un);
+							} catch (EmbeddedActionNotFoundException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (EmbeddedActionException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+
 					}
 
 

@@ -1,26 +1,27 @@
 package embedded.mas.bridges.jacamo;
 
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
 import java.io.InputStream;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
-
+import java.util.Map.Entry;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.Path;
 import java.nio.file.DirectoryStream;
 import java.nio.charset.StandardCharsets;
 import java.io.IOException;
-import java.util.List;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+
 
 import java.io.File;
 
 public class InternalActionGenerator  {
 
-	private static void writeToFile(String deviceId, String actionName, String serviceName, List<String> params, boolean requestResponseServiceAction) {
+	private static void writeToFile(String deviceId, String actionName, String serviceName, List<String> params, boolean requestResponseServiceAction, boolean concurrent) {
 		Path filePath = Paths.get("src/java/jason/stdlib/" + actionName + ".java");		
 		if(Files.exists(filePath))
 			System.out.println("*** [information] internal action " + actionName + " already exists in src/java/jason/stdlib and will not be overwritten ***");
@@ -39,7 +40,14 @@ public class InternalActionGenerator  {
 
                 "import static jason.asSyntax.ASSyntax.createAtom;\n\n";
 
+<<<<<<< HEAD
+			if(concurrent)
+				fileContent = fileContent + "public class "+ actionName +" extends embedded.mas.bridges.jacamo.concurrentEmbeddedInternalAction {\n\n";				
+			else if(requestResponseServiceAction)
+=======
+
 			if(requestResponseServiceAction)
+>>>>>>> 71e2620fb5c9db1f22402bafb93b99063cd123e3
 				fileContent = fileContent + "public class "+ actionName +" extends embedded.mas.bridges.jacamo.requestResponseEmbeddedInternalAction {\n\n";
 			else
 				fileContent = fileContent + "public class "+ actionName +" extends embedded.mas.bridges.jacamo.defaultEmbeddedInternalAction {\n\n";
@@ -85,6 +93,7 @@ public class InternalActionGenerator  {
 	}
 
 
+
 	private static List<Path> listYamlFiles(Path dir) {
 		List<Path> yamlFiles = new ArrayList<>();
 		try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir, "*.yaml")) {
@@ -97,20 +106,58 @@ public class InternalActionGenerator  {
 		return yamlFiles;
 	}
 
-	public static void main(String[] args) {
-		Path directoryPath = Paths.get("src/agt");
+	private static void writeToFile_MultiActuation(String actionName) {
+		Path filePath = Paths.get("src/java/jason/stdlib/" + actionName + ".java");		
+		if(Files.exists(filePath))
+			System.out.println("*** internal action " + actionName + " already exists in src/java/jason/stdlib and will not be overwritten ***");
+		else {
+			String fileContent = "package jason.stdlib; \n\n" +
+					"import jason.asSemantics.TransitionSystem;\n"
+					+ "import jason.asSemantics.Unifier;\n"
+					+ "import jason.asSyntax.ListTermImpl;\n"
+					+ "import jason.asSyntax.NumberTermImpl;\n"
+					+ "import jason.asSyntax.Term;\n"
+					+ "\n"
+					+ "import static jason.asSyntax.ASSyntax.createAtom;\n"
+					+ "\n"
+					+ "import java.util.Iterator;\n"
+					+ "\n"
+					+ "import embedded.mas.bridges.jacamo.actuation.Actuation;\n"
+					+ "import embedded.mas.bridges.jacamo.actuation.ActuationDevice;\n"
+					+ "import embedded.mas.bridges.jacamo.actuation.ActuationSequence;\n"
+					+ "import embedded.mas.bridges.jacamo.actuation.ActuationSet;\n"
+					+ "import embedded.mas.bridges.jacamo.actuation.Actuator;\n\n" +
 
-		List<Path> yamlFiles = listYamlFiles(directoryPath);
-		for(Path f: yamlFiles){
-			Yaml yaml = new Yaml();
 
-			InputStream inputStream = InternalActionGenerator.class
-					.getClassLoader()
-					.getResourceAsStream(f.getFileName().toString());
 
-			if (inputStream == null) {
-				throw new IllegalArgumentException("File not found! Check the file path.");
+
+                "public class "+ actionName +" extends embedded.mas.bridges.jacamo.defaultEmbeddedInternalAction2 {\n\n" +
+
+			fileContent = fileContent +
+					"        @Override\n" +
+					"        public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {\n" +
+
+                "            ListTermImpl parameters = new ListTermImpl();\n" +
+                "            for(Term t:args) parameters.add(t);\n" ;
+                "            Term[] arguments = new Term[3];\n" +
+                "            arguments[0] =  createAtom(\"" + actionName + "\"); \n" +
+                "            arguments[1] = parameters;\n" +
+                "            return super.execute(ts, un,  arguments);            \n" +
+                "        }\n" +
+                "}";
+
+			File directory = new File("src/java/jason/stdlib");
+			if (!directory.exists()) directory.mkdirs();
+
+
+
+
+			try {
+				Files.write(filePath, fileContent.getBytes(StandardCharsets.UTF_8));
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
+<<<<<<< HEAD
 			List<Map<String, Object>> yamlData = yaml.load(inputStream);
 
 			for (Map<String, Object> device : yamlData) {
@@ -129,7 +176,13 @@ public class InternalActionGenerator  {
 								requestResponseServiceAction = true;
 							else
 								requestResponseServiceAction = false;
-							InternalActionGenerator.writeToFile(deviceId, actionName, serviceName, params,requestResponseServiceAction);
+							//check whether the action is a concurrent one
+							boolean concurrent;
+							if(action.get("concurrent")!=null && action.get("concurrent").toString().equals("true"))
+								concurrent = true;
+							else
+								concurrent = false;
+							InternalActionGenerator.writeToFile(deviceId, actionName, serviceName, params,requestResponseServiceAction,concurrent);
 						}
 					}
 
@@ -140,12 +193,111 @@ public class InternalActionGenerator  {
 						for (Map<String, Object> action : topicWritingActions) {
 							String actionName = (String) action.get("actionName");
 							String serviceName = (String) action.get("serviceName");
-							List<String> params = (List<String>) action.getOrDefault("params", List.of());						
-							InternalActionGenerator.writeToFile(deviceId, actionName, serviceName, params, false);
+							List<String> params = (List<String>) action.getOrDefault("params", List.of());
+							//check whether the action is a concurrent one
+							boolean concurrent;
+							if(action.get("concurrent")!=null && action.get("concurrent").toString().equals("true"))
+								concurrent = true;
+							else
+								concurrent = false;
+							InternalActionGenerator.writeToFile(deviceId, actionName, serviceName, params, false,concurrent);
 						}
 					}
 				}
-			}
-		}	
+=======
+		}
 	}
+
+	private static List<String> getFilesByExtension(String diretorioCaminho, String extensao) {
+		File diretorio = new File(diretorioCaminho);
+		List<String> listaDeArquivos = new ArrayList<>();
+
+		if (!diretorio.isDirectory()) {
+			System.out.println("Invalid directory path.");
+			return listaDeArquivos;  // returns an empty list
+		}
+
+		File[] arquivos = diretorio.listFiles((dir, nome) -> nome.toLowerCase().endsWith(extensao.toLowerCase()));
+
+		if (arquivos != null) {
+			for (File arquivo : arquivos) {
+				listaDeArquivos.add(arquivo.getName());
+>>>>>>> 71e2620fb5c9db1f22402bafb93b99063cd123e3
+			}
+		}
+
+		return listaDeArquivos;
+	}
+
+
+	    public static void main(String[] args) {
+        Path directoryPath = Paths.get("src/agt");
+
+        List<Path> yamlFiles = listYamlFiles(directoryPath);
+        for(Path f: yamlFiles){
+            Yaml yaml = new Yaml();
+            try (InputStream inputStream = Files.newInputStream(f)) {
+
+                if (inputStream == null) {
+                    throw new IllegalArgumentException("File not found! Check the file path.");
+                }
+                List<Map<String, Object>> yamlData = yaml.load(inputStream);
+
+                for (Map<String, Object> device : yamlData) {
+                    String deviceId = (String) device.get("device_id");
+                    if(deviceId!=null) {
+                        Map<String, Object> actions = (Map<String, Object>) device.get("actions");
+                        if(actions!=null) {
+                            // serviceRequestActions
+                            List<Map<String, Object>> serviceRequestActions = (List<Map<String, Object>>) actions.get("serviceRequestActions");
+                            if(serviceRequestActions!=null){
+                                for (Map<String, Object> action : serviceRequestActions) {
+                                    String actionName = (String) action.get("actionName");
+                                    String serviceName = (String) action.get("serviceName");
+                                    List<String> params = (List<String>) action.getOrDefault("params", List.of());        
+                                    boolean requestResponseServiceAction; 
+                                    if(action.get("hasReturn")!=null && action.get("hasReturn").toString().equals("true"))
+                                        requestResponseServiceAction = true;
+                                    else
+                                        requestResponseServiceAction = false;
+                                    InternalActionGenerator.writeToFile(deviceId, actionName, serviceName, params, requestResponseServiceAction);
+                                }
+                            }
+
+                            // topicWritingActions
+                            List<Map<String, Object>> topicWritingActions = (List<Map<String, Object>>) actions.get("topicWritingActions");
+                            if(topicWritingActions!=null){
+                                for (Map<String, Object> action : topicWritingActions) {
+                                    String actionName = (String) action.get("actionName");
+                                    String serviceName = (String) action.get("serviceName");
+                                    List<String> params = (List<String>) action.getOrDefault("params", List.of());                        
+                                    InternalActionGenerator.writeToFile(deviceId, actionName, serviceName, params, false);
+                                }
+                            }
+                        } else {
+                            // Serial actions
+                            ArrayList l = (ArrayList) device.get("serialActions");
+                            if(l!=null)
+                                for(int i=0;i<l.size();i++) {
+                                    LinkedHashMap map = (LinkedHashMap)l.get(i);
+                                    InternalActionGenerator.writeToFile(deviceId, map.get("actionName").toString(), "", null, false);
+                                }
+                        }
+                    }
+
+                    // multi-actuation actions
+                    ArrayList actions = (ArrayList) device.get("actions");
+                    if(actions!=null) {
+                        for(int i=0;i<actions.size();i++) {
+                            for (Entry<String, ArrayList> action : ((LinkedHashMap<String, ArrayList>)actions.get(i)).entrySet()) {
+                                writeToFile_MultiActuation(action.getKey());
+                            }
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }
