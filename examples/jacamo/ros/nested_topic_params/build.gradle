@@ -16,7 +16,7 @@ group   'org.jacamo'
 repositories {
     maven { url "https://raw.githubusercontent.com/jacamo-lang/mvn-repo/master" }
     maven { url "https://repo.gradle.org/gradle/libs-releases" }
-    maven { url "https://raw.github.com/embedded-mas/embedded-mas-mvn-repo/master" }
+    maven { url "https://raw.githubusercontent.com/embedded-mas/embedded-mas-mvn-repo/master" }
 
     flatDir { dirs 'lib' }
 
@@ -26,8 +26,7 @@ repositories {
 
 dependencies {
     implementation 'org.jacamo:jacamo:1.2.3'
-    implementation "embedded-mas:embedded-mas:0.060-SNAPSHOT" 
-    implementation 'org.yaml:snakeyaml:2.0'
+    implementation "embedded-mas:embedded-mas:0.061-SNAPSHOT" 
 }
 
 sourceSets {

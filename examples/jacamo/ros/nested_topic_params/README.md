@@ -31,31 +31,12 @@ In the [agent code](src/agt/sample_agent.asl), these parameters are set in the e
 
 ## Running the example
 
-1. Start the roscore
-```
-roscore
-```
+1. Start the ROS node: `./launch_ros1.sh` (for ROS 1) or `launch_ros2` (for ROS2). Preceed with `sudo` if needed.
+``
 
-2. Launch the bridge between ROS and Java
-```
-roslaunch rosbridge_server rosbridge_websocket.launch
-```
+2. Launch the JaCaMo application: `./gradlew run`
 
-3. Launch the turtlesim simulator
-```
-rosrun turtlesim turtlesim_node
-```
 
-4. Launch the JaCaMo application:
-
-Linux:
-```
-./gradlew run
-```
-Windows:
-```
-gradlew run 
-```
 
 ## Some notes on the ROS-Jason integration
 This integration is part of a broader integration framework available [here](https://github.com/embedded-mas/embedded-mas)
