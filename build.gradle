@@ -28,16 +28,17 @@ repositories {
     jcenter()
     
     
-     maven { url "https://raw.github.com/jacamo-lang/mvn-repo/master" }
-     maven { url "https://raw.github.com/embedded-mas/embedded-mas-mvn-repo/master" }
+     maven { url "https://raw.githubusercontent.com/jacamo-lang/mvn-repo/master" }
+     maven { url "https://raw.githubusercontent.com/embedded-mas/embedded-mas-mvn-repo/master" }
+     
 }
 
 dependencies {
 
     // https://mvnrepository.com/artifact/com.fazecast/jSerialComm
-    implementation group: 'com.fazecast', name: 'jSerialComm', version: '2.11.0'
+    api group: 'com.fazecast', name: 'jSerialComm', version: '2.11.0'
     implementation "com.neuronrobotics:nrjavaserial:5.2.1"
-    implementation "javard:javard:0.036-SNAPSHOT"
+    api "javard:javard:0.036-SNAPSHOT"
     implementation group: 'org.jason' , name: 'jason'   , version: '2.6-SNAPSHOT'
     implementation group: 'javax.json', name: 'javax.json-api', version: '1.1.4'
     implementation group: 'org.glassfish', name: 'javax.json', version: '1.1.4'

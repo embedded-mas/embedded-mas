@@ -58,6 +58,7 @@ import embedded.mas.bridges.javard.Arduino4EmbeddedMas;
 import embedded.mas.bridges.javard.NRJ4EmbeddedMas;
 import embedded.mas.bridges.ros.DefaultRos4Bdi;
 import embedded.mas.bridges.ros.DefaultRos4EmbeddedMas;
+import embedded.mas.bridges.ros.ServiceArrayParam;
 import embedded.mas.bridges.ros.ServiceParam;
 import embedded.mas.bridges.ros.ServiceParameters;
 import embedded.mas.bridges.ros.ServiceRequestAction;
@@ -255,7 +256,7 @@ public class DefaultConfig {
 												}
 										}
 										currentActuationSequence.addLast(currentActuationSet);										
-									}
+									}									
 									actionsMap.put(createAtom(actionName), currentActuationSequence);
 								}
 							}
@@ -373,7 +374,7 @@ public class DefaultConfig {
 						if(topicActuation.get("parameters")!=null) {							
 							p = buildServiceParameters( (ArrayList<Object>)topicActuation.get("parameters"));
 						}
-						else
+						else //PROVAVELMENTE O PROBLEMA ESTÁ AQUI
 							p.add(new ServiceParam("data",null));
 						TopicWritingActuation actuation = new TopicWritingActuation(createAtom(topicActuation.get("actuation_id").toString()),
 								topicActuation.get("topicName").toString(),
@@ -613,19 +614,36 @@ public class DefaultConfig {
 		return devices;
 
 	}
+	
+	public ServiceParameters buildServiceArrayParameters(ArrayList<Object> object) {
+		ServiceParameters result = new ServiceParameters();
+		int arrayParamCount = 0;
+		for(Object o : object) //for each nested array
+			if(o instanceof ArrayList) {
+				ServiceParam p = new ServiceParam("arrray_parameter_" + arrayParamCount++, buildServiceParameters((ArrayList)o));
+				result.add(p);
+			}
+
+		return result;
+
+	}
+
 
 	private ServiceParameters buildServiceParameters(ArrayList<Object> object) {
 		ServiceParameters result = new ServiceParameters();
 		for(Object o:object) {
 			if(o instanceof LinkedHashMap) {
-				ServiceParam p;
 				for (Map.Entry<String, ArrayList> oo : ((LinkedHashMap<String, ArrayList>) o).entrySet()) {
 					if(oo.getValue() instanceof ArrayList) {
-						result.add( new ServiceParam(oo.getKey(), buildServiceParameters((ArrayList<Object>) oo.getValue())));
+						if(((ArrayList)oo.getValue()).get(0) instanceof ArrayList) {							
+							result.add(new ServiceArrayParam(oo.getKey(), buildServiceArrayParameters(oo.getValue())));
+						}
+						else
+							result.add( new ServiceParam(oo.getKey(), buildServiceParameters((ArrayList<Object>) oo.getValue())));
 					}
 				}
-			}
-			else
+			}	
+			else 
 				result.add(new ServiceParam(o.toString(), null));
 		}
 		return result;

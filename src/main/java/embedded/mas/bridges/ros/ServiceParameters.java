@@ -170,25 +170,65 @@ public class ServiceParameters extends ArrayList<ServiceParam> {
 
 	public int setParamValues(Object[] p, int initialPosition) {
 		int valuesPosition = initialPosition; //current position in the given parameters array
-
-		for(ServiceParam param : this) //for each service para,
+		for(ServiceParam param : this) //for each service parameter
 			if(param.getParamValue() instanceof ServiceParameters) { //if the current param is a set of nested parameters
-				valuesPosition = ((ServiceParameters)param.getParamValue()).setParamValues(p, valuesPosition)+1; //recursively set the nested parameters to the default state
+				if(p[valuesPosition] instanceof ListTermImpl && ((ListTermImpl)p[valuesPosition]).get(0) instanceof ListTermImpl) { 
+					setListOfParamValues((ServiceParameters)param.getParamValue(), (ListTermImpl)p[valuesPosition]);
+					valuesPosition++;
+				}
+				else
+					valuesPosition = ((ServiceParameters)param.getParamValue()).setParamValues(p, valuesPosition)+1; //recursively set the nested parameters to the default state
 			}
-			else
+			else 
 				if(param.isChangeable()) { //if the parameter is not a default one (it is changeable)
 					param.setParamValue(p[valuesPosition++]); //set param value to null		
 				}
 		return --valuesPosition;
 	}
 
+
+
+	/***
+	 * Atribuir os valores em p aos parâmetros em parameters
+	 * 
+	 * 
+	 * parameters é o array de parameters (ex. [arrray_parameter_0[y11/null, y12/null], arrray_parameter_1[y21/null, y22/null], arrray_parameter_2[y31/null, y32/null]])
+	 * p é a lista de parâmetros a ser atribuída (ex.: [[2,3],[4,5],[6,7]])
+         * 
+         * resultado  esperado: [arrray_parameter_0[y11/2, y12/3], arrray_parameter_1[y21/4, y22/5], arrray_parameter_2[y31/6, y32/7]]
+	 * 
+	 *  
+	 *  
+	 * @param parameters
+	 * @return
+	 */
+	private int setListOfParamValues(ServiceParameters parameters, ListTermImpl p) {
+		int pIndexI = 0, pIndexj;
+		for(ServiceParam param : parameters) //for each ServiceParameter
+			if(param.getParamValue() instanceof ServiceParameters) {
+				if((p.get(pIndexI) instanceof ListTermImpl) && ((ListTermImpl)p.get(pIndexI)).size()==((ServiceParameters)param.getParamValue()).size() ) {
+					pIndexj=0;
+					for(ServiceParam nestedParam : (ServiceParameters)param.getParamValue()) //for each nested param
+						nestedParam.setParamValue(((ListTermImpl)p.get(pIndexI)).get(pIndexj++));
+				}
+				pIndexI++;
+			}
+
+
+		return 0;
+	}
+
 	@Override
 	public ServiceParameters clone() {
 		ServiceParameters parameters = new ServiceParameters();
 		for(ServiceParam p:this) {
-			ServiceParam newP = new ServiceParam(p.getParamName(), null, p.isChangeable());
+			ServiceParam newP;
+			if(p instanceof ServiceArrayParam)
+				newP = new ServiceArrayParam(p.getParamName(), null);
+			else
+				newP = new ServiceParam(p.getParamName(), null, p.isChangeable());
 			if(p.getParamValue() instanceof ServiceParameters)
-				newP.setParamValue(((ServiceParameters)p.getParamValue()).clone());
+				newP.setParamValue(((ServiceParameters)p.getParamValue()).clone());	
 			else
 				if(!p.isChangeable()) { //if it is a default parameters
 					newP.setChangeable(true);

@@ -5,9 +5,9 @@ import java.util.Arrays;
 
 public class ServiceParam {
 
-	private String paramName;
-	private Object paramValue;
-	private boolean changeable; //true if the paramValue can be changed
+	protected String paramName;
+	protected Object paramValue;
+	protected boolean changeable; //true if the paramValue can be changed
 
 
 	public ServiceParam(String paramName, Object paramValue, boolean changeable){

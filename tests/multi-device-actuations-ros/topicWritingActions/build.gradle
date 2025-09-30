@@ -29,10 +29,13 @@ repositories {
 dependencies {
     implementation 'org.jacamo:jacamo:1.2.3'
     //implementation "embedded-mas:embedded-mas:0.060-SNAPSHOT" 
-    implementation files('/mnt/1C4C766F4C764414/maiquel/git/embedded-mas-multi-device-actuations/embedded-mas/build/libs/embedded-mas-0.060-SNAPSHOT.jar')
+    implementation files('/mnt/1C4C766F4C764414/maiquel/git/embedded-mas-multi-device-actuations/embedded-mas/build/libs/embedded-mas-0.061-SNAPSHOT.jar')
     //implementation files('/home/maiquel/temp/excluir_embedded_mas/embedded-mas/build/libs/embedded-mas-0.062-TEMP.jar')
+    
     implementation 'org.yaml:snakeyaml:2.0'
     implementation 'org.eclipse.jetty.websocket:websocket-client:9.4.57.v20241219'
+    implementation group: 'org.rxtx', name: 'rxtx', version: '2.1.7'
+    implementation "com.neuronrobotics:nrjavaserial:5.2.1"
 }
 
 sourceSets {
