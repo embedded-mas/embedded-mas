@@ -100,7 +100,7 @@ public class Arduino4EmbeddedMas extends Arduino implements IPhysicalInterface{
 			return message;
 		}
 		else {
-			return "Message conversation error";
+			return "Message conversation error " + message;
 		}
 		
 	}
