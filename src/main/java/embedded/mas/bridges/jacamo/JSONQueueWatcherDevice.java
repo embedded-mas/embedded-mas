@@ -39,7 +39,7 @@ public class JSONQueueWatcherDevice extends SerialDevice implements IDevice {
 		if(listOfBeliefs.size()>0) {
 			 percepts = listOfBeliefs.remove(0);
 		}
-		try {Thread.sleep((long)(Math.random() * 1000)); } catch (InterruptedException e) { } //espera um tempo aleatório antes de continuar
+		try {Thread.sleep(125); } catch (InterruptedException e) { } //espera um tempo aleatório antes de continuar
 	return percepts;
 	}
 
