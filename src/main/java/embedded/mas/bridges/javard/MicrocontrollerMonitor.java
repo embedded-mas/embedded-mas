@@ -50,7 +50,7 @@ public class MicrocontrollerMonitor extends Thread {
 			}
 			
 			try {
-				Thread.sleep((long)(Math.random() * 1000));
+				Thread.sleep((long)(Math.random() * 100));
 			} catch (InterruptedException e2) {
 				e2.printStackTrace();
 			}
