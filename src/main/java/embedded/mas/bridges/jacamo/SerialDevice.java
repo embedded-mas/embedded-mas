@@ -2,6 +2,7 @@ package embedded.mas.bridges.jacamo;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.StringJoiner;
 
 import embedded.mas.exception.EmbeddedActionException;
 import embedded.mas.exception.EmbeddedActionNotFoundException;
@@ -32,8 +33,15 @@ public class SerialDevice extends DefaultDevice {
 	@Override
 	public boolean execEmbeddedAction(Atom actionName, Object[] args, Unifier un) {
 		EmbeddedAction action = getEmbeddedAction(actionName);		
+		String actuation = ((SerialEmbeddedAction)action).getActuationName().toString();
+		if(args.length>0){
+		   StringJoiner joiner = new StringJoiner(",");
+  		   for(int i=0;i<args.length;i++)
+  		      joiner.add(args[i].toString());
+  		   actuation = actuation + "(" + joiner + ")";
+  		}
 		if(action instanceof SerialEmbeddedAction) {
-			return this.getMicrocontroller().write(((SerialEmbeddedAction)action).getActuationName().toString());
+			return this.getMicrocontroller().write(actuation);
 		}
 		return false;
 	}
