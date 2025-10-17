@@ -36,6 +36,16 @@ public abstract class DefaultDevice implements IDevice {
 	private HashMap<Atom, EmbeddedAction> embeddedActions = new HashMap<Atom, EmbeddedAction>();
 	private HashSet<Actuator> actuators = new HashSet<Actuator>();
 	private Actuation waitActuation = addWaitActuation();
+	
+	protected SensorValueCollector collector;
+	protected SensorValueTransformer transformer;
+	
+	public DefaultDevice(Atom id, SensorValueCollector collector, SensorValueTransformer transformer) {
+		this.id = id;
+		this.collector = collector;
+		this.transformer = transformer;
+		this.microcontroller = collector.getMicrocontroller();
+	}
 
 	public DefaultDevice(Atom id, IExternalInterface microcontroller) {
 		this.id = id;
