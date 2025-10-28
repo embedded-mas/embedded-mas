@@ -147,8 +147,9 @@ public class InternalActionGenerator  {
 				}
 				
 				ArrayList<Map> serialActions = (ArrayList)device.get("serialActions");
-				for(Map m: serialActions)
-     				   InternalActionGenerator.writeToFile(deviceId, m.get("actionName").toString(), "", null, false );
+				if(serialActions!=null)
+				   for(Map m: serialActions)
+     				      InternalActionGenerator.writeToFile(deviceId, m.get("actionName").toString(), "", null, false );
 				
 			}
 		}	
