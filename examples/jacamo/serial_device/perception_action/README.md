@@ -32,7 +32,7 @@ The agent has a perception "light_state(S)" (where S=1 means led on; S=0 means l
 
 1. [Rosserial Arduino Library](https://github.com/frankjoshua/rosserial_arduino_lib)
 
-   2.1 Procedure required after installation: edit the ```msg.h``` file (usually located in Arduino/libraries/Rosserial_Arduino_Library/src/ros in line 40 write ```#include <string.h>``` and in line 68 and 182 remove ```std:: before memcpy``` 
+   2.1 Procedure required after installation: edit the ```msg.h``` file (usually located in Arduino/libraries/Rosserial_Arduino_Library/src/ros in line 40 write ```#include <string.h>``` and in line 68 and 182 remove ```std::``` before ```memcpy``` 
    
 1. Embedded Protocol 
 
