@@ -179,16 +179,33 @@ public class DefaultConfig {
 						LinkedHashMap actions = (LinkedHashMap) l.get(i);
 						if((actions.get("actions") instanceof ArrayList)) { //if there are some actions 
 							ArrayList actionList = (ArrayList) actions.get("actions"); 
-							for(int i1=0;i1<actionList.size();i1++) { //for each action...
+							for(int i1=0;i1<actionList.size();i1++) { //for each action...							
 								LinkedHashMap actionItem = (LinkedHashMap) actionList.get(i1);
+								
+								//handle action parameters - start
+								Map<Atom, Object> actionParameters = new HashMap<>();
+								if(actionItem.get("parameters")!=null) {
+									for(Object parameter :(ArrayList)actionItem.get("parameters"))
+										actionParameters.put(createAtom(parameter.toString()), null);
+								}
+								//handle action parameters - end
+								
+								
+								
+								
 								Iterator it = actionItem.keySet().iterator();
 								if(it.hasNext()) {
 									String actionName = it.next().toString(); //save the current action name
-									ArrayList actuationSequence = (ArrayList) actionItem.get(actionName); //save the actuation sequence, which is a sequence of actuation sets
+									
+									
+									
+//									ArrayList actuationSequence = (ArrayList) actionItem.get(actionName); //save the actuation sequence, which is a sequence of actuation sets
+									ArrayList actuationSequence = (ArrayList)actionItem.get("sequence");
 									ActuationSequence currentActuationSequence = new ActuationSequence(); //start a new actuation sequence
 									String regex = "([^.]+)\\.([^.]+)\\.([^.]+)";
 									Pattern pattern;
 									Matcher matcher = null;
+									if(actuationSequence!=null)
 									for(int k=0;k<actuationSequence.size();k++) { //for each actuation set
 										ArrayList actuationSet = (ArrayList) actuationSequence.get(k);
 										ActuationSet currentActuationSet = new ActuationSet(); //start a new actuation set
@@ -260,7 +277,7 @@ public class DefaultConfig {
 									}									
 									Action currentAction = new Action(createAtom(actionName));
 									currentAction.setSequence(currentActuationSequence);
-									//TODO: set parameters
+									currentAction.setParams(actionParameters);
 									actionsMap.put(currentAction.getActionName(), currentAction);
 								}
 							}

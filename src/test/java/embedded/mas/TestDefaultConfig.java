@@ -105,20 +105,25 @@ public class TestDefaultConfig {
 							"\n" +
 							"- actions:\n" +
 							"  - a0:\n" +
-							"    - [my_device1.act1.print, my_device1.act2.print, my_device1.act1.print]\n" +
-							"    - [my_device1.act1.print, my_device1.act2.print, my_device1.act1.print]\n" +
+							"    parameters: [p1, p2, p3]\n" +
+							"    sequence:\n" +
+							"      - [my_device1.act1.print, my_device1.act2.print, my_device1.act1.print]\n" +
+							"      - [my_device1.act1.print, my_device1.act2.print, my_device1.act1.print]\n" +
 							"  - a1:\n" +
-							"    - [my_device1.act1.print, my_device1.act2.double]\n" +
-							"    - [my_device2.act21.printx, my_device1.act1.double]\n" +
-							"  - a2: [[my_device1.act1.print, my_device2.act21.double], [my_device2.act21.printx, my_device1.act1.double]]\n" +
+							"    sequence:\n"+
+							"      - [my_device1.act1.print, my_device1.act2.double]\n" +
+							"      - [my_device2.act21.printx, my_device1.act1.double]\n" +
+							"  - a2:\n" +
+							"    sequence: [[my_device1.act1.print, my_device2.act21.double], [my_device2.act21.printx, my_device1.act1.double]]\n" +
 							"  - a3:\n" +
-							"    - \n" +
-							"      - actuation: my_device1.act1.double \n" +
-							"        default_param_values: \n" +
-							"          value: 2\n" +
-							"          result: 5\n" +
-							"      - my_device1.act1.print\n" +
-							"    - [my_device1.act1.print]\n" +
+							"    sequence: \n"+
+							"      - \n" +
+							"        - actuation: my_device1.act1.double \n" +
+							"          default_param_values: \n" +
+							"            value: 2\n" +
+							"            result: 5\n" +
+							"        - my_device1.act1.print\n" +
+							"      - [my_device1.act1.print]\n" +
 							"  - a4:\n" +
 							"    - [my_device1.act1.print, my_device1.act2.double]\n";
 
@@ -390,6 +395,31 @@ public class TestDefaultConfig {
 		assertTrue(true);
 
 	}
+	
+	@Test
+	public void testActionParameters() {
+		DefaultConfig config = new DefaultConfig();
+		try {
+			List<DefaultDevice> l = config.loadFromYaml(new File(".").getCanonicalPath() + "/teste.yaml");
+			HashMap<Atom, Action> actionMap = config.getActions(l, new File(".").getCanonicalPath() + "/teste.yaml");
+			assertEquals(actionMap.get(createAtom("a0")).getParams().size(),3);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidDeviceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidActuationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidActuatorException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (EmbeddedActionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	@Test
 	public void testGetActions() {
@@ -412,6 +442,7 @@ public class TestDefaultConfig {
 			assertEquals(sequence.get(1).get(0).getDevice().getId().toString(),"my_device1");
 			assertEquals(sequence.get(1).get(0).getActuator().getId().toString(),"act1");
 			assertEquals(sequence.get(1).get(0).getActuation().getId().toString(),"print");
+
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
