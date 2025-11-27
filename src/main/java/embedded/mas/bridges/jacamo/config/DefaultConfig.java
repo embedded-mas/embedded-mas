@@ -46,6 +46,7 @@ import embedded.mas.bridges.jacamo.DemoDevice;
 import embedded.mas.bridges.jacamo.EmbeddedAction;
 import embedded.mas.bridges.jacamo.IExternalInterface;
 import embedded.mas.bridges.jacamo.SerialEmbeddedAction;
+import embedded.mas.bridges.jacamo.action.Action;
 import embedded.mas.bridges.jacamo.actuation.Actuation;
 import embedded.mas.bridges.jacamo.actuation.ActuationDevice;
 import embedded.mas.bridges.jacamo.actuation.ActuationSequence;
@@ -165,8 +166,8 @@ public class DefaultConfig {
 	}
 	 */
 
-	public HashMap<Atom, ActuationSequence> getActions(List<DefaultDevice> devices, String filename) throws InvalidDeviceException, InvalidActuationException, InvalidActuatorException, EmbeddedActionException{
-		HashMap<Atom, ActuationSequence> actionsMap = new HashMap<Atom, ActuationSequence>();
+	public HashMap<Atom, Action> getActions(List<DefaultDevice> devices, String filename) throws InvalidDeviceException, InvalidActuationException, InvalidActuatorException, EmbeddedActionException{
+		HashMap<Atom, Action> actionsMap = new HashMap<Atom, Action>();
 		Yaml yaml = new Yaml();
 		Iterable<Object> itr;
 		try {
@@ -257,7 +258,10 @@ public class DefaultConfig {
 										}
 										currentActuationSequence.addLast(currentActuationSet);										
 									}									
-									actionsMap.put(createAtom(actionName), currentActuationSequence);
+									Action currentAction = new Action(createAtom(actionName));
+									currentAction.setSequence(currentActuationSequence);
+									//TODO: set parameters
+									actionsMap.put(currentAction.getActionName(), currentAction);
 								}
 							}
 						}
