@@ -17,6 +17,7 @@ import org.junit.Test;
 import org.yaml.snakeyaml.Yaml;
 
 import embedded.mas.bridges.jacamo.DefaultDevice;
+import embedded.mas.bridges.jacamo.action.Action;
 import embedded.mas.bridges.jacamo.actuation.ActuationSequence;
 import embedded.mas.bridges.jacamo.actuation.Actuator;
 import embedded.mas.bridges.jacamo.actuation.ros.ServiceRequestActuation;
@@ -395,8 +396,8 @@ public class TestDefaultConfig {
 		DefaultConfig config = new DefaultConfig();
 		try {
 			List<DefaultDevice> l = config.loadFromYaml(new File(".").getCanonicalPath() + "/teste.yaml");
-			HashMap<Atom, ActuationSequence> actionMap = config.getActions(l, new File(".").getCanonicalPath() + "/teste.yaml");
-			ActuationSequence sequence = actionMap.get(createAtom("a3"));
+			HashMap<Atom, Action> actionMap = config.getActions(l, new File(".").getCanonicalPath() + "/teste.yaml");
+			ActuationSequence sequence = actionMap.get(createAtom("a3")).getSequence();
 			assertEquals(sequence.size(), 2);
 			assertEquals(sequence.get(0).size(), 2);
 			assertEquals(sequence.get(1).size(), 1);
