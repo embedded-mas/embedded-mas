@@ -185,9 +185,13 @@ public class InternalActionGenerator  {
                 if (inputStream == null) {
                     throw new IllegalArgumentException("File not found! Check the file path.");
                 }
-                List<Map<String, Object>> yamlData = yaml.load(inputStream);
+                Map<String, Object> yamlData = yaml.load(inputStream);
+                ArrayList<Map<String, Object>> devices = (ArrayList) yamlData.get("devices");
 
-                for (Map<String, Object> device : yamlData) {
+         
+                
+                
+                for (Map<String, Object> device : devices) {
                     String deviceId = (String) device.get("device_id");
                     if(deviceId!=null) {
                         Map<String, Object> actions = (Map<String, Object>) device.get("actions");
@@ -230,14 +234,14 @@ public class InternalActionGenerator  {
                     }
 
                     // multi-actuation actions
-                    ArrayList actions = (ArrayList) device.get("actions");
+                    ArrayList actions = (ArrayList) yamlData.get("actions");
                     if(actions!=null) {
                         for(int i=0;i<actions.size();i++) {
                             for (Entry<String, ArrayList> action : ((LinkedHashMap<String, ArrayList>)actions.get(i)).entrySet()) {
                                 writeToFile_MultiActuation(action.getKey());
                             }
                         }
-                    }
+                    }                  
                 }
             } catch (IOException e) {
                 e.printStackTrace();
