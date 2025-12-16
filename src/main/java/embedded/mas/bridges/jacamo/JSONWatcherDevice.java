@@ -18,7 +18,7 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.Atom;
 import jason.asSyntax.Literal;
 
-public class JSONWatcherDevice extends SerialDevice implements IDevice {
+public class JSONWatcherDevice extends SerialDevice4EmbeddedProtocol implements IDevice {
 	
 	List<Collection<Literal>> listOfBeliefs = Collections.synchronizedList(new ArrayList<Collection<Literal>>());
 	
@@ -39,7 +39,7 @@ public class JSONWatcherDevice extends SerialDevice implements IDevice {
 				listOfBeliefs.clear();
 			}
 		}
-		//try {Thread.sleep((long)(Math.random() * 1000)); } catch (InterruptedException e) { } //espera um tempo aleatório antes de continuar
+		try {Thread.sleep(125); } catch (InterruptedException e) { } //espera um tempo antes de continuar
 	return percepts;
 	}
 
@@ -54,27 +54,6 @@ public class JSONWatcherDevice extends SerialDevice implements IDevice {
 		return (IPhysicalInterface) this.microcontroller;
 	}
 	
-	@Override
-	public boolean execActuationSet(ArrayList<ActuationDevice> actuations, Unifier un) {		
-		StringBuilder s = new StringBuilder();
-
-		for (int i = 0; i < actuations.size(); i++) {
-			ActuationDevice act = actuations.get(i);
-			s.append(act.getActuator().getId())
-			.append(".")
-			.append(act.getActuation().getId());
-
-			if (i < actuations.size() - 1) {
-				s.append(";");
-			}
-		}
-		return this.getMicrocontroller().write(s.toString());
-	}
-
-	
-
-
-
 
 
 }

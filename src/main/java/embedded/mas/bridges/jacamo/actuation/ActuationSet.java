@@ -45,7 +45,9 @@ public class ActuationSet extends ArrayList<ActuationDevice>{
 	public HashMap<IDevice, ArrayList<ActuationDevice>> toActuationSetsByDevice(){
 		HashMap<IDevice, ArrayList<ActuationDevice>> result = new HashMap<IDevice, ArrayList<ActuationDevice>>(); 
 		for(ActuationDevice a:this) {
-			if(result.get(a.getDevice())==null) result.put(a.getDevice(), new ArrayList<ActuationDevice>());
+			if(result.get(a.getDevice())==null) { 
+				result.put(a.getDevice(), new ArrayList<ActuationDevice>());				
+			}
 			result.get(a.getDevice()).add(a);						
 		}		
 		return result;

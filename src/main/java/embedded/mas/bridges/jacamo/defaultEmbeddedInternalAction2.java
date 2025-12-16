@@ -76,7 +76,6 @@ public class defaultEmbeddedInternalAction2 extends EmbeddedInternalAction {
 					
 					
 					for(Map.Entry<IDevice, ArrayList<ActuationDevice>> map : subsets.entrySet()) { //for each device
-						//System.out.println("... " + map.getKey()+"/" + map.getValue());						
 						map.getKey().execActuationSet(map.getValue(),  un);
 					}
 						

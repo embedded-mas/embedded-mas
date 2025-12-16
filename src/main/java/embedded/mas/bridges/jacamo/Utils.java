@@ -1,14 +1,27 @@
 package embedded.mas.bridges.jacamo;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
+
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.JsonValue;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import jason.asSyntax.ListTermImpl;
+import jason.asSyntax.Literal;
+import jason.asSyntax.parser.ParseException;
+import jason.asSyntax.parser.TokenMgrError;
+
+import static jason.asSyntax.ASSyntax.parseLiteral;
+
 public class Utils {
 
 	public static  String jsonToPredArguments(JsonNode node) {
@@ -63,5 +76,62 @@ public class Utils {
 				paramsToIgnore.add(key);
 		}
 		return jsonToPredArguments(node, paramsToIgnore);
+	}
+	
+	
+	/**
+	 * Convert a json {key:value} to a literal key(value).
+	 * Examples
+	 * 	-  {"value":1} -> value(1)
+	 *  -  {"values":[1,2,3]} -> values(1,2,3)
+	 * 
+	 * @param key: The json key
+	 * @param value: The json value
+	 * @return A literal corresponding to the JSON 
+	 */
+	public static Literal Json2Literal(String key, JsonValue value) throws ParseException, TokenMgrError {
+		String belief = null;
+
+		belief = key +"(";
+		if(!(value instanceof JsonArray)) //se o valor não for um vetor (ou seja, se for uma belief com apenas um valor)
+			belief = belief + value;
+		else { //se for um vetor [v1,v2,...,vn], monta uma belief key(v1,v2,...,vn)    			
+			belief = belief + value.toString().replace("[","").replace("]", "");	 	
+		}
+		belief = belief + ")";
+
+		return parseLiteral(belief);
+
+	}
+
+	/**
+	 * Convert a JsonObject, which may include several Json elements, to a list o literals.
+	 * 
+	 * Example: {"name":"Alice","values":[1,2,3]} -> [name("Alice"),values(1,2,3)]
+	 * 
+	 * @param value: the JsonObject
+	 * @return a list of literal
+	 */
+	public static ListTermImpl JsonObject2ListTermImpl (JsonObject value) throws ParseException, TokenMgrError {
+		ListTermImpl result = new ListTermImpl();
+		for(String key: value.keySet()) { //iterar sobre todos os elementos do JsonObject - a variável "key" armazena cada chave do objeto json    		
+			Object jsonValue = value.get(key); //obtém o valor associado à chave "key"
+			result.add(Json2Literal(key, value.get(key)));
+		}
+		return result;
+		
+	}
+	
+	
+	public static Collection<Literal> JsonObject2ListTermImpl (Collection<Map.Entry<String, JsonValue>> value) throws ParseException, TokenMgrError {
+		ArrayList<Literal> result = new ArrayList<Literal>();
+		Iterator<Entry<String, JsonValue>> it =  value.iterator();
+		if(it==null) return null;
+		while(it.hasNext()){
+			Entry<String, JsonValue> current = it.next();
+			result.add(Json2Literal(current.getKey(), current.getValue()));
+		}
+		return result;
+		
 	}
 }

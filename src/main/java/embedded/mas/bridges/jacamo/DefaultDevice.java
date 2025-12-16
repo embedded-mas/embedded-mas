@@ -164,7 +164,18 @@ public abstract class DefaultDevice implements IDevice {
 	}
 
 
-	private boolean doWait(long millis) {
+	public boolean execActuationSet(ArrayList<ActuationDevice> actuations, Unifier un) {
+		boolean result = true;
+		Iterator<ActuationDevice> it = actuations.iterator();
+		while(it.hasNext()&&result==true) {
+			ActuationDevice act = it.next();
+ 			this.doExecActuation(act, un);
+		}
+		return result;
+	}
+
+	
+	protected boolean doWait(long millis) {
 		try {
 			Thread.sleep(millis);
 			System.out.println("[DefaultDevice] executed wait... " + millis);
