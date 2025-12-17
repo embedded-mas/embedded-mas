@@ -14,7 +14,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 
-import embedded.mas.bridges.jacamo.action.Action;
 import embedded.mas.bridges.jacamo.actuation.ActuationDevice;
 import embedded.mas.bridges.jacamo.actuation.ActuationSequence;
 import embedded.mas.bridges.jacamo.actuation.ActuationSet;
@@ -41,56 +40,49 @@ public class defaultEmbeddedInternalAction2 extends EmbeddedInternalAction {
 		return arguments;
 	}
 
-
-
+	
+	
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {  
 		if(ts.getAg() instanceof EmbeddedAgent) {
 			EmbeddedAgent agent = (EmbeddedAgent) ts.getAg();
 			DefaultDevice device = null;
 			//Case 1: check whether the action is in the agent's repertory (newest approach)
-
-
-			Action action = agent.getActionMap().get(createAtom(args[0].toString())); 
-
-			if(action!=null) { //if there is some configured action
-
-
-				//get the actuation sequence that realize the action of the parameter args[0]
-				ActuationSequence actuationSequence = action.getSequence(); 
-
-				if(actuationSequence!=null) { //if the action has an associated actuation sequence
-
-
-
-					Object[] arguments = ((ListTermImpl)args[1]).toArray();
-					Term[] termArguments = new Term[arguments.length];
-					for(int i=0;i<termArguments.length;i++)
-						termArguments[i] = (Term) arguments[i];
-
-
-					actuationSequence.setParameters(termArguments);
-
-					/**
-					 * TODO: Make the execution of sets actually parallel.
-					 * 
-					 * While the execution of all the sets is conceptually parallel, this impementation is based on an iteraction over the sets.
-					 */
-					for(ActuationSet actuationSet:actuationSequence.getActuations()) { //for each set of actuations of the sequence
-
-						//split the set into subsets grouped by device
-						HashMap<IDevice, ArrayList<ActuationDevice>> subsets = actuationSet.toActuationSetsByDevice(); 
-
-
-
-						for(Map.Entry<IDevice, ArrayList<ActuationDevice>> map : subsets.entrySet()) { //for each device
-							//System.out.println("... " + map.getKey()+"/" + map.getValue());						
-							map.getKey().execActuationSet(map.getValue(),  un);
-						}
-
-
+			
+			//get the actuation sequence that realize the action of the parameter args[0]
+			ActuationSequence actuationSequence = agent.getActionMap().get(createAtom(args[0].toString())); 
+				
+			if(actuationSequence!=null) { //if the repertory contains the action
+				
+				
+				
+				Object[] arguments = ((ListTermImpl)args[1]).toArray();
+				Term[] termArguments = new Term[arguments.length];
+				for(int i=0;i<termArguments.length;i++)
+					termArguments[i] = (Term) arguments[i];
+				
+				
+				actuationSequence.setParameters(termArguments);
+				
+				/**
+				 * TODO: Make the execution of sets actually parallel.
+				 * 
+				 * While the execution of all the sets is conceptually parallel, this impementation is based on an iteraction over the sets.
+				 */
+				for(ActuationSet actuationSet:actuationSequence.getActuations()) { //for each set of actuations of the sequence
+					
+					//split the set into subsets grouped by device
+					HashMap<IDevice, ArrayList<ActuationDevice>> subsets = actuationSet.toActuationSetsByDevice(); 
+					
+					
+					
+					for(Map.Entry<IDevice, ArrayList<ActuationDevice>> map : subsets.entrySet()) { //for each device
+						map.getKey().execActuationSet(map.getValue(),  un);
 					}
-					return true; //returns true if all the actuations have been done
+						
+					
+					
 				}
+				return true; //returns true if all the actuations have been done
 			}
 
 
