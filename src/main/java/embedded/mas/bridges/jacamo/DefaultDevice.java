@@ -187,9 +187,10 @@ public abstract class DefaultDevice implements IDevice {
 
 	private Actuation addWaitActuation() {
 		Actuation actuation = new Actuation(createAtom("wait"));
-		ArrayList<Atom> parameters = new ArrayList<>();
-		parameters.add(createAtom("millis"));
-		actuation.setParameters(parameters);
+//		ArrayList<Atom> parameters = new ArrayList<>();
+//		parameters.add(createAtom("millis"));
+//		actuation.setParameters(parameters);
+		actuation.getParameters().put(createAtom("millis"), null);
 		return actuation;
 	}
 
