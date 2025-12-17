@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import embedded.mas.bridges.jacamo.action.Action;
 import embedded.mas.bridges.jacamo.actuation.ActuationSequence;
 import jason.architecture.AgArch;
 import jason.asSemantics.Agent;
@@ -19,7 +20,7 @@ public abstract class EmbeddedAgent extends Agent {
 
 	private final List<DefaultDevice> devices = new ArrayList<DefaultDevice>();
 	private DefaultEmbeddedAgArch arch = null;
-	protected HashMap<Atom, ActuationSequence> actionMap = new HashMap<Atom, ActuationSequence>();
+	protected HashMap<Atom, Action> actionMap = new HashMap<Atom, Action>();
 
 
 	@Override
@@ -57,7 +58,7 @@ public abstract class EmbeddedAgent extends Agent {
 	}
 	
 	
-	public HashMap<Atom, ActuationSequence> getActionMap(){
+	public HashMap<Atom, Action> getActionMap(){
 		return this.actionMap;
 	}
 	
