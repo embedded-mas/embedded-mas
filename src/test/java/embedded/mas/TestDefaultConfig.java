@@ -125,7 +125,20 @@ public class TestDefaultConfig {
 							"        - my_device1.act1.print\n" +
 							"      - [my_device1.act1.print]\n" +
 							"  - a4:\n" +
-							"    - [my_device1.act1.print, my_device1.act2.double]\n";
+							"    - [my_device1.act1.print, my_device1.act2.double]\n" +
+//							"  - a5:\n" +
+//							"    parameters: [p1, p2, p3]\n" +
+//							"    sequence: \n"+
+//							"      - \n" +
+//							"        - actuation: my_device1.act1.double \n" +
+//							"          param_mapping: \n" +
+//							"            value: p1\n" +
+//							"        - my_device1.act1.print\n" +
+//							"          param_mapping:\n" +
+//							"            text: p2\n" +
+//							"      - [my_device1.act1.print]\n" +
+							""
+							;
 
 
 

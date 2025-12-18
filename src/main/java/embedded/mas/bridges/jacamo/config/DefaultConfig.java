@@ -199,8 +199,7 @@ public class DefaultConfig {
 									
 									
 									
-//									ArrayList actuationSequence = (ArrayList) actionItem.get(actionName); //save the actuation sequence, which is a sequence of actuation sets
-									ArrayList actuationSequence = (ArrayList)actionItem.get("sequence");
+									ArrayList actuationSequence = (ArrayList)actionItem.get("sequence"); //save the actuation sequence, which is a sequence of actuation sets
 									ActuationSequence currentActuationSequence = new ActuationSequence(); //start a new actuation sequence
 									String regex = "([^.]+)\\.([^.]+)\\.([^.]+)";
 									Pattern pattern;
@@ -337,7 +336,7 @@ public class DefaultConfig {
 					if(currentActuation.get("parameters")!=null) {
 						ArrayList parametersList = (ArrayList)currentActuation.get("parameters");
 						for(int k=0;k<parametersList.size();k++)
-							actuation.getParameters().add(createAtom(parametersList.get(k).toString()));
+							actuation.getParameters().put(createAtom(parametersList.get(k).toString()),null);
 					}
 					actuator.addActuation(actuation);					   
 				}

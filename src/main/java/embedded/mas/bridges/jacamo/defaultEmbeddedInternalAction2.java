@@ -67,7 +67,7 @@ public class defaultEmbeddedInternalAction2 extends EmbeddedInternalAction {
 						termArguments[i] = (Term) arguments[i];
 
 
-					actuationSequence.setParameters(termArguments);
+					actuationSequence.setParameters(termArguments);// aqui - ajustar os parâmetros da ação - talvez transformar em um método de action
 
 					/**
 					 * TODO: Make the execution of sets actually parallel.
