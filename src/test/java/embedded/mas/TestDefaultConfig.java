@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -60,50 +61,51 @@ public class TestDefaultConfig {
 			// Create directories if they don't exist
 			file.getParentFile().mkdirs();
 
-			String fileContent = 
-					"- device_id: my_device1\n" +
-							"  className: embedded.mas.bridges.jacamo.DemoDevice\n" +
-							"  microcontroller:\n" +
-							"      id: arduino1\n" +
-							"      className: DemoDevice\n" +
-							"  actuators:\n" +
-							"    - actuator_id: act1\n" +
-							"      actuations:\n" +
-							"        - actuation_id: print\n" +
-							"          parameters:\n" +
-							"            - text\n" +
-							"        - actuation_id: double\n" +
-							"          parameters:\n" +
-							"            - value\n" +
-							"            - result\n" +
-							"    - actuator_id: act2\n" +
-							"      actuations:\n" +
-							"        - actuation_id: print\n" +
-							"          parameters:\n" +
-							"            - text\n" +
-							"        - actuation_id: double\n" +
-							"          parameters:\n" +
-							"            - value\n" +
-							"            - result\n" +
+			String fileContent =
+					        "devices: \n"+
+					        "  - device_id: my_device1\n" +
+							"    className: embedded.mas.bridges.jacamo.DemoDevice\n" +
+							"    microcontroller:\n" +
+							"        id: arduino1\n" +
+							"        className: DemoDevice\n" +
+							"    actuators:\n" +
+							"      - actuator_id: act1\n" +
+							"        actuations:\n" +
+							"          - actuation_id: print\n" +
+							"            parameters:\n" +
+							"              - text\n" +
+							"          - actuation_id: double\n" +
+							"            parameters:\n" +
+							"              - value\n" +
+							"              - result\n" +
+							"      - actuator_id: act2\n" +
+							"        actuations:\n" +
+							"          - actuation_id: print\n" +
+							"            parameters:\n" +
+							"              - text\n" +
+							"          - actuation_id: double\n" +
+							"            parameters:\n" +
+							"              - value\n" +
+							"              - result\n" +
 							"\n" +
-							"- device_id: my_device2\n" +
-							"  className: embedded.mas.bridges.jacamo.DemoDevice\n" +
-							"  microcontroller:\n" +
-							"      id: arduino1\n" +
-							"      className: DemoDevice\n" +
-							"  actuators:\n" +
-							"    - actuator_id: act21\n" +
-							"      actuations:\n" +
-							"        - actuation_id: printx\n" +
-							"          parameters:\n" +
-							"            - textz\n" +
-							"            - blaz\n" +
-							"        - actuation_id: double\n" +
-							"          parameters:\n" +
-							"            - value\n" +
-							"            - result\n" +
+							"  - device_id: my_device2\n" +
+							"    className: embedded.mas.bridges.jacamo.DemoDevice\n" +
+							"    microcontroller:\n" +
+							"        id: arduino1\n" +
+							"        className: DemoDevice\n" +
+							"    actuators:\n" +
+							"      - actuator_id: act21\n" +
+							"        actuations:\n" +
+							"          - actuation_id: printx\n" +
+							"            parameters:\n" +
+							"              - textz\n" +
+							"              - blaz\n" +
+							"          - actuation_id: double\n" +
+							"            parameters:\n" +
+							"              - value\n" +
+							"              - result\n" +
 							"\n" +
-							"- actions:\n" +
+							"actions:\n" +
 							"  - a0:\n" +
 							"    parameters: [p1, p2, p3]\n" +
 							"    sequence:\n" +
@@ -177,58 +179,59 @@ public class TestDefaultConfig {
 			// Create directories if they don't exist
 			file.getParentFile().mkdirs();
 
-			String fileContent = 
-					"- device_id: my_device1\n" +
-							"  className: embedded.mas.bridges.ros.RosHost\n" +
-							"  microcontroller:\n" +
-							"      id: arduino1\n" +
-							"      className: DefaultRos4Bdi\n" +
-							"      connectionString: ws://localhost:9090\n" +
-							"  actuators:\n" +
-							"    - actuator_id: actuator11\n" +
-							"      topicWritingActuations:\n" +
-							"        - actuation_id: act111\n" +
-							"          topicName: /value1\n" +
-							"          topicType: std_msgs/Int32\n" +
-							"    - actuator_id: actuator12\n" +
-							"      topicWritingActuations:\n" +
-							"        - actuation_id: act121\n" +
-							"          topicName: /value2\n" +
-							"          topicType: std_msgs/Int32\n" +
-							"      serviceRequestActuations:\n" +
-							"        - actuation_id: act122\n" +
-							"          serviceName: /turtle1/teleport_relative\n" +
-							"          parameters:\n" +
-							"             - linear\n" +
-							"             - angular\n" +
-							"- device_id: my_device2\n" +
-							"  className: embedded.mas.bridges.ros.RosHost\n" +
-							"  microcontroller:\n" +
-							"      id: arduino1\n" +
-							"      className: DefaultRos4Bdi\n" +
-							"      connectionString: ws://localhost:9090\n" +
-							"  actuators:\n" +
-							"    - actuator_id: actuator21\n" +
-							"      topicWritingActuations:\n" +
-							"        - actuation_id: act211\n" +
-							"          topicName: /value1\n" +
-							"          topicType: std_msgs/Int32\n" +
-							"        - actuation_id: act212\n" +
-							"          topicName: /current_time\n" +
-							"          topicType: std_msgs/String\n" +
-							"        - actuation_id: move_robot\n" +
-							"          topicName: /cmd_vel\n" +
-							"          topicType: geometry_msgs/Twist\n" +
-							"          parameters:\n" +
-							"            - linear:\n" +
+			String fileContent =
+					        "devices: \n" +
+					        "  - device_id: my_device1\n" +
+							"    className: embedded.mas.bridges.ros.RosHost\n" +
+							"    microcontroller:\n" +
+							"        id: arduino1\n" +
+							"        className: DefaultRos4Bdi\n" +
+							"        connectionString: ws://localhost:9090\n" +
+							"    actuators:\n" +
+							"      - actuator_id: actuator11\n" +
+							"        topicWritingActuations:\n" +
+							"          - actuation_id: act111\n" +
+							"            topicName: /value1\n" +
+							"            topicType: std_msgs/Int32\n" +
+							"      - actuator_id: actuator12\n" +
+							"        topicWritingActuations:\n" +
+							"          - actuation_id: act121\n" +
+							"            topicName: /value2\n" +
+							"            topicType: std_msgs/Int32\n" +
+							"        serviceRequestActuations:\n" +
+							"          - actuation_id: act122\n" +
+							"            serviceName: /turtle1/teleport_relative\n" +
+							"            parameters:\n" +
+							"              - linear\n" +
+							"              - angular\n" +
+							"  - device_id: my_device2\n" +
+							"    className: embedded.mas.bridges.ros.RosHost\n" +
+							"    microcontroller:\n" +
+							"        id: arduino1\n" +
+							"        className: DefaultRos4Bdi\n" +
+							"        connectionString: ws://localhost:9090\n" +
+							"    actuators:\n" +
+							"      - actuator_id: actuator21\n" +
+							"        topicWritingActuations:\n" +
+							"          - actuation_id: act211\n" +
+							"            topicName: /value1\n" +
+							"            topicType: std_msgs/Int32\n" +
+							"          - actuation_id: act212\n" +
+							"            topicName: /current_time\n" +
+							"            topicType: std_msgs/String\n" +
+							"          - actuation_id: move_robot\n" +
+							"            topicName: /cmd_vel\n" +
+							"            topicType: geometry_msgs/Twist\n" +
+							"            parameters:\n" +
+							"              - linear:\n" +
 							"                - x\n" +
 							"                - y\n" +
 							"                - z\n" +
-							"            - angular:\n" +
+							"              - angular:\n" +
 							"                - x\n" +
 							"                - y\n" +
 							"                - z\n" +
-							"- actions:\n" +
+							"actions:\n" +
 							"  - front:\n" +
 							"    -\n" +
 							"      - actuation: ros_device_1.actuator1.move_robot\n"+
@@ -338,9 +341,13 @@ public class TestDefaultConfig {
 		DefaultConfig config = new DefaultConfig();
 		try {
 			Yaml yaml = new Yaml();
+			
+			Map<String, Object>  root = yaml.load(new FileInputStream(new File(".").getCanonicalPath() + "/testeRos.yaml"));
+			ArrayList devices = (ArrayList) root.get("devices"); //"l" is a list of JSON where each element is a single device configuration
+
+
+			
 			Iterable<Object> itr = yaml.loadAll(new FileInputStream(new File(".").getCanonicalPath() + "/testeRos.yaml"));
-			for (Object o : itr) { 
-				ArrayList devices = (ArrayList) o;
 				ArrayList actuators = null;
 				List<Actuator> act = null;
 				
@@ -399,7 +406,6 @@ public class TestDefaultConfig {
 
 
 
-			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

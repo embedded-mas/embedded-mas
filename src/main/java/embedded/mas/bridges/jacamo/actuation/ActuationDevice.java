@@ -46,7 +46,12 @@ public class ActuationDevice {
 
 	@Override
 	public String toString() {
-		return "(" + device.getId() + "." + actuator.getId() + "." + actuation.toString() + ")";
+		String sactuator;
+		if(actuator==null)
+			sactuator = "null";
+		else 
+			sactuator = actuator.getId().toString();
+		return "(" + device.getId() + "." + sactuator + "." + actuation.toString() + ")";
 	}
 	
 	

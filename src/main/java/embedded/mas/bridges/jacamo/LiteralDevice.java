@@ -38,16 +38,6 @@ public abstract class LiteralDevice extends DefaultDevice implements IDevice {
 		return (ILiteralListInterface) this.microcontroller;
 	}
 
-	@Override
-	public boolean execActuationSet(ArrayList<ActuationDevice> actuations, Unifier un) {
-		boolean result = true;
-		Iterator<ActuationDevice> it = actuations.iterator();
-		while(it.hasNext()&&result==true) {
-			ActuationDevice act = it.next();
- 			this.doExecActuation(act, un);
-		}
-		return result;
-	}
 
 
 
