@@ -28,7 +28,7 @@ The connection between agent's actions and perceptions is configured in a [yaml 
 
 
 # 3. Requirements
-- Java JRE >= 17
+- Java JRE >= 21
 
 Additional requirements depend on the method chosen set the simulation up (cf. sections 4.1.1 and 4.1.2 below).
 
@@ -80,7 +80,7 @@ Use the following commands to launch the nodes either in ROS 1 or in ROS 2:
 - ROS 1: ```./launch_ros1.sh``` (preceed with ```sudo``` if needed)
 - ROS 2: ```./launch_ros2.sh``` (preceed with ```sudo``` if needed)
 
-#### 1.2 Local setup: 
+#### 4.1.2 Local setup: 
 Requirements
 1. ROS 1 (recommended [ROS Noetic](http://wiki.ros.org/noetic)) or ROS 2 (recommended [ROS Humble](http://wiki.ros.org/humble))
 2. [Rosbridge](http://wiki.ros.org/rosbridge_suite/Tutorials/RunningRosbridge)
