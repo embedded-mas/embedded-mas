@@ -24,7 +24,7 @@ The connection between agent's actions and perceptions is configured in a [yaml 
 2. [Rosbridge](http://wiki.ros.org/rosbridge_suite/Tutorials/RunningRosbridge)
 3. [Turtlesim](http://wiki.ros.org/turtlesim)
 -->
-- Java JRE >= 17
+- Java JRE >= 21
 
 Additional requirements depend on the method chosen set the simulation up (cf. sections 4.1.1 and 4.1.2 below).
 
