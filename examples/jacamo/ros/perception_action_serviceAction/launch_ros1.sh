@@ -13,8 +13,10 @@ set -e
 
  docker run --rm -d --net=ros     --env="DISPLAY=novnc:0.0"     --env="ROS_MASTER_URI=http://embedded-mas-example:11311"     --name embedded-mas-example     -p 9090:9090     maiquelb/embedded-mas-ros:latest 
 
-sleep 2
+echo -e "\e[1;33m**** Launching ROS container. Wait 5 seconds ****\e[0m"	
 
- docker exec -d embedded-mas-example /bin/bash -c "source /opt/ros/noetic/setup.bash && rosrun turtlesim turtlesim_node "
+sleep 5
 
-echo -e "\e[1;33m**** Docker container is ready. Abra http://localhost:8080/vnc.html ****\e[0m"	
+docker exec -d embedded-mas-example /bin/bash -c "source /opt/ros/noetic/setup.bash && rosrun turtlesim turtlesim_node "
+
+echo -e "\e[1;33m**** Docker container is ready. Open http://localhost:8080/vnc.html ****\e[0m"	
