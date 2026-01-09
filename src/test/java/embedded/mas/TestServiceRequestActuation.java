@@ -9,6 +9,7 @@ import org.junit.Test;
 import embedded.mas.bridges.jacamo.actuation.ros.ServiceRequestActuation;
 import embedded.mas.bridges.ros.ServiceParam;
 import embedded.mas.bridges.ros.ServiceParameters;
+import jason.asSyntax.Atom;
 import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Term;
 
@@ -115,6 +116,41 @@ public class TestServiceRequestActuation {
 		assertEquals(p[1].toString(), "99");
 		assertEquals(p[2].toString(), "6");
 		assertEquals(p[3].toString(), "7");
+	}
+	
+	/**
+	 *       array of parameters: [1,2,3,4,5,6,7,8,9]
+	 *       initial position: 4
+	 *       expected result: 6 (i.e., the considered portion of the vector is in positions [3..6])
+	 *       expected parameter values:
+	 *         p1: 5, p2: 99, p3: 6, p4: 7         
+	 */
+	@Test
+	public void test_setParamMapping() {
+
+		ServiceParameters parameters = new ServiceParameters();
+		ServiceParam p1 = new ServiceParam("p1", null); parameters.add(p1);
+		ServiceParam p2 = new ServiceParam("p2", null); parameters.add(p2);
+		ServiceParam p3 = new ServiceParam("p3", null); parameters.add(p3);
+		ServiceParam p4 = new ServiceParam("p4", null); parameters.add(p4);
+
+		ServiceRequestActuation actuation = new ServiceRequestActuation(createAtom("act"), "serviceName", parameters);
+		
+		actuation.setParamActionMapping(p1.getParamName(), createAtom("action_param1"));
+		actuation.setParamActionMapping(p3, createAtom("action_param3"));
+		
+		HashMap<Atom, Object> params = new HashMap<>();
+		params.put(createAtom("action_param1"), 111);
+		params.put(createAtom("action_param2"), 222);
+		params.put(createAtom("action_param3"), 333);
+		
+		actuation.setParamValuesFromMapping(params);
+
+		assertEquals(actuation.getParameters().getServiceParamByName("p1").getParamValue(), 111);
+		assertNull(actuation.getParameters().getServiceParamByName("p2").getParamValue());
+		assertEquals(actuation.getParameters().getServiceParamByName("p3").getParamValue(), 333);
+		assertNull(actuation.getParameters().getServiceParamByName("p4").getParamValue());
+		
 	}
 
 }

@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import jason.asSyntax.Atom;
 import jason.asSyntax.NumberTermImpl;
@@ -19,10 +20,10 @@ public class TestActuation {
 
 	@Test
 	public void testGetParametersAsArray() {
-		ArrayList<Atom> params = new ArrayList<Atom>();
-		params.add(createAtom("p1"));
-		params.add(createAtom("p2"));
-		params.add(createAtom("p3"));
+		LinkedHashMap<Atom, Object> params = new LinkedHashMap<>();
+		params.put(createAtom("p1"),null);
+		params.put(createAtom("p2"),null);
+		params.put(createAtom("p3"),null);
 		Actuation actuation = new Actuation(createAtom("act"), params); 
 		
 		HashMap<String, Object> defaultParams = new HashMap<>();
@@ -39,11 +40,11 @@ public class TestActuation {
 	
 	@Test
 	public void testSetParametersToDefaultState() {
-		ArrayList<Atom> params = new ArrayList<Atom>();
-		params.add(createAtom("p1"));
-		params.add(createAtom("p2"));
-		params.add(createAtom("p3"));
-		params.add(createAtom("p4"));
+		LinkedHashMap<Atom, Object> params = new LinkedHashMap<>();
+		params.put(createAtom("p1"),null);
+		params.put(createAtom("p2"),null);
+		params.put(createAtom("p3"),null);
+		params.put(createAtom("p4"),null);
 		Actuation actuation = new Actuation(createAtom("act"), params); 
 		
 		HashMap<String, Object> defaultParams = new HashMap<>();
@@ -93,10 +94,10 @@ public class TestActuation {
 		 *Expected return: 3 
 		 */
 		
-		ArrayList<Atom> params = new ArrayList<Atom>();
-		params.add(createAtom("p1"));
-		params.add(createAtom("p2"));
-		params.add(createAtom("p3"));
+		LinkedHashMap<Atom, Object> params = new LinkedHashMap<>();
+		params.put(createAtom("p1"),null);
+		params.put(createAtom("p2"),null);
+		params.put(createAtom("p3"),null);
 		Actuation actuation = new Actuation(createAtom("act"), params); 
 		
 		HashMap<String, Object> defaultParams = new HashMap<>();
@@ -118,6 +119,35 @@ public class TestActuation {
 		assertEquals(actuation.getParameterValue(createAtom("p1")).toString(), "33");
 		assertEquals(actuation.getParameterValue(createAtom("p2")), 5);
 		assertEquals(actuation.getParameterValue(createAtom("p3")).toString(), "44");
+		
+	}
+	
+	@Test
+	public void test_setParamMapping() {
+		LinkedHashMap<Atom, Object> params = new LinkedHashMap<>();
+		params.put(createAtom("p1"),null);
+		params.put(createAtom("p2"),null);
+		params.put(createAtom("p3"),null);
+		Actuation actuation = new Actuation(createAtom("act"), params);
+
+		actuation.setParamActionMapping(createAtom("p1"), createAtom("action_param1"));
+		actuation.setParamActionMapping(createAtom("p3"), createAtom("action_param3"));
+				
+		assertEquals(actuation.getParamMapping().get(createAtom("p1")).toString(), "action_param1"); 
+		assertNull(actuation.getParamMapping().get(createAtom("p2")));
+		assertEquals(actuation.getParamMapping().get(createAtom("p3")).toString(), "action_param3");
+		
+		//test the assignment of values from action parameters
+		HashMap<Atom, Object> parameters = new HashMap<>();
+		parameters.put(createAtom("action_param1"), 111);
+		parameters.put(createAtom("action_param2"), 222);
+		parameters.put(createAtom("action_param3"), 333);
+		
+		actuation.setParamValuesFromMapping(parameters);
+		
+		assertEquals(actuation.getParameters().get(createAtom("p1")), 111);
+		assertNull(actuation.getParameters().get(createAtom("p2")));
+		assertEquals(actuation.getParameters().get(createAtom("p3")), 333);
 		
 	}
 

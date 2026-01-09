@@ -25,8 +25,6 @@ import jason.asSyntax.Atom;
 public class ActuationSet extends ArrayList<ActuationDevice>{
 
 
-//	private Map<Integer, Atom> parameterMapping = new HashMap<>(); //for a pair (k,v), maps the k-th actuation to an action parameter identified by "v"
-
 	@Override
 	public boolean add(ActuationDevice e) {
 		if(this.hasActuation(e)!=-1) return false;
@@ -46,7 +44,6 @@ public class ActuationSet extends ArrayList<ActuationDevice>{
 	}
 
 	private int hasActuation(DefaultDevice device, Actuator actuator, DefaultActuation actuation) {
-		//for(ActuationDevice a : this)
 		for(int i=0;i<this.size();i++)
 			if(this.get(i).getDevice().getId().toString().equals(device.getId().toString()) &&
 					this.get(i).getActuator().getId().toString().equals(actuator.getId().toString()) &&
@@ -88,23 +85,5 @@ public class ActuationSet extends ArrayList<ActuationDevice>{
 	}
 
 	
-	/**
-	 * Map the *actuationParameter* (which the is a parameter of the *actuation* of the *actuator* available in a *device*) 
-	 * to the *actionParameter*, which is the identifier of an action parameter (from the agent's repertory 
-	 * 
-	 * @param actionParameter
-	 * @param device
-	 * @param actuator
-	 * @param actuation
-	 * @param actuationParameter
-	 * @return
-	 */
-	public int setParameterMapping(DefaultDevice device, Actuator actuator, DefaultActuation actuation, Atom actuationParameter,Atom actionParameter){
-		int actIndex =  hasActuation(device, actuator, actuation);
-		if(actIndex!=-1)
-			this.get(actIndex).getActuation().setParamActionMapping(actuationParameter, actionParameter);
-		return actIndex;
-					
-	}
 
 }

@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import static jason.asSyntax.ASSyntax.createAtom;
 
@@ -12,6 +13,7 @@ import org.junit.Test;
 import embedded.mas.bridges.jacamo.actuation.ros.TopicWritingActuation;
 import embedded.mas.bridges.ros.ServiceParam;
 import embedded.mas.bridges.ros.ServiceParameters;
+import jason.asSyntax.Atom;
 import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Term;
 
@@ -523,6 +525,223 @@ public class TestTopicWritingActuation {
 		assertEquals(p[7].toString(), "7");
 		assertEquals(p[8].toString(), "0.6");
 		assertEquals(p[9].toString(), "8");
+
+	}
+	
+//	AQUI: TESTAR PARAM MAPPING
+	
+	@Test
+	public void test_SetParamMapping() {
+		
+		/**
+		 * Simulated params: 
+		 * default_param_values: 
+             linear:
+               x: 
+               y: 
+               z: 0.4 -> default
+               w: ---
+                 w1: 
+                 w2: 22 -> default
+                 w3: ---
+                   a1: 111 -> default
+                   a2: 222 -> default
+             angular:
+               x: 0.5
+               y: 0.6 -> default ->default
+               z: 0.7
+               
+               
+                
+            array of parameters: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+            initial position: 3
+            expected result: 7 (i.e., the considered portion of the vector is in positions [3..7])
+            expected parameter state:            
+             linear:
+                x: 4
+                y: 5
+                z: 0.4 -> default
+                w: ---
+                  w1: 6
+                  w2: 22 -> default
+                  w3: ---
+                    a1: 111 -> default
+                    a2: 222 -> default
+              angular:
+                x: 0.5 7
+                y: 0.6 -> default ->default
+                z: 0.7 8
+		 */
+
+
+		//build the hashmap which represents the default parameters
+		HashMap<String, Object> a = new HashMap<>();
+		a.put("a1", 111);
+		a.put("a2", 222);
+
+		HashMap<String, Object> w = new HashMap<>();
+		w.put("w2", 22);
+		w.put("w3", a);
+		
+
+		HashMap<String, Object> linear = new HashMap<>();
+		linear.put("z", 0.4);
+		linear.put("w", w);
+
+		HashMap<String, Object> angular = new HashMap<>();
+	    angular.put("y", 0.6);
+
+		HashMap<String, Object> params = new HashMap<>();
+		params.put("linear", linear);
+		params.put("angular", angular);
+
+
+		//build the parameters of the topic actuation
+		ServiceParameters spa = new ServiceParameters();
+		ServiceParam spa1 = new ServiceParam("a1", null); spa.add(spa1);
+		ServiceParam spa2 = new ServiceParam("a2", null); spa.add(spa2);
+
+		ServiceParameters spw = new ServiceParameters();
+		ServiceParam spw1 = new ServiceParam("w1", null); spw.add(spw1);
+		ServiceParam spw2 = new ServiceParam("w2", null); spw.add(spw2);
+		ServiceParam spw3 = new ServiceParam("w3", spa); spw.add(spw3);
+
+		ServiceParameters splinear = new ServiceParameters();
+		ServiceParam splinear1 = new ServiceParam("x", null); splinear.add(splinear1); 
+		ServiceParam splinear2 = new ServiceParam("y", null); splinear.add(splinear2); 
+		ServiceParam splinear3 = new ServiceParam("z", null); splinear.add(splinear3);
+		ServiceParam splinear4 = new ServiceParam("w", spw); splinear.add(splinear4);
+
+		ServiceParameters spangular = new ServiceParameters();
+		ServiceParam spangular1 = new ServiceParam("x", null); spangular.add(spangular1); 
+		ServiceParam spangular2 = new ServiceParam("y", null); spangular.add(spangular2); 
+		ServiceParam spangular3 = new ServiceParam("z", null); spangular.add(spangular3);
+
+		ServiceParameters serviceParameters = new ServiceParameters();
+		serviceParameters.add(new ServiceParam("test", null));
+		ServiceParam ssplinear = new ServiceParam("linear", splinear); serviceParameters.add(ssplinear);
+		ServiceParam sspangular = new ServiceParam("angular", spangular); serviceParameters.add(sspangular);
+
+		TopicWritingActuation actuation = new TopicWritingActuation(createAtom("act"), "topicName", "topicType", serviceParameters);
+		actuation.setParamActionMapping("linear.w.w3.a1", createAtom("action_param1"));
+		actuation.setParamActionMapping("test", createAtom("action_param_test"));
+		
+		System.out.println(actuation.toString());
+
+		
+	}
+	
+	@Test
+	public void test_setParamFromMapping() {
+		/**
+		 * Simulated params: 
+		 * default_param_values: 
+             linear:
+               x: 
+               y: 
+               z: 0.4 -> default
+               w: ---
+                 w1: 
+                 w2: 22 -> default
+                 w3: ---
+                   a1: 111 -> default
+                   a2: 222 -> default
+             angular:
+               x: 0.5
+               y: 0.6 -> default ->default
+               z: 0.7
+               
+               
+                
+            array of parameters: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+            initial position: 3
+            expected result: 7 (i.e., the considered portion of the vector is in positions [3..7])
+            expected parameter state:            
+             linear:
+                x: 4
+                y: 5
+                z: 0.4 -> default
+                w: ---
+                  w1: 6
+                  w2: 22 -> default
+                  w3: ---
+                    a1: 111 -> default
+                    a2: 222 -> default
+              angular:
+                x: 0.5 7
+                y: 0.6 -> default ->default
+                z: 0.7 8
+		 */
+
+
+		//build the hashmap which represents the default parameters
+		HashMap<String, Object> a = new HashMap<>();
+		a.put("a1", 111);
+		a.put("a2", 222);
+
+		HashMap<String, Object> w = new HashMap<>();
+		w.put("w2", 22);
+		w.put("w3", a);
+		
+
+		HashMap<String, Object> linear = new HashMap<>();
+		linear.put("z", 0.4);
+		linear.put("w", w);
+
+		HashMap<String, Object> angular = new HashMap<>();
+	    angular.put("y", 0.6);
+
+		HashMap<String, Object> params = new HashMap<>();
+		params.put("linear", linear);
+		params.put("angular", angular);
+
+
+		//build the parameters of the topic actuation
+		ServiceParameters spa = new ServiceParameters();
+		ServiceParam spa1 = new ServiceParam("a1", null); spa.add(spa1);
+		ServiceParam spa2 = new ServiceParam("a2", null); spa.add(spa2);
+
+		ServiceParameters spw = new ServiceParameters();
+		ServiceParam spw1 = new ServiceParam("w1", null); spw.add(spw1);
+		ServiceParam spw2 = new ServiceParam("w2", null); spw.add(spw2);
+		ServiceParam spw3 = new ServiceParam("w3", spa); spw.add(spw3);
+
+		ServiceParameters splinear = new ServiceParameters();
+		ServiceParam splinear1 = new ServiceParam("x", null); splinear.add(splinear1); 
+		ServiceParam splinear2 = new ServiceParam("y", null); splinear.add(splinear2); 
+		ServiceParam splinear3 = new ServiceParam("z", null); splinear.add(splinear3);
+		ServiceParam splinear4 = new ServiceParam("w", spw); splinear.add(splinear4);
+
+		ServiceParameters spangular = new ServiceParameters();
+		ServiceParam spangular1 = new ServiceParam("x", null); spangular.add(spangular1); 
+		ServiceParam spangular2 = new ServiceParam("y", null); spangular.add(spangular2); 
+		ServiceParam spangular3 = new ServiceParam("z", null); spangular.add(spangular3);
+
+		ServiceParameters serviceParameters = new ServiceParameters();
+		serviceParameters.add(new ServiceParam("test", null));
+		ServiceParam ssplinear = new ServiceParam("linear", splinear); serviceParameters.add(ssplinear);
+		ServiceParam sspangular = new ServiceParam("angular", spangular); serviceParameters.add(sspangular);
+
+		TopicWritingActuation actuation = new TopicWritingActuation(createAtom("act"), "topicName", "topicType", serviceParameters);
+		actuation.setParamActionMapping("linear.w.w3.a1", createAtom("action_param1"));
+		actuation.setParamActionMapping("test", createAtom("action_param_test"));
+		
+		Map<Atom, Object> actionParams = new HashMap<Atom, Object>();
+		actionParams.put(createAtom("action_param1"), 2222);
+		actionParams.put(createAtom("action_param2"), "blabla");
+		actionParams.put(createAtom("action_param_test"), 999);
+		
+		actuation.setParamActionMapping("linear.w.w3.a1", createAtom("action_param1"));
+		actuation.setParamActionMapping("angular.x", createAtom("action_param2"));
+		actuation.setParamActionMapping("test", createAtom("action_param_test"));
+		
+		actuation.setParamValuesFromMapping(actionParams);
+		
+		
+		assertEquals(((ServiceParameters)((ServiceParameters)((ServiceParameters)actuation.getParameters().getServiceParamByName("linear").getParamValue()).getServiceParamByName("w").getParamValue()).getServiceParamByName("w3").getParamValue()).getServiceParamByName("a1").getParamValue(),2222);
+		assertEquals(((ServiceParameters)actuation.getParameters().getServiceParamByName("angular").getParamValue()).getServiceParamByName("x").getParamValue(),"blabla");
+		assertEquals(actuation.getParameters().getServiceParamByName("test").getParamValue(),999);
+		
 
 	}
 }

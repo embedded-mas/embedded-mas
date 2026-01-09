@@ -96,6 +96,45 @@ public abstract class ROSActuation extends DefaultActuation<ServiceParameters> {
 		this.getParameters().setToDefaultState();
 
 	}
+	
+	/**
+	 *  Map the parameter *actuationParameter* to the *actionParam*, which is the identifier of an action parameter *
+	 *  
+	 *  The parameter *actuationParameter may be 
+	 *     - A string with the parameter name. Nested parameters must be separated by "." (e.g. "angular.x")
+	 *     - A ServiceParam object.
+	 *  
+	 */
+	@Override
+	public boolean setParamActionMapping(Object actuationParam, Atom actionParam) {
+		if(actuationParam instanceof ServiceParam) actuationParam = ((ServiceParam)actuationParam).getParamName();
+		String[] p = actuationParam.toString().split("\\.");
+		int i = 0;
+		ServiceParam param = this.getParameters().getServiceParamByName(p[i++]);		
+		while(i<p.length && param!=null && param.getParamValue()!=null && param.getParamValue() instanceof ServiceParameters) {
+			param = ((ServiceParameters)param.getParamValue()).getServiceParamByName(p[i++]);				
+		}
+		if(param==null) return false;
+		this.getParamMapping().put(param, actionParam); 
+		return true;
+	}
+
+	/**
+	 * Set the params of the actuation based on action parameters.
+	 * The action parameters are a map (x,y) where 
+	 *    (i) x is the action parameter identifier
+	 *    (ii) y is the parameter value
+	 * 
+	 * @param actionParams
+	 * @return
+	 */
+	@Override
+	public boolean setParamValuesFromMapping(Map<Atom, Object> actionParams) {		
+		for(Map.Entry<Object, Atom> mapping : this.getParamMapping().entrySet())   //for each mapping
+			if(actionParams.get(mapping.getValue())!=null) 
+				((ServiceParam)mapping.getKey()).setParamValue(actionParams.get(mapping.getValue()));
+		return true;
+	}
 
 
 

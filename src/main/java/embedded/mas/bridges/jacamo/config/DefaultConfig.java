@@ -171,119 +171,165 @@ public class DefaultConfig {
 		Yaml yaml = new Yaml();
 		Iterable<Object> itr;
 		try {
-			itr = yaml.loadAll(new FileInputStream(filename));
-			for (Object o : itr) { 
-				ArrayList l = (ArrayList) o; //"l" is a list of JSON where each element is a single device configuration
-				for(int i=0;i<l.size();i++) 
-					if(((LinkedHashMap) l.get(i)).containsKey("actions")) {
-						LinkedHashMap actions = (LinkedHashMap) l.get(i);
-						if((actions.get("actions") instanceof ArrayList)) { //if there are some actions 
-							ArrayList actionList = (ArrayList) actions.get("actions"); 
-							for(int i1=0;i1<actionList.size();i1++) { //for each action...							
-								LinkedHashMap actionItem = (LinkedHashMap) actionList.get(i1);
-								
-								//handle action parameters - start
-								Map<Atom, Object> actionParameters = new HashMap<>();
-								if(actionItem.get("parameters")!=null) {
-									for(Object parameter :(ArrayList)actionItem.get("parameters"))
-										actionParameters.put(createAtom(parameter.toString()), null);
-								}
-								//handle action parameters - end
-								
-								
-								
-								
-								Iterator it = actionItem.keySet().iterator();
-								if(it.hasNext()) {
-									String actionName = it.next().toString(); //save the current action name
-									
-									
-									
-									ArrayList actuationSequence = (ArrayList)actionItem.get("sequence"); //save the actuation sequence, which is a sequence of actuation sets
-									ActuationSequence currentActuationSequence = new ActuationSequence(); //start a new actuation sequence
-									String regex = "([^.]+)\\.([^.]+)\\.([^.]+)";
-									Pattern pattern;
-									Matcher matcher = null;
-									if(actuationSequence!=null)
-									for(int k=0;k<actuationSequence.size();k++) { //for each actuation set
-										ArrayList actuationSet = (ArrayList) actuationSequence.get(k);
-										ActuationSet currentActuationSet = new ActuationSet(); //start a new actuation set
-										for(int n=0;n<actuationSet.size();n++){// for each element in the actuation set
-											if(actuationSet.get(n) instanceof LinkedHashMap && ((LinkedHashMap)actuationSet.get(n)).get("actuation").toString().equals("wait")) {
-												if(((LinkedHashMap)actuationSet.get(n)).get("default_param_values")!=null)
-													throw new EmbeddedActionException("The wait actuation does not allow default parameters");
-											}												
-											else
-												//if the current action is the standard action "wait" without default parameters...
-												if(actuationSet.get(n).toString().equals("wait")) 
-													currentActuationSet.add(new ActuationDevice(devices.get(0), null, devices.get(0).getWaitActuation()));
-											//if the current action is a device-actuator-specific one (default case)
-												else {
-													pattern = Pattern.compile(regex);
-													HashMap<String, Object> def_params = null;
-													if(actuationSet.get(n) instanceof LinkedHashMap) { 
-
-														matcher = pattern.matcher(((LinkedHashMap)actuationSet.get(n)).get("actuation").toString());
-														if(((LinkedHashMap)actuationSet.get(n)).get("default_param_values")!=null)		
-															def_params = (HashMap<String, Object>) ((LinkedHashMap)actuationSet.get(n)).get("default_param_values");	
-													}
-													else
-														matcher = pattern.matcher(actuationSet.get(n).toString());
-
-													//System.out.println("[DefaultConfig] matcher 3: " + matcher.group(3));
-
-													while (matcher.find()) {
-														//find the device
-														DefaultDevice currentDevice = null;
-														for(DefaultDevice d:devices)
-															if(d.getId().toString().equals(matcher.group(1)))
-																currentDevice = d;			
-														if(currentDevice==null) throw new InvalidDeviceException("Device " + matcher.group(1) + " not found.");
-
-														if(currentDevice!=null) {
-															boolean actuatorFound = false;
-															Iterator<Actuator> actuatorIt = currentDevice.getActuators().iterator();
-															while(actuatorIt.hasNext()) {
-																Actuator currentActuator = actuatorIt.next();														
-																if(currentActuator.getId().toString().equals(matcher.group(2))) { //check whether the device has an actuator that matches with the specified in the action
-																	actuatorFound = true;
-																	//check whether the actuator includes the actuation specified
-																	Iterator<DefaultActuation> actuationIt = currentActuator.getActuations().iterator();
-																	boolean actuationFound = false;
-																	while(actuationIt.hasNext()) {
-																		DefaultActuation currentActuation = actuationIt.next().clone();
-																		if(currentActuation.getId().toString().equals(matcher.group(3))){
-																			actuationFound = true;
-																			ActuationDevice act = new ActuationDevice(currentDevice, currentActuator,currentActuation);
-																			act.getActuation().setDefaultParameterValues(def_params);
-																			currentActuationSet.add(act);
-																		}
-																	}
-																	if(!actuationFound) throw new InvalidActuationException("Actuation " + matcher.group(1)+"."+matcher.group(2)+"."+ matcher.group(3) + " not found.");
+			Map<String, Object> root = yaml.load(new FileInputStream(filename));
+			List<Map<String, Object>> actionList = (List<Map<String, Object>>) root.get("actions");
+			for(int i1=0;i1<actionList.size();i1++) { //for each action...								
+				LinkedHashMap actionItem = (LinkedHashMap) actionList.get(i1);
+				System.out.println("[DefaultConfig] processing action " + actionItem);
+				
 
 
 
-																}
-															}
-															if(!actuatorFound) throw new InvalidActuatorException("Actuator " + matcher.group(1)+"."+matcher.group(2) + " not found.");
-														}
+				Iterator it = actionItem.keySet().iterator();
+				if(it.hasNext()) {
+					String actionName = it.next().toString(); //save the current action name
 
-													}												
+					
+					//handle action parameters - start
+					Map<Atom, Object> actionParameters = new LinkedHashMap<>();
+					if(actionItem.get("parameters")!=null) {
+						
+						for(Object parameter :(ArrayList)actionItem.get("parameters"))
+							actionParameters.put(createAtom(parameter.toString()), null);
+					}	
+					//handle action parameters - end
 
-												}
+
+					ArrayList actuationSequence = (ArrayList)actionItem.get("sequence"); //save the actuation sequence, which is a sequence of actuation sets
+					System.out.println("[DefaultConfig] processing sequence " + actuationSequence.size() + " - " + actuationSequence);
+					ActuationSequence currentActuationSequence = new ActuationSequence(); //start a new actuation sequence
+					String regex = "([^.]+)\\.([^.]+)\\.([^.]+)";
+					Pattern pattern;
+					Matcher matcher = null;
+					if(actuationSequence!=null)
+						for(int k=0;k<actuationSequence.size();k++) { //for each actuation set
+							ArrayList actuationSet = (ArrayList) actuationSequence.get(k);
+							System.out.println("[DefaultConfig] processing sequence item " + actuationSet);
+							ActuationSet currentActuationSet = new ActuationSet(); //start a new actuation set
+							for(int n=0;n<actuationSet.size();n++){// for each element in the actuation set
+								HashMap<String, String> param_mapping = null;
+								System.out.println(">>>>> ACTUATION SET " + actuationSet.get(n) + " - " + actuationSet.get(n).getClass().getName());
+								if(actuationSet.get(n) instanceof LinkedHashMap && (HashMap<String, String>) ((LinkedHashMap)actuationSet.get(n)).get("param_mapping")!=null)
+									param_mapping =  (HashMap<String, String>) ((LinkedHashMap)actuationSet.get(n)).get("param_mapping"); 
+																								
+//								System.out.println("[DefaultConfig] processing set item " + actuationSet.get(n) + " --- " + ((LinkedHashMap) actuationSet.get(n)).get("actuation") + " --- " + ((LinkedHashMap) actuationSet.get(n)).get("actuation").toString().equals("wait"));
+								if(actuationSet.get(n) instanceof LinkedHashMap && ((LinkedHashMap)actuationSet.get(n)).get("actuation").toString().equals("wait") && ((LinkedHashMap)actuationSet.get(n)).get("default_param_values")!=null) {
+//									if(((LinkedHashMap)actuationSet.get(n)).get("default_param_values")!=null)
+										throw new EmbeddedActionException("The wait actuation does not allow default parameters");
+								}												
+								else
+									//if the current action is the standard action "wait" without default parameters...
+									if( ( actuationSet.get(n) instanceof LinkedHashMap && ((LinkedHashMap) actuationSet.get(n)).get("actuation").toString().equals("wait") ) || //if wait has parameters, it is a LinkedHashMap
+										(actuationSet.get(n) instanceof String && ((String)actuationSet.get(n)).equals("wait")) 	
+									  ) {
+										System.out.println("[DefaultConfig] adding wait");
+										
+										if(param_mapping!=null) 
+											if(param_mapping.size()>1||!param_mapping.containsKey("millis"))
+											   throw new EmbeddedActionException("The wait actuation admits only the parameter millis.");
+											else {
+												ActuationDevice waitActuation = new ActuationDevice(devices.get(0), null, devices.get(0).getWaitActuation());
+												waitActuation.getActuation().setParamActionMapping("millis", createAtom(param_mapping.get("millis")));
+												currentActuationSet.add(waitActuation);
+											}
+																																
+										//currentActuationSet.add(new ActuationDevice(devices.get(0), null, devices.get(0).getWaitActuation()));
+										System.out.println("[DefaultConfig] added wait");
+										//AQUI TRATAR O PARAM MAPPING DO WAIT
+										
+									}
+								//if the current action is a device-actuator-specific one (default case)
+									else {
+										pattern = Pattern.compile(regex);
+										HashMap<String, Object> def_params = null;
+										
+										if(actuationSet.get(n) instanceof LinkedHashMap) { 
+
+
+
+											matcher = pattern.matcher(((LinkedHashMap)actuationSet.get(n)).get("actuation").toString());
+											if(((LinkedHashMap)actuationSet.get(n)).get("default_param_values")!=null) {
+												def_params = (HashMap<String, Object>) ((LinkedHashMap)actuationSet.get(n)).get("default_param_values");
+											}
+
+
+											
 										}
-										currentActuationSequence.addLast(currentActuationSet);										
-									}									
-									Action currentAction = new Action(createAtom(actionName));
-									currentAction.setSequence(currentActuationSequence);
-									currentAction.setParams(actionParameters);
-									actionsMap.put(currentAction.getActionName(), currentAction);
-								}
-							}
-						}
-					}
+										else
+											matcher = pattern.matcher(actuationSet.get(n).toString());
 
+										//System.out.println("[DefaultConfig] matcher 3: " + matcher.group(3));
+
+										while (matcher.find()) {
+											//find the device
+											DefaultDevice currentDevice = null;
+
+
+
+											for(DefaultDevice d:devices) 
+												if(d.getId().toString().equals(matcher.group(1)))
+													currentDevice = d;
+
+
+
+
+											if(currentDevice==null) throw new InvalidDeviceException("Device " + matcher.group(1) + " not found.");
+
+											if(currentDevice!=null) {
+												boolean actuatorFound = false;
+												Iterator<Actuator> actuatorIt = currentDevice.getActuators().iterator();
+												while(actuatorIt.hasNext()) {
+													Actuator currentActuator = actuatorIt.next();														
+													if(currentActuator.getId().toString().equals(matcher.group(2))) { //check whether the device has an actuator that matches with the specified in the action
+														actuatorFound = true;
+														//check whether the actuator includes the actuation specified
+														Iterator<DefaultActuation> actuationIt = currentActuator.getActuations().iterator();
+														boolean actuationFound = false;
+														while(actuationIt.hasNext()) {
+															DefaultActuation currentActuation = actuationIt.next().clone();
+															if(currentActuation.getId().toString().equals(matcher.group(3))){
+
+																//																if(param_mapping!=null)
+																//																	System.out.println("PARAM MAPPING " + currentActuation.toString() + " = " + param_mapping);
+
+																if(param_mapping!=null) {
+																	Iterator<Map.Entry<String, String>> param_mapping_iterator = param_mapping.entrySet().iterator();																	
+																	while (param_mapping_iterator.hasNext()) {
+																		Map.Entry<String, String> entry = param_mapping_iterator.next();
+																		currentActuation.setParamActionMapping(entry.getKey(), createAtom(entry.getValue()));
+																	}
+																}
+
+																actuationFound = true;
+																ActuationDevice act = new ActuationDevice(currentDevice, currentActuator,currentActuation);
+																act.getActuation().setDefaultParameterValues(def_params);
+																currentActuationSet.add(act);
+															}
+														}
+														if(!actuationFound) throw new InvalidActuationException("Actuation " + matcher.group(1)+"."+matcher.group(2)+"."+ matcher.group(3) + " not found.");
+
+
+
+													}
+												}
+												if(!actuatorFound) throw new InvalidActuatorException("Actuator " + matcher.group(1)+"."+matcher.group(2) + " not found.");
+											}
+
+										}												
+
+									}
+								
+							}
+							currentActuationSequence.addLast(currentActuationSet);										
+						}									
+					Action currentAction = new Action(createAtom(actionName));
+					currentAction.setSequence(currentActuationSequence);
+					currentAction.setParams(actionParameters);
+					actionsMap.put(currentAction.getActionName(), currentAction);
+					System.out.println("[DefaultConfig] actions " + actionsMap);
+				}
 			}
+
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -293,28 +339,25 @@ public class DefaultConfig {
 		return actionsMap;
 	}
 
+	
+	
 
 	public List<Literal> getPerceptionRules(String fileName) {
 		Yaml yaml = new Yaml();
 		ArrayList<Literal> rules = new ArrayList<>();
 		try {
-			Iterable<Object> itr = yaml.loadAll(new FileInputStream(fileName));
-			for (Object o : itr) { 
-				ArrayList l = (ArrayList) o; //"l" is a list of JSON where each element is a single device configuration
-				for(int i=0;i<l.size();i++) 
-					if(((LinkedHashMap) l.get(i)).containsKey("perception_rules")) {
-						ArrayList<String> sRules = (ArrayList) ((LinkedHashMap) l.get(i)).get("perception_rules");
-						for(String s:sRules)
-							rules.add(parseRule(s));							
-					}
-			}
+			Map<String, Object> root = yaml.load(new FileInputStream(fileName));
+			ArrayList<String> sRules = (ArrayList<String>) root.get("perception_rules");
+			if(sRules!=null)
+				for(String s:sRules)
+					rules.add(parseRule(s));							
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (ParseException e) {
+		} catch (TokenMgrError e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (TokenMgrError e) {
+		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -438,148 +481,150 @@ public class DefaultConfig {
 		Yaml yaml = new Yaml();
 
 		try {
-			Iterable<Object> itr = yaml.loadAll(new FileInputStream(filename));	
-			for (Object o : itr) { 
-				ArrayList l = (ArrayList) o; //"l" is a list of JSON where each element is a single device configuration
+			Map<String, Object>  root = yaml.load(new FileInputStream(filename));
+			ArrayList l = (ArrayList) root.get("devices"); //"l" is a list of JSON where each element is a single device configuration
 
 
 
-				for(int i=0;i<l.size();i++) {
-					if(((LinkedHashMap) l.get(i)).get("device_id")!=null) {
-						LinkedHashMap item = (LinkedHashMap) l.get(i);
-						if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("Arduino4EmbeddedMas")|
-								((LinkedHashMap)item.get("microcontroller")).get("className").equals("SerialReader")) {
-							microcontroller= createArduino4EmbeddedMas(((LinkedHashMap)item.get("microcontroller")).get("serial").toString(),
-									Integer.parseInt(((LinkedHashMap)item.get("microcontroller")).get("baudRate").toString()));
-						}		
-						else if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("NRJ4EmbeddedMas")) {
-							microcontroller= createNRJ4EmbeddedMas(((LinkedHashMap)item.get("microcontroller")).get("serial").toString(),
-									Integer.parseInt(((LinkedHashMap)item.get("microcontroller")).get("baudRate").toString()));
-							ArrayList actionsArray = (ArrayList) item.get("serialActions");
-							for(int j=0;j<actionsArray.size();j++) {
-								SerialEmbeddedAction action  = new SerialEmbeddedAction(createAtom(((LinkedHashMap)actionsArray.get(j)).get("actionName").toString() ), 
-										createAtom(((LinkedHashMap)actionsArray.get(j)).get("actuationName").toString()));
-								embeddedActionList.add(action);
 
 
-							}
-						}
 
-						else if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4EmbeddedMas")|
-								((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4Bdi")) { //DefaultRos4Bdi is just an alias class for the names to make more sense in Jason-ROS applications
-							ArrayList perceptionTopics = (ArrayList) item.get("perceptionTopics");
-							ArrayList<String> topics = new ArrayList<String>();
-							ArrayList<String> types = new ArrayList<String>();
-							ArrayList<String> beliefNames = new ArrayList<String>();
-							HashMap<String, ArrayList<String>> ignoreParams = new HashMap<>();
-							if(perceptionTopics!=null)
-								for(int j=0;j<perceptionTopics.size();j++) {
-									topics.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicName").toString());
-									types.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicType").toString());
-									if(((LinkedHashMap)perceptionTopics.get(j)).get("beliefName")==null)
-										beliefNames.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicName").toString());
-									else
-										beliefNames.add(((LinkedHashMap)perceptionTopics.get(j)).get("beliefName").toString());	
-									ArrayList tempParams =  (ArrayList) ((LinkedHashMap)perceptionTopics.get(j)).get("ignoreValues");
-									ignoreParams.put(((LinkedHashMap)perceptionTopics.get(j)).get("topicName").toString(), tempParams);
-								}
-
-							if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4EmbeddedMas"))
-								microcontroller= createRos4EmbeddedMas(((LinkedHashMap)item.get("microcontroller")).get("connectionString").toString(),topics,types,beliefNames, ignoreParams);
-							else
-								if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4Bdi"))
-									microcontroller = createRos4Bdi(((LinkedHashMap)item.get("microcontroller")).get("connectionString").toString(),topics,types,beliefNames, ignoreParams);
+			for(int i=0;i<l.size();i++) {
+				if(((LinkedHashMap) l.get(i)).get("device_id")!=null) {
+					LinkedHashMap item = (LinkedHashMap) l.get(i);
+					if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("Arduino4EmbeddedMas")|
+							((LinkedHashMap)item.get("microcontroller")).get("className").equals("SerialReader")) {
+						microcontroller= createArduino4EmbeddedMas(((LinkedHashMap)item.get("microcontroller")).get("serial").toString(),
+								Integer.parseInt(((LinkedHashMap)item.get("microcontroller")).get("baudRate").toString()));
+					}		
+					else if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("NRJ4EmbeddedMas")) {
+						microcontroller= createNRJ4EmbeddedMas(((LinkedHashMap)item.get("microcontroller")).get("serial").toString(),
+								Integer.parseInt(((LinkedHashMap)item.get("microcontroller")).get("baudRate").toString()));
+						ArrayList actionsArray = (ArrayList) item.get("serialActions");
+						for(int j=0;j<actionsArray.size();j++) {
+							SerialEmbeddedAction action  = new SerialEmbeddedAction(createAtom(((LinkedHashMap)actionsArray.get(j)).get("actionName").toString() ), 
+									createAtom(((LinkedHashMap)actionsArray.get(j)).get("actuationName").toString()));
+							embeddedActionList.add(action);
 
 
-							//handle topic writing actions
-							if(item.get("actions")!=null) {
-								if(((LinkedHashMap)item.get("actions")).get("topicWritingActions")!=null) {
-									ArrayList topicWritingActions = (ArrayList) ((LinkedHashMap)item.get("actions")).get("topicWritingActions");
-									for(int j=0;j<topicWritingActions.size();j++) {
-										ServiceParameters params = new ServiceParameters();
-										if(((LinkedHashMap)topicWritingActions.get(j)).get("params")!=null)
-											params = buildServiceParameters( (ArrayList<Object>) ((LinkedHashMap) topicWritingActions.get(j)).get("params"));
-
-										embeddedActionList.add(new TopicWritingAction(createAtom(((LinkedHashMap) topicWritingActions.get(j)).get("actionName").toString()),
-												((LinkedHashMap) topicWritingActions.get(j)).get("topicName").toString(),
-												((LinkedHashMap) topicWritingActions.get(j)).get("topicType").toString(),null,params));
-									}
-								}
-
-								//handle service request actions
-								//if(((LinkedHashMap)((LinkedHashMap)item.get("microcontroller")).get("actions")).get("serviceRequestActions")!=null) {
-								if(((LinkedHashMap)item.get("actions")).get("serviceRequestActions")!=null) {
-									ArrayList serviceRequestActions = (ArrayList) ((LinkedHashMap)item.get("actions")).get("serviceRequestActions");
-									for(int j=0;j<serviceRequestActions.size();j++) {
-										ServiceParameters params = new ServiceParameters();
-										if(((LinkedHashMap)serviceRequestActions.get(j)).get("params")!=null)
-											params = buildServiceParameters( (ArrayList<Object>) ((LinkedHashMap) serviceRequestActions.get(j)).get("params"));
-										ServiceRequestAction serviceAction = null; 
-										serviceAction = new ServiceRequestAction(createAtom(((LinkedHashMap)serviceRequestActions.get(j)).get("actionName").toString()), 
-												((LinkedHashMap)serviceRequestActions.get(j)).get("serviceName").toString(), params);
-										embeddedActionList.add(serviceAction);
-
-									}
-								}	
-
-							}
-						}
-						else if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DemoDevice")) {
-							//do nothing (so far)
-						}		
-
-
-						DefaultDevice device = null;
-						try {
-							Class c = Class.forName((String) item.get("className"));
-							Object obj = null;
-							if(item.get("className").equals("embedded.mas.bridges.jacamo.DemoDevice")) {
-								obj = new DemoDevice(createAtom(item.get("device_id").toString()));
-							}
-							else {
-								Constructor constructor = c.getConstructor(jason.asSyntax.Atom.class,getIExternalDevice(microcontroller.getClass()));
-								obj = constructor.newInstance(createAtom(item.get("device_id").toString()),microcontroller);
-							}
-							for(EmbeddedAction a : embeddedActionList)
-								((DefaultDevice) obj).addEmbeddedAction(a);
-
-
-							List<Actuator> actuators;
-							if(item.get("className").equals("embedded.mas.bridges.ros.RosHost")|
-									item.get("className").equals("embedded.mas.bridges.ros.RosMaster"))
-								actuators = processRosActuators((ArrayList) item.get("actuators"));
-							else
-								actuators = processActuators((ArrayList) item.get("actuators")); 
-							for(Actuator a : actuators) {								
-								((DefaultDevice) obj).addActuator(a);
-							}
-
-
-							devices.add((DefaultDevice) obj);
-						} catch (ClassNotFoundException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (SecurityException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (NoSuchMethodException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (InstantiationException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (IllegalAccessException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (IllegalArgumentException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (InvocationTargetException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
 						}
 					}
-					/*else
+
+					else if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4EmbeddedMas")|
+							((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4Bdi")) { //DefaultRos4Bdi is just an alias class for the names to make more sense in Jason-ROS applications
+						ArrayList perceptionTopics = (ArrayList) item.get("perceptionTopics");
+						ArrayList<String> topics = new ArrayList<String>();
+						ArrayList<String> types = new ArrayList<String>();
+						ArrayList<String> beliefNames = new ArrayList<String>();
+						HashMap<String, ArrayList<String>> ignoreParams = new HashMap<>();
+						if(perceptionTopics!=null)
+							for(int j=0;j<perceptionTopics.size();j++) {
+								topics.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicName").toString());
+								types.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicType").toString());
+								if(((LinkedHashMap)perceptionTopics.get(j)).get("beliefName")==null)
+									beliefNames.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicName").toString());
+								else
+									beliefNames.add(((LinkedHashMap)perceptionTopics.get(j)).get("beliefName").toString());	
+								ArrayList tempParams =  (ArrayList) ((LinkedHashMap)perceptionTopics.get(j)).get("ignoreValues");
+								ignoreParams.put(((LinkedHashMap)perceptionTopics.get(j)).get("topicName").toString(), tempParams);
+							}
+
+						if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4EmbeddedMas"))
+							microcontroller= createRos4EmbeddedMas(((LinkedHashMap)item.get("microcontroller")).get("connectionString").toString(),topics,types,beliefNames, ignoreParams);
+						else
+							if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4Bdi"))
+								microcontroller = createRos4Bdi(((LinkedHashMap)item.get("microcontroller")).get("connectionString").toString(),topics,types,beliefNames, ignoreParams);
+
+
+						//handle topic writing actions
+						if(item.get("actions")!=null) {
+							if(((LinkedHashMap)item.get("actions")).get("topicWritingActions")!=null) {
+								ArrayList topicWritingActions = (ArrayList) ((LinkedHashMap)item.get("actions")).get("topicWritingActions");
+								for(int j=0;j<topicWritingActions.size();j++) {
+									ServiceParameters params = new ServiceParameters();
+									if(((LinkedHashMap)topicWritingActions.get(j)).get("params")!=null)
+										params = buildServiceParameters( (ArrayList<Object>) ((LinkedHashMap) topicWritingActions.get(j)).get("params"));
+
+									embeddedActionList.add(new TopicWritingAction(createAtom(((LinkedHashMap) topicWritingActions.get(j)).get("actionName").toString()),
+											((LinkedHashMap) topicWritingActions.get(j)).get("topicName").toString(),
+											((LinkedHashMap) topicWritingActions.get(j)).get("topicType").toString(),null,params));
+								}
+							}
+
+							//handle service request actions
+							//if(((LinkedHashMap)((LinkedHashMap)item.get("microcontroller")).get("actions")).get("serviceRequestActions")!=null) {
+							if(((LinkedHashMap)item.get("actions")).get("serviceRequestActions")!=null) {
+								ArrayList serviceRequestActions = (ArrayList) ((LinkedHashMap)item.get("actions")).get("serviceRequestActions");
+								for(int j=0;j<serviceRequestActions.size();j++) {
+									ServiceParameters params = new ServiceParameters();
+									if(((LinkedHashMap)serviceRequestActions.get(j)).get("params")!=null)
+										params = buildServiceParameters( (ArrayList<Object>) ((LinkedHashMap) serviceRequestActions.get(j)).get("params"));
+									ServiceRequestAction serviceAction = null; 
+									serviceAction = new ServiceRequestAction(createAtom(((LinkedHashMap)serviceRequestActions.get(j)).get("actionName").toString()), 
+											((LinkedHashMap)serviceRequestActions.get(j)).get("serviceName").toString(), params);
+									embeddedActionList.add(serviceAction);
+
+								}
+							}	
+
+						}
+					}
+					else if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DemoDevice")) {
+						//do nothing (so far)
+					}		
+
+
+					DefaultDevice device = null;
+					try {
+						Class c = Class.forName((String) item.get("className"));
+						Object obj = null;
+						if(item.get("className").equals("embedded.mas.bridges.jacamo.DemoDevice")) {
+							obj = new DemoDevice(createAtom(item.get("device_id").toString()));
+						}
+						else {
+							Constructor constructor = c.getConstructor(jason.asSyntax.Atom.class,getIExternalDevice(microcontroller.getClass()));
+							obj = constructor.newInstance(createAtom(item.get("device_id").toString()),microcontroller);
+						}
+						for(EmbeddedAction a : embeddedActionList)
+							((DefaultDevice) obj).addEmbeddedAction(a);
+
+
+						List<Actuator> actuators;
+						if(item.get("className").equals("embedded.mas.bridges.ros.RosHost")|
+								item.get("className").equals("embedded.mas.bridges.ros.RosMaster"))
+							actuators = processRosActuators((ArrayList) item.get("actuators"));
+						else
+							actuators = processActuators((ArrayList) item.get("actuators")); 
+						for(Actuator a : actuators) {								
+							((DefaultDevice) obj).addActuator(a);
+						}
+
+
+						devices.add((DefaultDevice) obj);
+					} catch (ClassNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (SecurityException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (NoSuchMethodException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (InstantiationException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IllegalAccessException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IllegalArgumentException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (InvocationTargetException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				/*else
 						if(((LinkedHashMap) l.get(i)).containsKey("actions")) {
 							LinkedHashMap actions = (LinkedHashMap) l.get(i);
 							if((actions.get("actions") instanceof ArrayList)) { //if there are some actions 
@@ -618,8 +663,8 @@ public class DefaultConfig {
 								}
 							}
 						}*/
-					//System.out.println(l.get(0).getClass().getName());
-				}
+				//System.out.println(l.get(0).getClass().getName());
+
 			}
 			return devices;
 		} catch (FileNotFoundException e) {
@@ -634,7 +679,7 @@ public class DefaultConfig {
 		return devices;
 
 	}
-	
+
 	public ServiceParameters buildServiceArrayParameters(ArrayList<Object> object) {
 		ServiceParameters result = new ServiceParameters();
 		int arrayParamCount = 0;

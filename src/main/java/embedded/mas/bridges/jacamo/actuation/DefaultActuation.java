@@ -1,6 +1,7 @@
 package embedded.mas.bridges.jacamo.actuation;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import jason.asSyntax.Atom;
 import jason.asSyntax.Term;
@@ -10,6 +11,9 @@ public abstract class DefaultActuation<T> {
 	private Atom id;
 	private T parameters;
 	private HashMap<String, Object> defaultValues = new HashMap<String, Object>();
+	
+	//The parameter mapping records pairs (a,b) s.t. a is the name of the actuation parameter and b is the name of the action parameter
+	private Map<Object, Atom> paramMapping = new HashMap<Object,Atom>();
 
 	public DefaultActuation(Atom id) {
 		this(id, null);
@@ -44,6 +48,11 @@ public abstract class DefaultActuation<T> {
 
 	
 	
+	
+	public Map<Object, Atom> getParamMapping() {
+		return this.paramMapping;
+	}
+
 	/**
 	 * Clear values of parameters that do not have a default value.
 	 * Useful when an actuation needs to back to its original state after getting a parameter value.
@@ -55,46 +64,18 @@ public abstract class DefaultActuation<T> {
 	 */
 	public abstract int parameterSize();
 
-	/*public void addParameter(Atom parameter) {
-		if(this.parameters==null)
-			parameters = new ArrayList<Atom>();
-		this.parameters.add(parameter);
-	}*/
-	
-	//public abstract Term[] getParameterValuesAsArrayOfTerms(Term[] parameterValues);
-
-	@Override
-	public String toString() {
-		return "DefaultActuation [id=" + id + ", parameters=" + parameters + ", default parameter values: "+ defaultValues +"]";
-	}
-
 	
 	public abstract DefaultActuation<T> clone();
 	
 	
+	@Override
+	public String toString() {
+		return "DefaultActuation [id=" + id + ", parameters=" + parameters + ", defaultValues=" + defaultValues
+				+ ", paramMapping=" + paramMapping + "]";
+	}
+
 	public abstract Term[] getParametersAsArray();
 	
-//	/**
-//	 * Produce an array of parameters
-//	 * @param params
-//	 * @return
-//	 */
-//	public final Term[] setParamValues(Term[] p) {		
-//		Term[] params = new Term[this.parameterSize()];
-//		Term[] actuation_param_values = this.getParametersAsArray();
-//		int k=0,l=0;											
-//		for(int i=0;i<this.parameterSize();i++)
-//			if(actuation_param_values[k]==null) {
-//				params[i] = p[l++]; 
-//				k++;
-//			}
-//			else
-//				params[i] = actuation_param_values[k++];
-//		return params;
-//		
-//	}
-
-
 	
 	/**
 	 * Set the parameter values from an input array of terms, starting at the initialPosition
@@ -112,5 +93,18 @@ public abstract class DefaultActuation<T> {
 	 */
 	public abstract int setParamValues(Object[] p, int initialPosition);
 
+	
+	public abstract boolean setParamActionMapping(Object actuationParam, Atom actionParam);
+
+	/**
+	 * Set the params of the actuation based on action parameters.
+	 * The action parameters are a map (x,y) where 
+	 *    (i) x is the action parameter identifier
+	 *    (ii) y is the parameter value
+	 * 
+	 * @param actionParams
+	 * @return
+	 */
+	public abstract boolean setParamValuesFromMapping(Map<Atom,Object> actionParams);
 	
 }

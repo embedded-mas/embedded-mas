@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -19,8 +20,12 @@ import org.yaml.snakeyaml.Yaml;
 
 import embedded.mas.bridges.jacamo.DefaultDevice;
 import embedded.mas.bridges.jacamo.action.Action;
+import embedded.mas.bridges.jacamo.actuation.Actuation;
+import embedded.mas.bridges.jacamo.actuation.ActuationDevice;
 import embedded.mas.bridges.jacamo.actuation.ActuationSequence;
+import embedded.mas.bridges.jacamo.actuation.ActuationSet;
 import embedded.mas.bridges.jacamo.actuation.Actuator;
+import embedded.mas.bridges.jacamo.actuation.ros.ROSActuation;
 import embedded.mas.bridges.jacamo.actuation.ros.ServiceRequestActuation;
 import embedded.mas.bridges.jacamo.actuation.ros.TopicWritingActuation;
 import embedded.mas.bridges.jacamo.config.DefaultConfig;
@@ -62,8 +67,8 @@ public class TestDefaultConfig {
 			file.getParentFile().mkdirs();
 
 			String fileContent =
-					        "devices: \n"+
-					        "  - device_id: my_device1\n" +
+					"devices: \n"+
+							"  - device_id: my_device1\n" +
 							"    className: embedded.mas.bridges.jacamo.DemoDevice\n" +
 							"    microcontroller:\n" +
 							"        id: arduino1\n" +
@@ -127,18 +132,19 @@ public class TestDefaultConfig {
 							"        - my_device1.act1.print\n" +
 							"      - [my_device1.act1.print]\n" +
 							"  - a4:\n" +
-							"    - [my_device1.act1.print, my_device1.act2.double]\n" +
-//							"  - a5:\n" +
-//							"    parameters: [p1, p2, p3]\n" +
-//							"    sequence: \n"+
-//							"      - \n" +
-//							"        - actuation: my_device1.act1.double \n" +
-//							"          param_mapping: \n" +
-//							"            value: p1\n" +
-//							"        - my_device1.act1.print\n" +
-//							"          param_mapping:\n" +
-//							"            text: p2\n" +
-//							"      - [my_device1.act1.print]\n" +
+							"    sequence: \n"+							
+							"      - [my_device1.act1.print, my_device1.act2.double]\n" +
+							"  - a5:\n" +
+							"    parameters: [p1, p2, p3]\n" +
+							"    sequence: \n"+
+							"      - \n" +
+							"        - actuation: my_device1.act1.double \n" +
+							"          param_mapping: \n" +
+							"            value: p1\n" +
+							"        - actuation: my_device1.act1.print\n" +
+							"          param_mapping:\n" +
+							"            text: p2\n" +
+							"      - [my_device1.act1.print]\n" +
 							""
 							;
 
@@ -165,7 +171,7 @@ public class TestDefaultConfig {
 		try {
 			// Get the directory where the application was started
 			String appPath = new File(".").getCanonicalPath();
-
+			
 			// Define the complete path of the file
 			String filePath = appPath + "/testeRos.yaml";
 			File file = new File(filePath);
@@ -180,13 +186,13 @@ public class TestDefaultConfig {
 			file.getParentFile().mkdirs();
 
 			String fileContent =
-					        "devices: \n" +
-					        "  - device_id: my_device1\n" +
+					"devices: \n" +
+							"  - device_id: ros_device_1\n" +
 							"    className: embedded.mas.bridges.ros.RosHost\n" +
 							"    microcontroller:\n" +
 							"        id: arduino1\n" +
 							"        className: DefaultRos4Bdi\n" +
-							"        connectionString: ws://localhost:9090\n" +
+							"        connectionString: junit4__test\n" +
 							"    actuators:\n" +
 							"      - actuator_id: actuator11\n" +
 							"        topicWritingActuations:\n" +
@@ -209,7 +215,7 @@ public class TestDefaultConfig {
 							"    microcontroller:\n" +
 							"        id: arduino1\n" +
 							"        className: DefaultRos4Bdi\n" +
-							"        connectionString: ws://localhost:9090\n" +
+							"        connectionString: junit4__test\n" +
 							"    actuators:\n" +
 							"      - actuator_id: actuator21\n" +
 							"        topicWritingActuations:\n" +
@@ -233,20 +239,32 @@ public class TestDefaultConfig {
 							"                - z\n" +
 							"actions:\n" +
 							"  - front:\n" +
-							"    -\n" +
-							"      - actuation: ros_device_1.actuator1.move_robot\n"+
-							"        default_param_values: \n"+
-							"          - linear:\n"+
-							"            x: 0.2\n"+
-							"            y: 0.3\n"+
-							"            z: 0.4\n"+
+							"    sequence:\n" +
+							"      -\n"+
+							"        - actuation: my_device2.actuator21.move_robot\n"+
+							"          default_param_values: \n"+
+							"            linear:\n"+
+							"              x: 0.2\n"+
+							"              y: 0.3\n"+
+							"              z: 0.4\n"+
 
-							"          - angular:\n"+
-							"            x: 0.5\n"+
-							"            y: 0.6\n"+
-							"            z: 0.7"
-
-							;
+							"            angular:\n"+
+							"              x: 0.5\n"+
+							"              y: 0.6\n"+
+							"              z: 0.7\n" +
+							"  - back:\n" +
+							"    parameters: [lx, ly, lz, ax, ay, az]\n" +
+							"    sequence:\n" +
+							"      -\n"+
+							"        - actuation: my_device2.actuator21.move_robot\n"+
+							"          param_mapping:\n" +
+							"            linear.x: lx\n" +
+							"            linear.y: ly\n" +
+							"            linear.z: lz\n" +
+							"            angular.x: ax\n" +
+							"            angular.y: ay\n" +
+							"            angular.z: az\n" 
+						;
 
 
 
@@ -341,66 +359,66 @@ public class TestDefaultConfig {
 		DefaultConfig config = new DefaultConfig();
 		try {
 			Yaml yaml = new Yaml();
-			
+
 			Map<String, Object>  root = yaml.load(new FileInputStream(new File(".").getCanonicalPath() + "/testeRos.yaml"));
 			ArrayList devices = (ArrayList) root.get("devices"); //"l" is a list of JSON where each element is a single device configuration
 
 
-			
+
 			Iterable<Object> itr = yaml.loadAll(new FileInputStream(new File(".").getCanonicalPath() + "/testeRos.yaml"));
-				ArrayList actuators = null;
-				List<Actuator> act = null;
-				
-				//1st device
-				actuators = (ArrayList) ((LinkedHashMap<?, ?>) devices.get(0)).get("actuators");
-				act =  config.processRosActuators(actuators);
-				assertEquals(act.size(), 2);
-				assertEquals(act.get(0).getId().toString(), "actuator11");
-				assertEquals(act.get(0).getActuations().size(), 1);
-							
-				assertEquals(act.get(1).getId().toString(), "actuator12");				
-				assertNotNull(act.get(1).getActuationById(createAtom("act122")));
-				assertEquals(((ServiceRequestActuation)act.get(1).getActuationById(createAtom("act122"))).getServiceName(), "/turtle1/teleport_relative");
-				assertEquals(((ServiceRequestActuation)act.get(1).getActuationById(createAtom("act122"))).getParameters().size(), 2);
-				assertEquals(((ServiceRequestActuation)act.get(1).getActuationById(createAtom("act122"))).parameterSize(), 2);
-				assertEquals(((ServiceRequestActuation)act.get(1).getActuationById(createAtom("act122"))).getParameters().get(0).getParamName(), "linear");
-				assertEquals(((ServiceRequestActuation)act.get(1).getActuationById(createAtom("act122"))).getParameters().get(1).getParamName(), "angular");
+			ArrayList actuators = null;
+			List<Actuator> act = null;
+
+			//1st device
+			actuators = (ArrayList) ((LinkedHashMap<?, ?>) devices.get(0)).get("actuators");
+			act =  config.processRosActuators(actuators);
+			assertEquals(act.size(), 2);
+			assertEquals(act.get(0).getId().toString(), "actuator11");
+			assertEquals(act.get(0).getActuations().size(), 1);
+
+			assertEquals(act.get(1).getId().toString(), "actuator12");				
+			assertNotNull(act.get(1).getActuationById(createAtom("act122")));
+			assertEquals(((ServiceRequestActuation)act.get(1).getActuationById(createAtom("act122"))).getServiceName(), "/turtle1/teleport_relative");
+			assertEquals(((ServiceRequestActuation)act.get(1).getActuationById(createAtom("act122"))).getParameters().size(), 2);
+			assertEquals(((ServiceRequestActuation)act.get(1).getActuationById(createAtom("act122"))).parameterSize(), 2);
+			assertEquals(((ServiceRequestActuation)act.get(1).getActuationById(createAtom("act122"))).getParameters().get(0).getParamName(), "linear");
+			assertEquals(((ServiceRequestActuation)act.get(1).getActuationById(createAtom("act122"))).getParameters().get(1).getParamName(), "angular");
 
 
-				//2nd device
-				actuators = (ArrayList) ((LinkedHashMap<?, ?>) devices.get(1)).get("actuators");
-				act =  config.processRosActuators(actuators);
-				assertEquals(act.size(), 1);
-				assertEquals(act.get(0).getId().toString(), "actuator21");
-				assertEquals(act.get(0).getActuations().size(), 3);
-
-
-
-				assertNotNull(act.get(0).getActuationById(createAtom("act211")));
-				assertEquals(((TopicWritingActuation)act.get(0).getActuationById(createAtom("act211"))).getTopicName(), "/value1");
-				assertEquals(((TopicWritingActuation)act.get(0).getActuationById(createAtom("act211"))).getTopicType(), "std_msgs/Int32");				
-				assertEquals(((TopicWritingActuation)act.get(0).getActuationById(createAtom("act211"))).parameterSize(), 1);
+			//2nd device
+			actuators = (ArrayList) ((LinkedHashMap<?, ?>) devices.get(1)).get("actuators");
+			act =  config.processRosActuators(actuators);
+			assertEquals(act.size(), 1);
+			assertEquals(act.get(0).getId().toString(), "actuator21");
+			assertEquals(act.get(0).getActuations().size(), 3);
 
 
 
-				assertNotNull(act.get(0).getActuationById(createAtom("act212")));
-				assertEquals(((TopicWritingActuation)act.get(0).getActuationById(createAtom("act212"))).getTopicName(), "/current_time");
-				assertEquals(((TopicWritingActuation)act.get(0).getActuationById(createAtom("act212"))).getTopicType(), "std_msgs/String");
+			assertNotNull(act.get(0).getActuationById(createAtom("act211")));
+			assertEquals(((TopicWritingActuation)act.get(0).getActuationById(createAtom("act211"))).getTopicName(), "/value1");
+			assertEquals(((TopicWritingActuation)act.get(0).getActuationById(createAtom("act211"))).getTopicType(), "std_msgs/Int32");				
+			assertEquals(((TopicWritingActuation)act.get(0).getActuationById(createAtom("act211"))).parameterSize(), 1);
 
-				assertNotNull(act.get(0).getActuationById(createAtom("move_robot")));
-				assertEquals(((TopicWritingActuation)act.get(0).getActuationById(createAtom("move_robot"))).getParameters().get(0).getParamName(), "linear");
-				assertTrue(((TopicWritingActuation)act.get(0).getActuationById(createAtom("move_robot"))).getParameters().get(0).getParamValue() instanceof ServiceParameters);
-				assertEquals(((ServiceParameters)((TopicWritingActuation)act.get(0).getActuationById(createAtom("move_robot"))).getParameters().get(0).getParamValue()).size(), 3);
-				assertEquals(((ServiceParameters)((TopicWritingActuation)act.get(0).getActuationById(createAtom("move_robot"))).getParameters().get(0).getParamValue()).get(0).getParamName(), "x");
-				assertEquals(((ServiceParameters)((TopicWritingActuation)act.get(0).getActuationById(createAtom("move_robot"))).getParameters().get(0).getParamValue()).get(1).getParamName(), "y");
-				assertEquals(((ServiceParameters)((TopicWritingActuation)act.get(0).getActuationById(createAtom("move_robot"))).getParameters().get(0).getParamValue()).get(2).getParamName(), "z");
 
-				assertEquals(((TopicWritingActuation)act.get(0).getActuationById(createAtom("move_robot"))).getParameters().get(1).getParamName(), "angular");
-				assertTrue(((TopicWritingActuation)act.get(0).getActuationById(createAtom("move_robot"))).getParameters().get(1).getParamValue() instanceof ServiceParameters);
-				assertEquals(((ServiceParameters)((TopicWritingActuation)act.get(0).getActuationById(createAtom("move_robot"))).getParameters().get(1).getParamValue()).size(), 3);
-				assertEquals(((ServiceParameters)((TopicWritingActuation)act.get(0).getActuationById(createAtom("move_robot"))).getParameters().get(1).getParamValue()).get(0).getParamName(), "x");
-				assertEquals(((ServiceParameters)((TopicWritingActuation)act.get(0).getActuationById(createAtom("move_robot"))).getParameters().get(1).getParamValue()).get(1).getParamName(), "y");
-				assertEquals(((ServiceParameters)((TopicWritingActuation)act.get(0).getActuationById(createAtom("move_robot"))).getParameters().get(1).getParamValue()).get(2).getParamName(), "z");
+
+			assertNotNull(act.get(0).getActuationById(createAtom("act212")));
+			assertEquals(((TopicWritingActuation)act.get(0).getActuationById(createAtom("act212"))).getTopicName(), "/current_time");
+			assertEquals(((TopicWritingActuation)act.get(0).getActuationById(createAtom("act212"))).getTopicType(), "std_msgs/String");
+
+			assertNotNull(act.get(0).getActuationById(createAtom("move_robot")));
+			assertEquals(((TopicWritingActuation)act.get(0).getActuationById(createAtom("move_robot"))).getParameters().get(0).getParamName(), "linear");
+			assertTrue(((TopicWritingActuation)act.get(0).getActuationById(createAtom("move_robot"))).getParameters().get(0).getParamValue() instanceof ServiceParameters);
+			assertEquals(((ServiceParameters)((TopicWritingActuation)act.get(0).getActuationById(createAtom("move_robot"))).getParameters().get(0).getParamValue()).size(), 3);
+			assertEquals(((ServiceParameters)((TopicWritingActuation)act.get(0).getActuationById(createAtom("move_robot"))).getParameters().get(0).getParamValue()).get(0).getParamName(), "x");
+			assertEquals(((ServiceParameters)((TopicWritingActuation)act.get(0).getActuationById(createAtom("move_robot"))).getParameters().get(0).getParamValue()).get(1).getParamName(), "y");
+			assertEquals(((ServiceParameters)((TopicWritingActuation)act.get(0).getActuationById(createAtom("move_robot"))).getParameters().get(0).getParamValue()).get(2).getParamName(), "z");
+
+			assertEquals(((TopicWritingActuation)act.get(0).getActuationById(createAtom("move_robot"))).getParameters().get(1).getParamName(), "angular");
+			assertTrue(((TopicWritingActuation)act.get(0).getActuationById(createAtom("move_robot"))).getParameters().get(1).getParamValue() instanceof ServiceParameters);
+			assertEquals(((ServiceParameters)((TopicWritingActuation)act.get(0).getActuationById(createAtom("move_robot"))).getParameters().get(1).getParamValue()).size(), 3);
+			assertEquals(((ServiceParameters)((TopicWritingActuation)act.get(0).getActuationById(createAtom("move_robot"))).getParameters().get(1).getParamValue()).get(0).getParamName(), "x");
+			assertEquals(((ServiceParameters)((TopicWritingActuation)act.get(0).getActuationById(createAtom("move_robot"))).getParameters().get(1).getParamValue()).get(1).getParamName(), "y");
+			assertEquals(((ServiceParameters)((TopicWritingActuation)act.get(0).getActuationById(createAtom("move_robot"))).getParameters().get(1).getParamValue()).get(2).getParamName(), "z");
 
 
 
@@ -414,7 +432,7 @@ public class TestDefaultConfig {
 		assertTrue(true);
 
 	}
-	
+
 	@Test
 	public void testActionParameters() {
 		DefaultConfig config = new DefaultConfig();
@@ -463,6 +481,9 @@ public class TestDefaultConfig {
 			assertEquals(sequence.get(1).get(0).getActuation().getId().toString(),"print");
 
 			
+			ActuationSequence sequence2 = actionMap.get(createAtom("a5")).getSequence();
+			assertEquals(sequence2.size(), 2);
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -479,6 +500,164 @@ public class TestDefaultConfig {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+
+	/*
+	 * Mappings:
+	 *    my_device1.act1.value -> p1
+	 *    my_device1.act1.print -> p2
+	 */
+	@Test
+	public void testParamMapping() {
+		DefaultConfig config = new DefaultConfig();
+		try {
+			List<DefaultDevice> l = config.loadFromYaml(new File(".").getCanonicalPath() + "/teste.yaml");
+			HashMap<Atom, Action> actionMap = config.getActions(l, new File(".").getCanonicalPath() + "/teste.yaml");
+
+
+	
+			//test the assignment of values from action parameters
+			HashMap<Atom, Object> parameters = new HashMap<>();
+			parameters.put(createAtom("p1"), 111);
+			parameters.put(createAtom("p2"), "teste");
+
+
+			for(ActuationSet set: actionMap.get(createAtom("a5")).getSequence().getActuations())
+				for(ActuationDevice actDevice : set)
+					actDevice.getActuation().setParamValuesFromMapping(parameters);
+
+			assertEquals(((Actuation)actionMap.get(createAtom("a5")).getSequence().get(0).get(0).getActuation()).getParameterValue(createAtom("value")),
+					111);
+
+			assertNull(((Actuation)actionMap.get(createAtom("a5")).getSequence().get(0).get(0).getActuation()).getParameterValue(createAtom("result")));
+
+
+			assertEquals(((Actuation)actionMap.get(createAtom("a5")).getSequence().get(0).get(1).getActuation()).getParameterValue(createAtom("text")),
+					"teste");
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidDeviceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidActuationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidActuatorException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (EmbeddedActionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	@Test
+	public void testParamMappingRos() {
+		DefaultConfig config = new DefaultConfig();
+
+		Yaml yaml = new Yaml();
+
+		Map<String, Object> root;
+		try {
+			root = yaml.load(new FileInputStream(new File(".").getCanonicalPath() + "/testeRos.yaml"));
+			List<DefaultDevice> devices = config.loadFromYaml(new File(".").getCanonicalPath() + "/testeRos.yaml");
+			HashMap<Atom, Action> actionMap = config.getActions(devices, new File(".").getCanonicalPath() + "/testeRos.yaml");
+			
+			HashMap<Atom, Object> parameters = new HashMap<>();
+			parameters.put(createAtom("lx"), 111);
+			parameters.put(createAtom("ly"), 222);
+			parameters.put(createAtom("lz"), 333);
+			parameters.put(createAtom("ax"), 444);
+			parameters.put(createAtom("ay"), 555);
+			parameters.put(createAtom("az"), 666);
+			
+			for(ActuationSet set: actionMap.get(createAtom("back")).getSequence().getActuations())
+				for(ActuationDevice actDevice : set)
+					actDevice.getActuation().setParamValuesFromMapping(parameters);
+			
+			assertEquals(((ServiceParameters)((ROSActuation)actionMap.get(createAtom("back")).getSequence().get(0).get(0).getActuation()).getParameters().getServiceParamByName("linear").getParamValue()).getServiceParamByName("x").getParamValue(),111);
+			assertEquals(((ServiceParameters)((ROSActuation)actionMap.get(createAtom("back")).getSequence().get(0).get(0).getActuation()).getParameters().getServiceParamByName("linear").getParamValue()).getServiceParamByName("y").getParamValue(),222);
+			assertEquals(((ServiceParameters)((ROSActuation)actionMap.get(createAtom("back")).getSequence().get(0).get(0).getActuation()).getParameters().getServiceParamByName("linear").getParamValue()).getServiceParamByName("z").getParamValue(),333);
+			assertEquals(((ServiceParameters)((ROSActuation)actionMap.get(createAtom("back")).getSequence().get(0).get(0).getActuation()).getParameters().getServiceParamByName("angular").getParamValue()).getServiceParamByName("x").getParamValue(),444);
+			assertEquals(((ServiceParameters)((ROSActuation)actionMap.get(createAtom("back")).getSequence().get(0).get(0).getActuation()).getParameters().getServiceParamByName("angular").getParamValue()).getServiceParamByName("y").getParamValue(),555);
+			assertEquals(((ServiceParameters)((ROSActuation)actionMap.get(createAtom("back")).getSequence().get(0).get(0).getActuation()).getParameters().getServiceParamByName("angular").getParamValue()).getServiceParamByName("z").getParamValue(),666);
+
+			
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidDeviceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidActuationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidActuatorException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (EmbeddedActionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+
+		
+
+	}
+	
+	
+	//test whether the action parameters are properly read
+	@Test
+	public void testActionParamReading() {
+		DefaultConfig config = new DefaultConfig();
+
+		Yaml yaml = new Yaml();
+
+		Map<String, Object> root;
+		try {
+			root = yaml.load(new FileInputStream(new File(".").getCanonicalPath() + "/testeRos.yaml"));
+			List<DefaultDevice> devices = config.loadFromYaml(new File(".").getCanonicalPath() + "/testeRos.yaml");
+			HashMap<Atom, Action> actionMap = config.getActions(devices, new File(".").getCanonicalPath() + "/testeRos.yaml");
+			
+			System.out.println(">>>" + actionMap.get(createAtom("back")).getParams());
+			
+			assertEquals(actionMap.get(createAtom("back")).getParams().size(),6);
+			
+			assertTrue(actionMap.get(createAtom("back")).getParams().containsKey(createAtom("lx")));
+			assertTrue(actionMap.get(createAtom("back")).getParams().containsKey(createAtom("ly")));
+			assertTrue(actionMap.get(createAtom("back")).getParams().containsKey(createAtom("lz")));
+			assertTrue(actionMap.get(createAtom("back")).getParams().containsKey(createAtom("ax")));
+			assertTrue(actionMap.get(createAtom("back")).getParams().containsKey(createAtom("ay")));
+			assertTrue(actionMap.get(createAtom("back")).getParams().containsKey(createAtom("az")));
+			
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidDeviceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidActuationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidActuatorException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (EmbeddedActionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+
 	}
 
 }

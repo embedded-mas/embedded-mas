@@ -1,5 +1,7 @@
 package embedded.mas.bridges.jacamo.actuation.ros;
 
+import java.util.Map;
+
 import embedded.mas.bridges.jacamo.actuation.DefaultActuation;
 import embedded.mas.bridges.ros.ServiceParam;
 import embedded.mas.bridges.ros.ServiceParameters;
@@ -36,7 +38,7 @@ public class ServiceRequestActuation extends ROSActuation {
 	@Override
 	public String toString() {
 		return "ServiceRequestActuation [serviceName=" + serviceName + ", getId()=" + getId() + ", getParameters()="
-				+ getParameters() + "]";
+				+ getParameters() +  "  param mapping: " + this.getParamMapping() +"]";
 	}
 
 

@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import org.junit.Test;
 
@@ -20,6 +21,7 @@ import embedded.mas.bridges.ros.ServiceParam;
 import embedded.mas.bridges.ros.ServiceParameters;
 import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Term;
+import jason.asSyntax.Atom;
 
 import static jason.asSyntax.ASSyntax.createAtom;
 
@@ -66,8 +68,17 @@ public class TestActuationSequence {
 
 	@Test
 	public void test_setParameters() {
-		Actuation act1 = new Actuation(createAtom("actuation1"), new ArrayList<>(List.of(createAtom("p11"),createAtom("p12"),createAtom("p13"))));
-		Actuation act2 = new Actuation(createAtom("actuation2"), new ArrayList<>(List.of(createAtom("p21"),createAtom("p22"),createAtom("p23"))));
+		LinkedHashMap<Atom, Object> mapParams1 = new LinkedHashMap<>();
+		mapParams1.put(createAtom("p11"), null);
+		mapParams1.put(createAtom("p12"), null);
+		mapParams1.put(createAtom("p13"), null);
+		Actuation act1 = new Actuation(createAtom("actuation1"), mapParams1);
+		
+		LinkedHashMap<Atom, Object> mapParams2 = new LinkedHashMap<>();
+		mapParams2.put(createAtom("p21"), null);
+		mapParams2.put(createAtom("p22"), null);
+		mapParams2.put(createAtom("p23"), null);
+		Actuation act2 = new Actuation(createAtom("actuation2"), mapParams2);
 
 
 		DemoDevice d1 = new DemoDevice(createAtom("myDevice1"));
@@ -165,7 +176,11 @@ public class TestActuationSequence {
 
 	@Test
 	public void test_setParametersWithDefaultValues() {
-		Actuation act1 = new Actuation(createAtom("actuation1"), new ArrayList<>(List.of(createAtom("p11"),createAtom("p12"),createAtom("p13"))));
+		LinkedHashMap<Atom, Object> mapParams = new LinkedHashMap<>();
+		mapParams.put(createAtom("p11"), null);
+		mapParams.put(createAtom("p12"), null);
+		mapParams.put(createAtom("p13"), null);
+		Actuation act1 = new Actuation(createAtom("actuation1"), mapParams);
 
 		act1.setDefaultParameterValue("p12", Integer.valueOf(12));
 

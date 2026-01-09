@@ -2,6 +2,7 @@ package embedded.mas.bridges.jacamo;
 
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.Atom;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Term;
@@ -67,7 +68,17 @@ public class defaultEmbeddedInternalAction2 extends EmbeddedInternalAction {
 						termArguments[i] = (Term) arguments[i];
 
 
-					actuationSequence.setParameters(termArguments);// aqui - ajustar os parâmetros da ação - talvez transformar em um método de action
+
+					if(termArguments.length!=action.getParams().size())
+						throw new Exception("The given parameter size ("+termArguments.length+") differs from the expected ("+action.getParams().size()+")");
+
+
+
+					int i=0;
+					for (Atom chave : action.getParams().keySet()) {
+						action.getParams().put(chave, termArguments[i++]);
+					}
+					
 
 					/**
 					 * TODO: Make the execution of sets actually parallel.
@@ -75,6 +86,13 @@ public class defaultEmbeddedInternalAction2 extends EmbeddedInternalAction {
 					 * While the execution of all the sets is conceptually parallel, this impementation is based on an iteraction over the sets.
 					 */
 					for(ActuationSet actuationSet:actuationSequence.getActuations()) { //for each set of actuations of the sequence
+						
+						
+						for(ActuationDevice act : actuationSet) { //for each actuation in the sequence
+							Map<Object, Atom> mappings = act.getActuation().getParamMapping();
+							act.getActuation().setParamValuesFromMapping(mappings);
+						}		
+														
 
 						//split the set into subsets grouped by device
 						HashMap<IDevice, ArrayList<ActuationDevice>> subsets = actuationSet.toActuationSetsByDevice(); 
@@ -82,7 +100,11 @@ public class defaultEmbeddedInternalAction2 extends EmbeddedInternalAction {
 
 
 						for(Map.Entry<IDevice, ArrayList<ActuationDevice>> map : subsets.entrySet()) { //for each device
-							//System.out.println("... " + map.getKey()+"/" + map.getValue());						
+							
+							for(ActuationDevice currencAct: map.getValue())
+								currencAct.getActuation().setParamValuesFromMapping(action.getParams());
+							
+							System.out.println("[defaultEmbeddedInternalAction2] ... going to execute " + map.getKey()+"/" + map.getValue() + " - " + map.getValue().get(0).getClass().getName());						
 							map.getKey().execActuationSet(map.getValue(),  un);
 						}
 
