@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import embedded.mas.bridges.ros.ros.RosBridge;
+import embedded.mas.bridges.jacamo.ros.RosBridge4EmbeddedMas;
 import embedded.mas.bridges.ros.ros.RosListenDelegate;
 import embedded.mas.bridges.jacamo.EmbeddedAction;
 import embedded.mas.bridges.ros.ros.Publisher;
@@ -76,7 +77,7 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 	 * */
 	private HashMap<String, Literal> topicValues = new HashMap<>();
 
-	RosBridge bridge = new RosBridge();
+	RosBridge bridge = new RosBridge4EmbeddedMas();
 	private String connection=null;
 
 
