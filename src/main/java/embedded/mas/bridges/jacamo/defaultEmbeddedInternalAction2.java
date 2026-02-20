@@ -104,7 +104,7 @@ public class defaultEmbeddedInternalAction2 extends EmbeddedInternalAction {
 							for(ActuationDevice currencAct: map.getValue())
 								currencAct.getActuation().setParamValuesFromMapping(action.getParams());
 							
-							System.out.println("[defaultEmbeddedInternalAction2] ... going to execute " + map.getKey()+"/" + map.getValue() + " - " + map.getValue().get(0).getClass().getName());						
+//							System.out.println("[defaultEmbeddedInternalAction2] ... going to execute " + map.getKey()+"/" + map.getValue() + " - " + map.getValue().get(0).getClass().getName());						
 							map.getKey().execActuationSet(map.getValue(),  un);
 						}
 

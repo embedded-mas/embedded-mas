@@ -111,18 +111,18 @@ public class TestDefaultConfig {
 							"              - result\n" +
 							"\n" +
 							"actions:\n" +
-							"  - a0:\n" +
+							"  - name: a0\n" +
 							"    parameters: [p1, p2, p3]\n" +
 							"    sequence:\n" +
 							"      - [my_device1.act1.print, my_device1.act2.print, my_device1.act1.print]\n" +
 							"      - [my_device1.act1.print, my_device1.act2.print, my_device1.act1.print]\n" +
-							"  - a1:\n" +
+							"  - name: a1\n" +
 							"    sequence:\n"+
 							"      - [my_device1.act1.print, my_device1.act2.double]\n" +
 							"      - [my_device2.act21.printx, my_device1.act1.double]\n" +
-							"  - a2:\n" +
+							"  - name: a2\n" +
 							"    sequence: [[my_device1.act1.print, my_device2.act21.double], [my_device2.act21.printx, my_device1.act1.double]]\n" +
-							"  - a3:\n" +
+							"  - name: a3\n" +
 							"    sequence: \n"+
 							"      - \n" +
 							"        - actuation: my_device1.act1.double \n" +
@@ -131,10 +131,10 @@ public class TestDefaultConfig {
 							"            result: 5\n" +
 							"        - my_device1.act1.print\n" +
 							"      - [my_device1.act1.print]\n" +
-							"  - a4:\n" +
+							"  - name: a4\n" +
 							"    sequence: \n"+							
 							"      - [my_device1.act1.print, my_device1.act2.double]\n" +
-							"  - a5:\n" +
+							"  - name: a5\n" +
 							"    parameters: [p1, p2, p3]\n" +
 							"    sequence: \n"+
 							"      - \n" +
@@ -238,7 +238,7 @@ public class TestDefaultConfig {
 							"                - y\n" +
 							"                - z\n" +
 							"actions:\n" +
-							"  - front:\n" +
+							"  - name: front\n" +
 							"    sequence:\n" +
 							"      -\n"+
 							"        - actuation: my_device2.actuator21.move_robot\n"+
@@ -252,7 +252,7 @@ public class TestDefaultConfig {
 							"              x: 0.5\n"+
 							"              y: 0.6\n"+
 							"              z: 0.7\n" +
-							"  - back:\n" +
+							"  - name: back\n" +
 							"    parameters: [lx, ly, lz, ax, ay, az]\n" +
 							"    sequence:\n" +
 							"      -\n"+

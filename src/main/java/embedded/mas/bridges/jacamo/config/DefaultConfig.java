@@ -175,159 +175,150 @@ public class DefaultConfig {
 			List<Map<String, Object>> actionList = (List<Map<String, Object>>) root.get("actions");
 			for(int i1=0;i1<actionList.size();i1++) { //for each action...								
 				LinkedHashMap actionItem = (LinkedHashMap) actionList.get(i1);
-				System.out.println("[DefaultConfig] processing action " + actionItem);
-				
+				String actionName =  actionItem.get("name").toString();
+
+				//handle action parameters - start
+				Map<Atom, Object> actionParameters = new LinkedHashMap<>();
+				if(actionItem.get("parameters")!=null) {
+
+					for(Object parameter :(ArrayList)actionItem.get("parameters"))
+						actionParameters.put(createAtom(parameter.toString()), null);
+				}	
+				//handle action parameters - end
 
 
+				ArrayList actuationSequence = (ArrayList)actionItem.get("sequence"); //save the actuation sequence, which is a sequence of actuation sets
+				System.out.println("[DefaultConfig] processing sequence " + actuationSequence.size() + " - " + actuationSequence);
+				ActuationSequence currentActuationSequence = new ActuationSequence(); //start a new actuation sequence
+				String regex = "([^.]+)\\.([^.]+)\\.([^.]+)";
+				Pattern pattern;
+				Matcher matcher = null;
+				if(actuationSequence!=null)
+					for(int k=0;k<actuationSequence.size();k++) { //for each actuation set
+						ArrayList actuationSet = (ArrayList) actuationSequence.get(k);
+						System.out.println("[DefaultConfig] processing sequence item " + actuationSet);
+						ActuationSet currentActuationSet = new ActuationSet(); //start a new actuation set
+						for(int n=0;n<actuationSet.size();n++){// for each element in the actuation set
+							HashMap<String, String> param_mapping = null;
+							System.out.println(">>>>> ACTUATION SET " + actuationSet.get(n) + " - " + actuationSet.get(n).getClass().getName());
+							if(actuationSet.get(n) instanceof LinkedHashMap && (HashMap<String, String>) ((LinkedHashMap)actuationSet.get(n)).get("param_mapping")!=null)
+								param_mapping =  (HashMap<String, String>) ((LinkedHashMap)actuationSet.get(n)).get("param_mapping"); 
 
-				Iterator it = actionItem.keySet().iterator();
-				if(it.hasNext()) {
-					String actionName = it.next().toString(); //save the current action name
-
-					
-					//handle action parameters - start
-					Map<Atom, Object> actionParameters = new LinkedHashMap<>();
-					if(actionItem.get("parameters")!=null) {
-						
-						for(Object parameter :(ArrayList)actionItem.get("parameters"))
-							actionParameters.put(createAtom(parameter.toString()), null);
-					}	
-					//handle action parameters - end
-
-
-					ArrayList actuationSequence = (ArrayList)actionItem.get("sequence"); //save the actuation sequence, which is a sequence of actuation sets
-					System.out.println("[DefaultConfig] processing sequence " + actuationSequence.size() + " - " + actuationSequence);
-					ActuationSequence currentActuationSequence = new ActuationSequence(); //start a new actuation sequence
-					String regex = "([^.]+)\\.([^.]+)\\.([^.]+)";
-					Pattern pattern;
-					Matcher matcher = null;
-					if(actuationSequence!=null)
-						for(int k=0;k<actuationSequence.size();k++) { //for each actuation set
-							ArrayList actuationSet = (ArrayList) actuationSequence.get(k);
-							System.out.println("[DefaultConfig] processing sequence item " + actuationSet);
-							ActuationSet currentActuationSet = new ActuationSet(); //start a new actuation set
-							for(int n=0;n<actuationSet.size();n++){// for each element in the actuation set
-								HashMap<String, String> param_mapping = null;
-								System.out.println(">>>>> ACTUATION SET " + actuationSet.get(n) + " - " + actuationSet.get(n).getClass().getName());
-								if(actuationSet.get(n) instanceof LinkedHashMap && (HashMap<String, String>) ((LinkedHashMap)actuationSet.get(n)).get("param_mapping")!=null)
-									param_mapping =  (HashMap<String, String>) ((LinkedHashMap)actuationSet.get(n)).get("param_mapping"); 
-																								
-//								System.out.println("[DefaultConfig] processing set item " + actuationSet.get(n) + " --- " + ((LinkedHashMap) actuationSet.get(n)).get("actuation") + " --- " + ((LinkedHashMap) actuationSet.get(n)).get("actuation").toString().equals("wait"));
-								if(actuationSet.get(n) instanceof LinkedHashMap && ((LinkedHashMap)actuationSet.get(n)).get("actuation").toString().equals("wait") && ((LinkedHashMap)actuationSet.get(n)).get("default_param_values")!=null) {
-//									if(((LinkedHashMap)actuationSet.get(n)).get("default_param_values")!=null)
-										throw new EmbeddedActionException("The wait actuation does not allow default parameters");
-								}												
-								else
-									//if the current action is the standard action "wait" without default parameters...
-									if( ( actuationSet.get(n) instanceof LinkedHashMap && ((LinkedHashMap) actuationSet.get(n)).get("actuation").toString().equals("wait") ) || //if wait has parameters, it is a LinkedHashMap
+							//								System.out.println("[DefaultConfig] processing set item " + actuationSet.get(n) + " --- " + ((LinkedHashMap) actuationSet.get(n)).get("actuation") + " --- " + ((LinkedHashMap) actuationSet.get(n)).get("actuation").toString().equals("wait"));
+							if(actuationSet.get(n) instanceof LinkedHashMap && ((LinkedHashMap)actuationSet.get(n)).get("actuation").toString().equals("wait") && ((LinkedHashMap)actuationSet.get(n)).get("default_param_values")!=null) {
+								//									if(((LinkedHashMap)actuationSet.get(n)).get("default_param_values")!=null)
+								throw new EmbeddedActionException("The wait actuation does not allow default parameters");
+							}												
+							else
+								//if the current action is the standard action "wait" without default parameters...
+								if( ( actuationSet.get(n) instanceof LinkedHashMap && ((LinkedHashMap) actuationSet.get(n)).get("actuation").toString().equals("wait") ) || //if wait has parameters, it is a LinkedHashMap
 										(actuationSet.get(n) instanceof String && ((String)actuationSet.get(n)).equals("wait")) 	
-									  ) {
-										System.out.println("[DefaultConfig] adding wait");
-										
-										if(param_mapping!=null) 
-											if(param_mapping.size()>1||!param_mapping.containsKey("millis"))
-											   throw new EmbeddedActionException("The wait actuation admits only the parameter millis.");
-											else {
-												ActuationDevice waitActuation = new ActuationDevice(devices.get(0), null, devices.get(0).getWaitActuation());
-												waitActuation.getActuation().setParamActionMapping("millis", createAtom(param_mapping.get("millis")));
-												currentActuationSet.add(waitActuation);
-											}
-																																
-										//currentActuationSet.add(new ActuationDevice(devices.get(0), null, devices.get(0).getWaitActuation()));
-										System.out.println("[DefaultConfig] added wait");
-										//AQUI TRATAR O PARAM MAPPING DO WAIT
-										
-									}
-								//if the current action is a device-actuator-specific one (default case)
-									else {
-										pattern = Pattern.compile(regex);
-										HashMap<String, Object> def_params = null;
-										
-										if(actuationSet.get(n) instanceof LinkedHashMap) { 
+										) {
+									System.out.println("[DefaultConfig] adding wait");
 
-
-
-											matcher = pattern.matcher(((LinkedHashMap)actuationSet.get(n)).get("actuation").toString());
-											if(((LinkedHashMap)actuationSet.get(n)).get("default_param_values")!=null) {
-												def_params = (HashMap<String, Object>) ((LinkedHashMap)actuationSet.get(n)).get("default_param_values");
-											}
-
-
-											
+									if(param_mapping!=null) 
+										if(param_mapping.size()>1||!param_mapping.containsKey("millis"))
+											throw new EmbeddedActionException("The wait actuation admits only the parameter millis.");
+										else {
+											ActuationDevice waitActuation = new ActuationDevice(devices.get(0), null, devices.get(0).getWaitActuation());
+											waitActuation.getActuation().setParamActionMapping("millis", createAtom(param_mapping.get("millis")));
+											currentActuationSet.add(waitActuation);
 										}
-										else
-											matcher = pattern.matcher(actuationSet.get(n).toString());
 
-										//System.out.println("[DefaultConfig] matcher 3: " + matcher.group(3));
+									//currentActuationSet.add(new ActuationDevice(devices.get(0), null, devices.get(0).getWaitActuation()));
+									System.out.println("[DefaultConfig] added wait");
+									//AQUI TRATAR O PARAM MAPPING DO WAIT
 
-										while (matcher.find()) {
-											//find the device
-											DefaultDevice currentDevice = null;
+								}
+							//if the current action is a device-actuator-specific one (default case)
+								else {
+									pattern = Pattern.compile(regex);
+									HashMap<String, Object> def_params = null;
 
-
-
-											for(DefaultDevice d:devices) 
-												if(d.getId().toString().equals(matcher.group(1)))
-													currentDevice = d;
+									if(actuationSet.get(n) instanceof LinkedHashMap) { 
 
 
 
-
-											if(currentDevice==null) throw new InvalidDeviceException("Device " + matcher.group(1) + " not found.");
-
-											if(currentDevice!=null) {
-												boolean actuatorFound = false;
-												Iterator<Actuator> actuatorIt = currentDevice.getActuators().iterator();
-												while(actuatorIt.hasNext()) {
-													Actuator currentActuator = actuatorIt.next();														
-													if(currentActuator.getId().toString().equals(matcher.group(2))) { //check whether the device has an actuator that matches with the specified in the action
-														actuatorFound = true;
-														//check whether the actuator includes the actuation specified
-														Iterator<DefaultActuation> actuationIt = currentActuator.getActuations().iterator();
-														boolean actuationFound = false;
-														while(actuationIt.hasNext()) {
-															DefaultActuation currentActuation = actuationIt.next().clone();
-															if(currentActuation.getId().toString().equals(matcher.group(3))){
-
-																//																if(param_mapping!=null)
-																//																	System.out.println("PARAM MAPPING " + currentActuation.toString() + " = " + param_mapping);
-
-																if(param_mapping!=null) {
-																	Iterator<Map.Entry<String, String>> param_mapping_iterator = param_mapping.entrySet().iterator();																	
-																	while (param_mapping_iterator.hasNext()) {
-																		Map.Entry<String, String> entry = param_mapping_iterator.next();
-																		currentActuation.setParamActionMapping(entry.getKey(), createAtom(entry.getValue()));
-																	}
-																}
-
-																actuationFound = true;
-																ActuationDevice act = new ActuationDevice(currentDevice, currentActuator,currentActuation);
-																act.getActuation().setDefaultParameterValues(def_params);
-																currentActuationSet.add(act);
-															}
-														}
-														if(!actuationFound) throw new InvalidActuationException("Actuation " + matcher.group(1)+"."+matcher.group(2)+"."+ matcher.group(3) + " not found.");
+										matcher = pattern.matcher(((LinkedHashMap)actuationSet.get(n)).get("actuation").toString());
+										if(((LinkedHashMap)actuationSet.get(n)).get("default_param_values")!=null) {
+											def_params = (HashMap<String, Object>) ((LinkedHashMap)actuationSet.get(n)).get("default_param_values");
+										}
 
 
-
-													}
-												}
-												if(!actuatorFound) throw new InvalidActuatorException("Actuator " + matcher.group(1)+"."+matcher.group(2) + " not found.");
-											}
-
-										}												
 
 									}
-								
-							}
-							currentActuationSequence.addLast(currentActuationSet);										
-						}									
-					Action currentAction = new Action(createAtom(actionName));
-					currentAction.setSequence(currentActuationSequence);
-					currentAction.setParams(actionParameters);
-					actionsMap.put(currentAction.getActionName(), currentAction);
-					System.out.println("[DefaultConfig] actions " + actionsMap);
-				}
+									else
+										matcher = pattern.matcher(actuationSet.get(n).toString());
+
+									//System.out.println("[DefaultConfig] matcher 3: " + matcher.group(3));
+
+									while (matcher.find()) {
+										//find the device
+										DefaultDevice currentDevice = null;
+
+
+
+										for(DefaultDevice d:devices) 
+											if(d.getId().toString().equals(matcher.group(1)))
+												currentDevice = d;
+
+
+
+
+										if(currentDevice==null) throw new InvalidDeviceException("Device " + matcher.group(1) + " not found.");
+
+										if(currentDevice!=null) {
+											boolean actuatorFound = false;
+											Iterator<Actuator> actuatorIt = currentDevice.getActuators().iterator();
+											while(actuatorIt.hasNext()) {
+												Actuator currentActuator = actuatorIt.next();														
+												if(currentActuator.getId().toString().equals(matcher.group(2))) { //check whether the device has an actuator that matches with the specified in the action
+													actuatorFound = true;
+													//check whether the actuator includes the actuation specified
+													Iterator<DefaultActuation> actuationIt = currentActuator.getActuations().iterator();
+													boolean actuationFound = false;
+													while(actuationIt.hasNext()) {
+														DefaultActuation currentActuation = actuationIt.next().clone();
+														if(currentActuation.getId().toString().equals(matcher.group(3))){
+
+															//																if(param_mapping!=null)
+															//																	System.out.println("PARAM MAPPING " + currentActuation.toString() + " = " + param_mapping);
+
+															if(param_mapping!=null) {
+																Iterator<Map.Entry<String, String>> param_mapping_iterator = param_mapping.entrySet().iterator();																	
+																while (param_mapping_iterator.hasNext()) {
+																	Map.Entry<String, String> entry = param_mapping_iterator.next();
+																	currentActuation.setParamActionMapping(entry.getKey(), createAtom(entry.getValue()));
+																}
+															}
+
+															actuationFound = true;
+															ActuationDevice act = new ActuationDevice(currentDevice, currentActuator,currentActuation);
+															act.getActuation().setDefaultParameterValues(def_params);
+															currentActuationSet.add(act);
+														}
+													}
+													if(!actuationFound) throw new InvalidActuationException("Actuation " + matcher.group(1)+"."+matcher.group(2)+"."+ matcher.group(3) + " not found.");
+
+
+
+												}
+											}
+											if(!actuatorFound) throw new InvalidActuatorException("Actuator " + matcher.group(1)+"."+matcher.group(2) + " not found.");
+										}
+
+									}												
+
+								}
+
+						}
+						currentActuationSequence.addLast(currentActuationSet);										
+					}									
+				Action currentAction = new Action(createAtom(actionName));
+				currentAction.setSequence(currentActuationSequence);
+				currentAction.setParams(actionParameters);
+				actionsMap.put(currentAction.getActionName(), currentAction);
+				System.out.println("[DefaultConfig] actions " + actionsMap);
 			}
 
 		} catch (FileNotFoundException e) {
@@ -339,8 +330,8 @@ public class DefaultConfig {
 		return actionsMap;
 	}
 
-	
-	
+
+
 
 	public List<Literal> getPerceptionRules(String fileName) {
 		Yaml yaml = new Yaml();
