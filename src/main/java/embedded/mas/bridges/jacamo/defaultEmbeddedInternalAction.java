@@ -4,6 +4,7 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Atom;
 import jason.asSyntax.ListTermImpl;
+import jason.asSyntax.Literal;
 import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Term;
@@ -25,10 +26,20 @@ public class defaultEmbeddedInternalAction extends EmbeddedInternalAction {
 				if(args.get(i) instanceof NumberTermImpl)
 					arguments[i] = args.get(i);
 				else
-					arguments[i] = args.get(i).toString().replaceAll("\"(.+)\"", "$1");
+					if(args.get(i)==Literal.LTrue)
+						arguments[i] = Boolean.TRUE;
+					else
+						if(args.get(i)==Literal.LFalse)
+							arguments[i] = Boolean.FALSE;
+						else
+							arguments[i] = args.get(i).toString().replaceAll("\"(.+)\"", "$1");
+
 		}		
+
 		return arguments;
+
 	}
+
 
 	@Override
 	/**

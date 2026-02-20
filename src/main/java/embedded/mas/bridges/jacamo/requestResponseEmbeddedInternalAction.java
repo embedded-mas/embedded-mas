@@ -11,6 +11,7 @@ import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Term;
+import jason.asSyntax.VarTerm;
 
 public class requestResponseEmbeddedInternalAction extends EmbeddedInternalAction {
 
@@ -24,6 +25,9 @@ public class requestResponseEmbeddedInternalAction extends EmbeddedInternalActio
 	 */
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {  
 		if(ts.getAg() instanceof EmbeddedAgent) {
+		
+			if(!(args[3] instanceof VarTerm) || (((VarTerm)args[3]).isGround())) 
+			  throw new Exception("The latest argument of action " + args[1] + " must be a non-ground variable.");
 
 			//find the device the action is applied upon
 			DefaultDevice device = null;

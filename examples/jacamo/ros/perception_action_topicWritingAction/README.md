@@ -1,34 +1,64 @@
-# Example of ROS-Based agent
+# 1. Application overview
+This application example illustrates an agent (see the agent code [here](src/agt/sample_agent.asl)) whose (i) beliefs include values read from ROS topics and (ii) actions are realized by writing in the same topics. The agent prints in the console every change in the beliefs acquired from ROS.
 
-## Scenario
+# 2. Application Scenario
+The application contains an agent that monitors two values from the environment, called `value1` and `value2`. These values are represented in the agent's mind by the beliefs `value1(V)` and `value2(V)` (s.t `V` is the perceived value). Besides, the agent perceives the current time from a clock available in the environment. This time is represented in the agent's mind by the belief `current_hour(V)` (where `V`is the current time). These perceptions/beliefs are obtained from ROS topics, as summarized in the table below:
 
-This example illustrates an agent whose (i) beliefs include values read from ROS topics and (ii) whose actions include writing in ROS Topics.
+| Belief/Perception | ROS Topic     |
+|-------------------|---------------|
+| value1            | value1        |
+| value2            | value2        |
+| current_hour      | current_time  |
 
-The scenario includes the topics ```value1``` and ```value2```, which store integer values. When `value1` changes, the agent increments its value and writes it in `value2`. When `value2` changes, the agent increments its value and writes it in `value1`. This process runs in a loop.
-
-The scenario also includes a topic `current_time`, which stores a string describing the current time. The agent perceives this information and updates the topic.
 
 
-## Running the example
+When perceives some change in `value1`, the agent increments `value2` by executing the action `update_value2`. When perceives some change in `value2`, the agent increments `value1` by executing the action `update_value1`. When the agent perceives some change in the environemntal clock, it checks its internal clock and updates the environmental clock accordingly by executing the action `update_time`. These actions are realized by writing in ROS topics, s summarized in the table below:
 
-### 1. Ros node setup:
-It is possible to choose between a container-based setup (only Docker is required) and a local setup (ROS core and related tools are required).
+| Action        | Topic to write |
+|---------------|----------------|
+| update_value1 | value1         |
+| update_value2 | value2         |
+| update_time   | current_time   |
 
-#### 1.1 Container-based setup: 
+
+
+The connection between agent's actions and perceptions is configured in a [yaml file](src/agt/sample_agent.yaml) with the same name as the agent, placed in the same folder as the asl file where the agent is specified.
+
+
+
+
+# 3. Requirements
+- Java JRE >= 21
+
+Additional requirements depend on the method chosen set the simulation up (cf. sections 4.1.1 and 4.1.2 below).
+
+# 4. Running the example
+Running the example requires two main steps:  
+1. Launch the ROS infrastructure (cf. Section 4.1 below)
+2. Launch the JaCaMo application (cf. Section 4.2 below)
+
+
+### 4.1. Ros node setup:
+
+It is possible to choose between a container-based setup (recommended - only Docker is required) and a local setup (ROS core and related tools are required).
+
+#### 4.1.1 Container-based setup: 
 Requirements: [Docker](https://www.docker.com/)
 
-Use the following commands to launch the nodes either in ROS 1 or in ROS 2:
+<!-- Use the following commands to launch the nodes either in ROS 1 or in ROS 2:
 ##### 1.1.1 ROS 1: 
 
    ```
-   sudo docker run -it -p9090:9090 --rm --net=ros --name noetic maiquelb/embedded-mas-ros:0.5 \
-   /bin/bash -c "source /opt/ros/noetic/setup.bash && roslaunch rosbridge_server rosbridge_websocket.launch & \
-                 while ! rostopic list | grep '/value1'; do \
-                 source /opt/ros/noetic/setup.bash; \
-                 sleep 1; \
-                 done \
-                 && (rostopic pub /value1 std_msgs/Int32 0 & rostopic pub /current_time std_msgs/String 'unknown') \
-                "
+sudo docker run -it -p9090:9090 --rm --net=ros --name noetic maiquelb/embedded-mas-ros:0.5 \
+/bin/bash -c " ((source /opt/ros/noetic/setup.bash &&roslaunch rosbridge_server rosbridge_websocket.launch) & \
+                (echo -e '\e[1;33m**** Launching the Docker container. Wait a few seconds...****\e[0m]'  && \
+                 sleep 5 && \
+                 source /opt/ros/noetic/setup.bash && \
+                 (rostopic pub /value1 std_msgs/Int32 0  > /dev/null 2>&1 & \
+                  rostopic pub /current_time std_msgs/String 'unknown'  > /dev/null 2>&1 &)&&\
+                 echo -e '\e[1;33m**** Docker container is ready. Start the JaCaMo application****\e[0m]' && \
+                 tail -f /dev/null  ))"
+              
    ```
 
 ##### 1.1.2 ROS 2:
@@ -44,9 +74,13 @@ sudo docker run -it -p9090:9090 --rm --net=ros --name noetic maiquelb/embedded-m
               )&& ros2 launch rosbridge_server rosbridge_websocket_launch.xml\
              "
 ```
+-->
 
+Use the following commands to launch the nodes either in ROS 1 or in ROS 2:
+- ROS 1: ```./launch_ros1.sh``` (preceed with ```sudo``` if needed)
+- ROS 2: ```./launch_ros2.sh``` (preceed with ```sudo``` if needed)
 
-#### 1.2 Local setup: 
+#### 4.1.2 Local setup: 
 Requirements
 1. ROS 1 (recommended [ROS Noetic](http://wiki.ros.org/noetic)) or ROS 2 (recommended [ROS Humble](http://wiki.ros.org/humble))
 2. [Rosbridge](http://wiki.ros.org/rosbridge_suite/Tutorials/RunningRosbridge)
@@ -85,7 +119,7 @@ ros2 topic pub --once /current_time std_msgs/String \"{\"data\": \"unknown\"}\"
 
 
 
-### 2. Launch the JaCaMo application:
+### 4.2. Launch the JaCaMo application:
 
 #### Linux:
 ```

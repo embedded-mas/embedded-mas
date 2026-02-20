@@ -49,11 +49,11 @@ public class MicrocontrollerMonitor extends Thread {
 				e1.printStackTrace();
 			}
 			
-//			try {
-//				Thread.sleep((long)(Math.random() * 1000));
-//			} catch (InterruptedException e2) {
-//				e2.printStackTrace();
-//			}
+			try {
+				Thread.sleep((long)(Math.random() * 100));
+			} catch (InterruptedException e2) {
+				e2.printStackTrace();
+			}
 		}
 	}
 	
