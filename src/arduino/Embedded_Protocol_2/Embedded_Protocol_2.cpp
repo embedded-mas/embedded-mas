@@ -86,24 +86,50 @@ void Communication::publishROSMessage(ros::Publisher chatter, std_msgs::String s
 
 }
 
-String Communication::paramStr(String s){
-    int n = s.length();
-    int p1;
-    char a='(';
 
-    for (int i=0; i<=n; i++){
-      if(s[i]==a){
-        p1 = i;
-      }
+// Returns the i-th parameter inside parentheses as a String.
+// Example: "cmd(10,abc,3.14)" → paramStrAt(s, 1) = "abc"
+String Communication::paramStr(String s, int i) {
+    int n = s.length();
+    int openIdx = -1, closeIdx = -1;
+
+    // Find the first '(' and the first ')'
+    for (int j = 0; j < n; j++) {
+        if (s[j] == '(' && openIdx == -1) {
+            openIdx = j;
+        } else if (s[j] == ')') {
+            closeIdx = j;
+            break;
+        }
     }
-    if(p1!=0){
-      _t = s.substring(0,p1);
+
+    // If parentheses are missing or malformed, return empty string
+    if (openIdx == -1 || closeIdx == -1 || closeIdx <= openIdx) {
+        return "";
     }
-    else{
-      _t = s;
+
+    // Extract the substring inside the parentheses
+    String inside = s.substring(openIdx + 1, closeIdx);
+
+    // Split parameters by commas and return the i-th one
+    int start = 0;
+    int count = 0;
+    for (int j = 0; j <= inside.length(); j++) {
+        if (inside[j] == ',' || j == inside.length()) {
+            if (count == i) {
+                String param = inside.substring(start, j);
+                param.trim();  // remove surrounding spaces
+                return param;
+            }
+            count++;
+            start = j + 1;
+        }
     }
-    return _t;
+
+    // If the requested index does not exist
+    return "";
 }
+
 
 int Communication::paramInt(String s, int p=0){
     int var[10]={1};
@@ -132,6 +158,18 @@ int Communication::paramInt(String s, int p=0){
 
     if(p1!=0){
       char tC[10];
+      
+      
+      
+    if (v == 0) {
+       // só um valor entre parênteses
+       int d = p2 - p1 - 1;
+       for (int k = 0; k < d; k++) {
+          tC[k] = s[p1 + 1 + k];
+       }   
+       tC[d] = '\0';
+       var[0] = atoi(tC);
+    } else {
       for (int j=0; j<=v; j++){
         if(j==0){
           int d, p1aux;
@@ -164,9 +202,44 @@ int Communication::paramInt(String s, int p=0){
             var[j] = atoi(tC);
         }
       }
+      }
     }
     else{
       var[0] = 1;
     }
     return var[p];
+}
+
+
+// Returns the i-th parameter as a float.
+// If conversion fails or parameter is missing, returns 0.0.
+float Communication::paramFloat(String s, int i) {
+    // Reuse the string extraction function
+    String param = paramStr(s, i);
+
+    // If parameter is found, convert to float
+    if (param.length() > 0) {
+        return param.toFloat();
+    }
+
+    // Default return if not found
+    return 0.0;
+}
+
+
+
+/* Returns the string before "(".
+   e.g. "test" returns "test
+        "test(1,2,3)" returns "test"
+
+ */
+String Communication::actuationName(String input) {
+  int index = input.indexOf('(');  // search the 1st '('
+  if (index == -1) {
+    //  '(' not found, returns the input
+    return input;
+  } else {
+    // returns the substring before '('
+    return input.substring(0, index);
+  }
 }

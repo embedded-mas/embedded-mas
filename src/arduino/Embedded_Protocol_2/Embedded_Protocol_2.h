@@ -26,8 +26,11 @@ class Communication {
           void sendMessage();
           void publishROSMessage(ros::Publisher chatter, std_msgs::String str_msg);
 
-          String paramStr(String s);
+
+          String Communication::paramStr(String s, int i);
           int paramInt(String s, int p);
+          float Communication::paramFloat(String s, int i);
+          String actuationName(String input);
 
         private:
           String _beliefBuffer = "";

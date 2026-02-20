@@ -9,9 +9,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import embedded.mas.bridges.ros.ros.RosBridge;
+import embedded.mas.bridges.jacamo.ros.RosBridge4EmbeddedMas;
 import embedded.mas.bridges.ros.ros.RosListenDelegate;
 import embedded.mas.bridges.jacamo.EmbeddedAction;
-import embedded.mas.bridges.jacamo.actuation.ros.TopicWritingActuation;
 import embedded.mas.bridges.ros.ros.Publisher;
 import embedded.mas.bridges.ros.ros.msgs.std_msgs.PrimitiveMsg;
 import static embedded.mas.bridges.jacamo.Utils.jsonToPredArguments;
@@ -51,7 +51,7 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 			"std_msgs/UInt8", "std_msgs/msg/UInt8",
 			"std_msgs/Int16", "std_msgs/msg/Int16",
 			"std_msgs/UInt16", "std_msgs/msg/UInt16",
-			//"std_msgs/Int32", "std_msgs/msg/Int32",
+			"std_msgs/Int32", "std_msgs/msg/Int32",
 			"std_msgs/UInt32", "std_msgs/msg/UInt32",
 			"std_msgs/Int64", "std_msgs/msg/Int64",
 			"std_msgs/UInt64", "std_msgs/msg/UInt64"
@@ -77,7 +77,7 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 	 * */
 	private HashMap<String, Literal> topicValues = new HashMap<>();
 
-	RosBridge bridge = new RosBridge();
+	RosBridge bridge = new RosBridge4EmbeddedMas();
 	private String connection=null;
 
 
@@ -183,15 +183,11 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 
 	public void rosWrite(String topic, String type, String s){
 		Publisher pub = new Publisher(topic, type, bridge);
-		if(INTEGER_TYPES.contains(type)) {
-			//pub.publish(new PrimitiveMsg<Integer>(Integer.parseInt(s))); PARECE QUE O PROBLEMA É NO PARSEINT
-			//pub.publish(new PrimitiveMsg<Integer>(99)); 
-		}
+		if(INTEGER_TYPES.contains(type))
+			pub.publish(new PrimitiveMsg<Integer>(Integer.parseInt(s)));
 		else
-			if(PRIMITIVE_TYPES.contains(type)) {
+			if(PRIMITIVE_TYPES.contains(type))
 				pub.publish(new PrimitiveMsg<String>(s));
-				System.out.println("[DefaultRos4EmbeddedMas] vai escrever string:: " + s );
-			}
 			else
 				try {
 					pub.publish(new ObjectMapper().readTree(s));
@@ -238,7 +234,5 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 				serviceRequest(((ServiceRequestAction)action).getServiceName(), ((ServiceRequestAction)action).getServiceParameters().toJson());
 			}
 	}
-
-
 
 }
