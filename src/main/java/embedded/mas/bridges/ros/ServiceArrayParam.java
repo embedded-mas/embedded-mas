@@ -1,29 +1,62 @@
 /**
- * A ServiceArrayParam is a ServiceParam whose (i) value is a ServiceParameters and (ii) the value is written as an array in the corresponding JSON
+ * A ServiceArrayParam is a ServiceParam whose (i) value is an array of values (ii) the value is written as an array in the corresponding JSON
  */
 
 package embedded.mas.bridges.ros;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 public class ServiceArrayParam extends ServiceParam {
 
-	public ServiceArrayParam(String paramName, ServiceParameters paramValue) {
+	public ServiceArrayParam(String paramName, Object[] paramValue) {		
 		super(paramName, paramValue);
+
 	}
+
+	public int size() {
+		return ((Object[])this.paramValue).length;
+	}
+	
+
+	@Override
+	public void setParamValue(Object paramValue) {
+		if((paramValue instanceof Object[])) {
+			Object[] value = (Object[]) paramValue;
+			this.paramValue = new ArrayList<>(Arrays.asList(value));
+		}
+
+	}
+
+	
+	/**	 
+	 * @param value
+	 */
+	public void add(Object value) {
+		Object[] newArray;
+		if(this.paramValue==null)
+			newArray = new Object[1];
+		else
+		   newArray = Arrays.copyOf(((Object[])this.paramValue), ((Object[])this.paramValue).length+1);
+		newArray[ newArray.length-1] = value;
+		this.paramValue = newArray;
+	}
+
+
 
 	@Override
 	public String toJsonValue() {
 		String pValue = "";
-		if(paramValue==null) return super.toJsonValue();
-
-		ServiceParameters parameters = (ServiceParameters)this.getParamValue();
-		for(ServiceParam param : parameters)
-			if(param.getParamValue() instanceof ServiceParameters)
-				pValue = pValue + ((ServiceParameters)param.getParamValue()).toJson() + ",";
+		if(paramValue==null) return "\""+ paramName + "\":" +"[" + "null" + "]" ; 		
+		for(Object o : (Object[])this.getParamValue()) {
+			if(o instanceof ServiceParam) {
+				if(((ServiceParam)o).getParamValue() instanceof ServiceParameters)					
+				   pValue = pValue + ((ServiceParameters)((ServiceParam)o).getParamValue()).toJson() + ",";
+			}
 			else
-				if(param.getParamValue()==null)
-					pValue = pValue + "null" + ",";
-				else
-					pValue = pValue + param.getParamValue().toString() + ",";
+				pValue = pValue + o + ",";
+		}
+
 		pValue = pValue.replaceAll(",$", "");
 		return  "\""+ paramName + "\":" +"[" + pValue + "]" ; 
 	}

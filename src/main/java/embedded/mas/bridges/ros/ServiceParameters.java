@@ -1,6 +1,7 @@
 package embedded.mas.bridges.ros;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -39,23 +40,38 @@ public class ServiceParameters extends ArrayList<ServiceParam> {
 		if(values.length!=this.size())
 			return false;
 		for(int i=0;i<values.length;i++) {
-			if((values[i] instanceof ListTermImpl)|(values[i] instanceof Object[])) {	//if the i-th parameter is a list						
-				if(this.get(i).getParamValue() instanceof ServiceParameters) { //if the value is a list, the corresponding param must be a list of parameters
-					Object[] v = null;
-					if(values[i] instanceof ListTermImpl) {
-						v = ((ListTermImpl)values[i]).toArray();
-					}
-					else
-						if(values[i] instanceof Object[]) {
-							v = (Object[]) values[i];
+			if((values[i] instanceof List)|(values[i] instanceof Object[])) {	//if the i-th parameter is a list	
+
+
+				if(this.get(i) instanceof ServiceArrayParam) {
+					if((values[i] instanceof Object[])) {
+						for(int j=0;j<((Object[])values[i]).length;j++) {
+							((ServiceArrayParam)this.get(i)).add(((Object[])values[i])[j]);
 						}
-					((ServiceParameters)this.get(i).getParamValue()).setValues(v);
-				}
-				else	
-					return false;
+					}
+					if(values[i] instanceof List) {
+						for(Object t : (List)values[i]) {	   
+							((ServiceArrayParam)this.get(i)).add(t);
+						}
+					}
+				} 
+				else
+					if(this.get(i).getParamValue() instanceof ServiceParameters) { //if the value is a list, the corresponding param must be a list of parameters
+						Object[] v = null;
+						if(values[i] instanceof ListTermImpl) {
+							v = ((ListTermImpl)values[i]).toArray();
+						}
+						else
+							if(values[i] instanceof Object[]) {
+								v = (Object[]) values[i];
+							}
+						((ServiceParameters)this.get(i).getParamValue()).setValues(v);
+					}
+					else	
+						return false;
 			}
 			else
-			{
+			{ 
 				this.get(i).setParamValue(values[i]);
 			}
 		}
@@ -74,7 +90,14 @@ public class ServiceParameters extends ArrayList<ServiceParam> {
 	}
 
 
-
+	@Override
+	public ServiceParameters clone() {
+		ServiceParameters s = new ServiceParameters();
+		for (ServiceParam obj : this) {
+			s.add(obj.clone()); 
+		}
+		return s;
+	}
 
 
 }

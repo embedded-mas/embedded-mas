@@ -8,9 +8,14 @@ public class ServiceParam {
 	protected String paramName;
 	protected Object paramValue;
 
+	public static ServiceParam createServiceParam(String paramName, Object paramValue) {
+		if(paramValue instanceof Object[]) {
+			return new ServiceArrayParam(paramName, (Object[]) paramValue);
+		}
+		return new ServiceParam(paramName, paramValue);
+	}
 
-
-	public ServiceParam(String paramName, Object paramValue){
+	ServiceParam(String paramName, Object paramValue){
 		super();
 		this.paramName = paramName;
 		this.paramValue = paramValue;				
@@ -86,6 +91,12 @@ public class ServiceParam {
 	@Override
 	public String toString() {
 		return "ServiceParam [paramName=" + paramName + ", paramValue=" + paramValue + "]";
+	}
+
+	@Override
+	protected ServiceParam clone() {
+		ServiceParam clone  = new ServiceParam(paramName, paramValue);
+		return clone;
 	}
 
 

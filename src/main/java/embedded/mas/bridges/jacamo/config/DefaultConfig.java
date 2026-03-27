@@ -55,6 +55,7 @@ import embedded.mas.bridges.javard.Arduino4EmbeddedMas;
 import embedded.mas.bridges.javard.NRJ4EmbeddedMas;
 import embedded.mas.bridges.ros.DefaultRos4Bdi;
 import embedded.mas.bridges.ros.DefaultRos4EmbeddedMas;
+import embedded.mas.bridges.ros.ServiceArrayMsgParam;
 import embedded.mas.bridges.ros.ServiceArrayParam;
 import embedded.mas.bridges.ros.ServiceParam;
 import embedded.mas.bridges.ros.ServiceParameters;
@@ -73,6 +74,8 @@ import jason.asSyntax.parser.TokenMgrError;
 
 import static jason.asSyntax.ASSyntax.createAtom;
 import static jason.asSyntax.ASSyntax.parseRule;
+
+import static embedded.mas.bridges.ros.ServiceParam.createServiceParam;
 
 public class DefaultConfig {
 	private List<DefaultDevice> devices = new ArrayList<DefaultDevice>();
@@ -518,7 +521,7 @@ public class DefaultConfig {
 		int arrayParamCount = 0;
 		for(Object o : object) //for each nested array
 			if(o instanceof ArrayList) {
-				ServiceParam p = new ServiceParam("arrray_parameter_" + arrayParamCount++, buildServiceParameters((ArrayList)o));
+				ServiceParam p = createServiceParam("arrray_parameter_" + arrayParamCount++, buildServiceParameters((ArrayList)o));
 				result.add(p);
 			}
 
@@ -528,19 +531,31 @@ public class DefaultConfig {
 
 	public ServiceParameters buildServiceParameters(ArrayList<Object> object) {
 		ServiceParameters result = new ServiceParameters();
-		for(Object o:object) {
-			if(o instanceof LinkedHashMap) {
-				for (Map.Entry<String, ArrayList> oo : ((LinkedHashMap<String, ArrayList>) o).entrySet()) {
-					if(oo.getValue() instanceof ArrayList) {
-						if(((ArrayList)oo.getValue()).get(0) instanceof ArrayList)
-							result.add(new ServiceArrayParam(oo.getKey(), buildServiceArrayParameters(oo.getValue())));
+		for(Object o:object) { //for each parameter
+			if(o instanceof LinkedHashMap) { //if the current parameter has nested parameters
+				for (Map.Entry<String, ArrayList> oo : ((LinkedHashMap<String, ArrayList>) o).entrySet()) { //for each nested parameter
+					if(oo.getValue() instanceof ArrayList) { //if the nested parameter is an ArrayList (default condition for nested parameters)
+						if(((ArrayList)oo.getValue()).size()==0) { //if the paramvalue is an array which accepts any amount of parameters
+						    result.add(new ServiceArrayParam(oo.getKey(), null));
+						}
 						else
-							result.add( new ServiceParam(oo.getKey(), buildServiceParameters((ArrayList<Object>) oo.getValue())));
+						if(((ArrayList)oo.getValue()).get(0) instanceof ArrayList) {  //if the paramvalue is an array whose expected elements are service parameters 
+							if (((ArrayList)((ArrayList)oo.getValue()).get(0)).size()>0){ 
+								ServiceParameters p = new ServiceParameters();
+								for(int i=0;i<((ArrayList)((ArrayList)oo.getValue()).get(0)).size();i++)
+									p.add(createServiceParam(((ArrayList)((ArrayList)oo.getValue()).get(0)).get(i).toString(), null));
+								result.add(new ServiceArrayMsgParam(oo.getKey(), null,p));
+							}							
+						}
+						else
+							result.add( createServiceParam(oo.getKey(), buildServiceParameters((ArrayList<Object>) oo.getValue())));
 					}
-				}
-			}	
-			else 
-				result.add(new ServiceParam(o.toString(), null));
+				}					
+			}
+			else {
+				result.add(createServiceParam(o.toString(), null));
+			}
+
 		}
 		return result;
 	}

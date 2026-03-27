@@ -63,6 +63,7 @@ public class TestDefaultConfig {
 						+ "              - x\n"
 						+ "              - y\n"
 						+ "              - z \n"
+						+ "           - p\n"
 						+ "\n"
 						+ "- perception_rules:\n"
 						+ "  - obstacle_front(X) :- distance_reading(ranges(L)) & .length(L,S) & .nth(0,L,X).    \n"
@@ -113,8 +114,7 @@ public class TestDefaultConfig {
 						+ "               - x\n"
 						+ "               - y:\n"
 						+ "                   - [y11, y12]\n"
-						+ "                   - [y21, y22]\n"
-						+ "                   - [y31, y32]\n"
+						+ "               - w: []\n"
 						+ "               - z"
 						+ "\n"
 						+ "- perception_rules:\n"
@@ -146,10 +146,10 @@ public class TestDefaultConfig {
 			((ServiceParameters)parameters.get(1).getParamValue()).get(0).setParamValue(4.0);
 			((ServiceParameters)parameters.get(1).getParamValue()).get(1).setParamValue(5.0);
 			((ServiceParameters)parameters.get(1).getParamValue()).get(2).setParamValue(6.0);
+			
+			parameters.get(2).setParamValue(7.0);
 
-
-
-			assertEquals(parameters.toJson().toString(), "{\"linear\":{\"x\":1.0,\"y\":2.0,\"z\":3.0},\"angular\":{\"x\":4.0,\"y\":5.0,\"z\":6.0}}");
+			assertEquals(parameters.toJson().toString(), "{\"linear\":{\"x\":1.0,\"y\":2.0,\"z\":3.0},\"angular\":{\"x\":4.0,\"y\":5.0,\"z\":6.0},\"p\":7.0}");
 
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -171,8 +171,8 @@ public class TestDefaultConfig {
 		Yaml yaml = new Yaml();
 		try (InputStream in = new FileInputStream(file.getAbsolutePath())) {
 			ArrayList<Object> paramsList = (ArrayList)((LinkedHashMap)((ArrayList)((LinkedHashMap)((LinkedHashMap)((ArrayList)yaml.load(in)).get(0)).get("actions")).get("topicWritingActions")).get(0)).get("params");
-			ServiceParameters parameters = config.buildServiceParameters(paramsList);
-			assertTrue(parameters.toJson().toString().equals("{\"a\":{\"x\":null,\"y\":[{\"y11\":null,\"y12\":null},{\"y21\":null,\"y22\":null},{\"y31\":null,\"y32\":null}],\"z\":null}}"));
+			ServiceParameters parameters = config.buildServiceParameters(paramsList);			
+			assertTrue(parameters.toJson().toString().equals("{\"a\":{\"x\":null,\"y\":[{\"y11\":null,\"y12\":null}],\"w\":[null],\"z\":null}}"));
 			
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
