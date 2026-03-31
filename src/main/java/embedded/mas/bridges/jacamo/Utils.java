@@ -19,6 +19,7 @@ public class Utils {
 			s =  node.toString(); 
 		}else 
 			if(node instanceof ArrayNode) {				
+				if(((ArrayNode)node).size()==0) return "[]";
 				s = s.concat("[");
 				int i;
 				for(i=0;i<((ArrayNode)node).size()-1;i++) {

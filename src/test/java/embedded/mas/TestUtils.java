@@ -59,4 +59,24 @@ public class TestUtils {
 		
 	}
 
+	
+	@Test
+	public void testjsonToPredArgumentsArrayNode() {
+		String json = "{\"x\":[1,2,3]}";
+		ObjectMapper objectMapper = new ObjectMapper();
+	    try {	    	
+			JsonNode jsonNode = objectMapper.readTree(json);			
+			assertEquals(Utils.jsonToPredArguments(jsonNode),"x([1,2,3])" );
+			
+			
+			jsonNode = objectMapper.readTree("{\"x\": []}");
+			assertEquals(Utils.jsonToPredArguments(jsonNode),"x([])" );
+			
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	    
+		
+	}
 }
