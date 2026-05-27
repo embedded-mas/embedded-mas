@@ -6,6 +6,9 @@ The agent is equipped with an Arduino which has a led plugged to. If the led is 
 
 The agent has a perception "light_state(S)" (where S=1 means led on; S=0 means led off). The repertory of actions of the agent includes the action lightOn that turns the led on.
 
+### Requirements
+
+Java >= 21
 
 ### Running the example
 1. Check the serial port which the Arduino is connected to.
