@@ -104,54 +104,60 @@ public class InternalActionGenerator  {
 		for(Path f: yamlFiles){
 			Yaml yaml = new Yaml();
 
-			InputStream inputStream = InternalActionGenerator.class
-					.getClassLoader()
-					.getResourceAsStream(f.getFileName().toString());
+			InputStream inputStream;
+			try {
+				inputStream = Files.newInputStream(f);
 
-			if (inputStream == null) {
-				throw new IllegalArgumentException("File not found! Check the file path.");
-			}
-			List<Map<String, Object>> yamlData = yaml.load(inputStream);
-
-			for (Map<String, Object> device : yamlData) {
-				String deviceId = (String) device.get("device_id");
-				Map<String, Object> actions = (Map<String, Object>) device.get("actions");
-				if(actions!=null) {
-					List<Map<String, Object>> serviceRequestActions = (List<Map<String, Object>>) actions.get("serviceRequestActions");
-
-					if(serviceRequestActions!=null){
-						for (Map<String, Object> action : serviceRequestActions) {
-							String actionName = (String) action.get("actionName");
-							String serviceName = (String) action.get("serviceName");
-							List<String> params = (List<String>) action.getOrDefault("params", List.of());		
-							boolean requestResponseServiceAction; 
-							if(action.get("hasReturn")!=null && action.get("hasReturn").toString().equals("true"))
-								requestResponseServiceAction = true;
-							else
-								requestResponseServiceAction = false;
-							InternalActionGenerator.writeToFile(deviceId, actionName, serviceName, params,requestResponseServiceAction);
-						}
-					}
-
-
-					List<Map<String, Object>> topicWritingActions = (List<Map<String, Object>>) actions.get("topicWritingActions");
-
-					if(topicWritingActions!=null){
-						for (Map<String, Object> action : topicWritingActions) {
-							String actionName = (String) action.get("actionName");
-							String serviceName = (String) action.get("serviceName");
-							List<String> params = (List<String>) action.getOrDefault("params", List.of());						
-							InternalActionGenerator.writeToFile(deviceId, actionName, serviceName, params, false);
-						}
-					}
+				if (inputStream == null) {
+					throw new IllegalArgumentException("File "+ f.getFileName() +" not found! Check the file path.");
 				}
-				
-				ArrayList<Map> serialActions = (ArrayList)device.get("serialActions");
-				if(serialActions!=null)
-				   for(Map m: serialActions)
-     				      InternalActionGenerator.writeToFile(deviceId, m.get("actionName").toString(), "", null, false );
-				
+				List<Map<String, Object>> yamlData = yaml.load(inputStream);
+
+				for (Map<String, Object> device : yamlData) {
+					String deviceId = (String) device.get("device_id");
+					Map<String, Object> actions = (Map<String, Object>) device.get("actions");
+					if(actions!=null) {
+						List<Map<String, Object>> serviceRequestActions = (List<Map<String, Object>>) actions.get("serviceRequestActions");
+
+						if(serviceRequestActions!=null){
+							for (Map<String, Object> action : serviceRequestActions) {
+								String actionName = (String) action.get("actionName");
+								String serviceName = (String) action.get("serviceName");
+								List<String> params = (List<String>) action.getOrDefault("params", List.of());		
+								boolean requestResponseServiceAction; 
+								if(action.get("hasReturn")!=null && action.get("hasReturn").toString().equals("true"))
+									requestResponseServiceAction = true;
+								else
+									requestResponseServiceAction = false;
+								InternalActionGenerator.writeToFile(deviceId, actionName, serviceName, params,requestResponseServiceAction);
+							}
+						}
+
+
+						List<Map<String, Object>> topicWritingActions = (List<Map<String, Object>>) actions.get("topicWritingActions");
+
+						if(topicWritingActions!=null){
+							for (Map<String, Object> action : topicWritingActions) {
+								String actionName = (String) action.get("actionName");
+								String serviceName = (String) action.get("serviceName");
+								List<String> params = (List<String>) action.getOrDefault("params", List.of());						
+								InternalActionGenerator.writeToFile(deviceId, actionName, serviceName, params, false);
+							}
+						}
+					}
+
+					ArrayList<Map> serialActions = (ArrayList)device.get("serialActions");
+					if(serialActions!=null)
+						for(Map m: serialActions)
+							InternalActionGenerator.writeToFile(deviceId, m.get("actionName").toString(), "", null, false );
+
+				}
 			}
+			catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 		}	
 	}
 }
