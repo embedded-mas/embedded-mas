@@ -10,7 +10,7 @@
 // ***************************************************************************************************************************************
 +light_state(0)
    <- .print("The light A is off. I must turn it on");
-       embedded.mas.bridges.jacamo.defaultEmbeddedInternalAction("arduino1","lightOn",[]).
+       .lightOn.
 
 
 +light_state(1) <- .print("The light A is on. It is fine").
@@ -34,7 +34,7 @@
 //plan to satisfy the goal light_on when the light is off
 +!light_on : light_state(0) 
    <- .print("The light A is off. I must turn it on");
-      embedded.mas.bridges.jacamo.defaultEmbeddedInternalAction("arduino1","lightOn",[]);
+      .lightOn;
       .wait(light_state(1));
       !light_on.       
 
