@@ -19,10 +19,25 @@ plugins {
 version = '0.061-SNAPSHOT'
 
 
+//**** compatibility with Java 17 is required for old devices
+//     building with Java 17: gradle build -Pjava17
+//     publishing with Java 17: gradle publishMavenGitHub -Pjava17
+def java17Build = project.hasProperty('java17')
+
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(
+            java17Build ? 17 : 21
+        )
     }
+}
+
+
+if (java17Build) {
+    version = version.replace(
+        '-SNAPSHOT',
+        '-JDK17-SNAPSHOT'
+    )
 }
 
 
