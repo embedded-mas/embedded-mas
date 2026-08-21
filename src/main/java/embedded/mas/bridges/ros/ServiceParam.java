@@ -2,8 +2,11 @@ package embedded.mas.bridges.ros;
 
 import java.util.Arrays;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 public class ServiceParam {
+	private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
 
 	protected String paramName;
 	protected Object paramValue;
@@ -53,18 +56,16 @@ public class ServiceParam {
 					pValue = ((ServiceParameters)paramValue).toJson().toString();
 				}
 				else
-					if(paramValue instanceof String) {					
-						if(paramValue.equals("on"))  //on/off values must be translated to 1/0
-							pValue = "1";
-						else
-							if(paramValue.equals("off"))  
-								pValue = "0";
+						if(paramValue instanceof String) {					
+							if(paramValue.equals("on"))  //on/off values must be translated to 1/0
+								pValue = "1";
 							else
-								if(paramValue.equals(""))
-									pValue = pValue + "";
-								else
-									pValue = pValue + "\"" + paramValue.toString() + "\"" ;
-					}
+								if(paramValue.equals("off"))  
+									pValue = "0";
+								else {
+									pValue = JSON_MAPPER.valueToTree(paramValue).toString();
+								}
+						}
 					else
 						pValue = paramValue.toString();
 		return "\""+ paramName + "\":" + pValue ; 
@@ -95,8 +96,26 @@ public class ServiceParam {
 
 	@Override
 	protected ServiceParam clone() {
-		ServiceParam clone  = new ServiceParam(paramName, paramValue);
-		return clone;
+		Object clonedValue = paramValue;
+		if(paramValue instanceof ServiceParameters)
+			clonedValue = ((ServiceParameters)paramValue).clone();
+		else if(paramValue instanceof Object[])
+			clonedValue = cloneArray((Object[])paramValue);
+		return new ServiceParam(paramName, clonedValue);
+	}
+
+	protected Object[] cloneArray(Object[] values) {
+		Object[] clonedValues = new Object[values.length];
+		for(int i=0;i<values.length;i++) {
+			Object value = values[i];
+			if(value instanceof ServiceParameters)
+				clonedValues[i] = ((ServiceParameters)value).clone();
+			else if(value instanceof Object[])
+				clonedValues[i] = cloneArray((Object[])value);
+			else
+				clonedValues[i] = value;
+		}
+		return clonedValues;
 	}
 
 

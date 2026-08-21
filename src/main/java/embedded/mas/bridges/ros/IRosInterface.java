@@ -18,4 +18,14 @@ public interface IRosInterface extends ILiteralListInterface {
 	/*Service request*/
 	public boolean serviceRequest(String serviceName, JsonNode serviceArguments);
 
+	String sendActionGoal(
+			RosActionClientAction action,
+			Object[] arguments
+	);
+
+	boolean cancelActionGoal(
+			RosActionCancelAction action,
+			String goalId
+	);
+
 }

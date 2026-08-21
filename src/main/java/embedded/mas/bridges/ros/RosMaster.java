@@ -1,4 +1,5 @@
 package embedded.mas.bridges.ros;
+import jason.asSyntax.ASSyntax;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import static embedded.mas.bridges.jacamo.Utils.jsonToPredArguments;
@@ -77,43 +78,159 @@ public class RosMaster extends LiteralDevice {
 
 
 
-	public boolean execEmbeddedAction(String actionName, Object[] args, Term returnArg, Unifier un) throws Exception {
-		EmbeddedAction action = this.getEmbeddedActions().get(createAtom(actionName));
-		if(args!=null&&!checkArrayArguments(args))
-			throw new Exception("Array arguments require all elements of the same type.");
+	public boolean execEmbeddedAction(
+			String actionName,
+			Object[] args,
+			Term returnArg,
+			Unifier un) throws Exception {
 
-		if(action instanceof ServiceRequestAction) {
+		EmbeddedAction action;
+		IRosInterface rosInterface;
+
+		action = this.getEmbeddedActions().get(
+				createAtom(actionName)
+		);
+
+		if (action == null) {
+			throw new Exception(
+					"Action "
+					+ actionName
+					+ " was not found."
+			);
+		}
+
+		rosInterface =
+				(IRosInterface) this.getMicrocontroller();
+
+		if (action instanceof ServiceRequestAction) {
 			Literal response;
-			if(args==null)
-				response = this.serviceRequestResponse(((ServiceRequestAction)action).getServiceName(), null);
-			else {
-				for(int i=0;i<args.length;i++) { //set service params
-					((ServiceRequestAction)action).getServiceParameters().get(i).setParamValue(args[i]);
-				}			  
-				response = this.serviceRequestResponse(((ServiceRequestAction)action).getServiceName(), ((ServiceRequestAction)action).getServiceParameters());
+			ServiceRequestAction serviceAction;
+
+			serviceAction =
+					(ServiceRequestAction) action;
+
+			if (args == null) {
+				response = this.serviceRequestResponse(
+						serviceAction.getServiceName(),
+						null
+				);
+			} else {
+				for (int index = 0;
+						index < args.length;
+						index++) {
+
+					serviceAction
+							.getServiceParameters()
+							.get(index)
+							.setParamValue(args[index]);
+				}
+
+				response = this.serviceRequestResponse(
+						serviceAction.getServiceName(),
+						serviceAction.getServiceParameters()
+				);
 			}
-			return un.unifies(response, returnArg);
-		}else
-			throw new Exception("Action must be of class " + ((ServiceRequestAction)action).getClass().getName());
+
+			return un.unifies(
+					response,
+					returnArg
+			);
+		}
+
+		if (action instanceof RosActionClientAction) {
+			String goalId;
+
+			goalId = rosInterface.sendActionGoal(
+					(RosActionClientAction) action,
+					args
+			);
+
+			return un.unifies(
+					returnArg,
+					ASSyntax.createString(goalId)
+			);
+		}
+
+		throw new Exception(
+				"Unsupported action type: "
+				+ action.getClass().getName()
+		);
 	}
 
 
 	@Override
-	public boolean execEmbeddedAction(Atom actionName,Object[] args, Unifier un) {	
-//		if(!checkArrayArguments(args))
-//			return false;
-		EmbeddedAction action = this.getEmbeddedActions().get(actionName);
-		if(action!=null)
-			if(action instanceof TopicWritingAction) {
-				((TopicWritingAction)action).setParamValues(args);
-				this.getMicrocontroller().execEmbeddedAction(action);
-			}	
-			else
-				if(action instanceof ServiceRequestAction) {
-					((ServiceRequestAction)action).setParamValues(args);										
-					this.getMicrocontroller().execEmbeddedAction(action);
-				}
-		return true;
+	public boolean execEmbeddedAction(
+			Atom actionName,
+			Object[] args,
+			Unifier un) {
+
+		EmbeddedAction action;
+		IRosInterface rosInterface;
+
+		action = this.getEmbeddedActions().get(
+				actionName
+		);
+
+		if (action == null) {
+			return false;
+		}
+
+		rosInterface =
+				(IRosInterface) this.getMicrocontroller();
+
+		if (action instanceof TopicWritingAction) {
+			TopicWritingAction topicAction;
+
+			topicAction =
+					(TopicWritingAction) action;
+
+			topicAction.setParamValues(args);
+
+			this.getMicrocontroller()
+					.execEmbeddedAction(topicAction);
+
+			return true;
+		}
+
+		if (action instanceof ServiceRequestAction) {
+			ServiceRequestAction serviceAction;
+
+			serviceAction =
+					(ServiceRequestAction) action;
+
+			serviceAction.setParamValues(args);
+
+			this.getMicrocontroller()
+					.execEmbeddedAction(serviceAction);
+
+			return true;
+		}
+
+		if (action instanceof RosActionCancelAction) {
+			String goalId;
+
+			if (args == null) {
+				return false;
+			}
+
+			if (args.length != 1) {
+				return false;
+			}
+
+			goalId = args[0].toString();
+
+			goalId = goalId.replaceAll(
+					"^\"|\"$",
+					""
+			);
+
+			return rosInterface.cancelActionGoal(
+					(RosActionCancelAction) action,
+					goalId
+			);
+		}
+
+		return false;
 	}
 
 

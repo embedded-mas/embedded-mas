@@ -55,6 +55,8 @@ import embedded.mas.bridges.javard.Arduino4EmbeddedMas;
 import embedded.mas.bridges.javard.NRJ4EmbeddedMas;
 import embedded.mas.bridges.ros.DefaultRos4Bdi;
 import embedded.mas.bridges.ros.DefaultRos4EmbeddedMas;
+import embedded.mas.bridges.ros.RosActionCancelAction;
+import embedded.mas.bridges.ros.RosActionClientAction;
 import embedded.mas.bridges.ros.ServiceArrayMsgParam;
 import embedded.mas.bridges.ros.ServiceArrayParam;
 import embedded.mas.bridges.ros.ServiceParam;
@@ -407,9 +409,48 @@ public class DefaultConfig {
 												embeddedActionList.add(serviceAction);
 
 											}
-										}	
+											}
 
-									}
+											ArrayList rosActionClientActions = (ArrayList) ((LinkedHashMap)item.get("actions")).get("rosActionClientActions");
+											if(rosActionClientActions != null) {
+												for(Object actionObject : rosActionClientActions) {
+													LinkedHashMap actionItem = (LinkedHashMap) actionObject;
+													String actionName = actionItem.get("actionName").toString();
+													String rosActionName = actionItem.get("rosActionName").toString();
+													String actionType = actionItem.get("actionType").toString();
+													String cancelActionName = "cancel_" + actionName;
+													String feedbackBelief = actionName + "_feedback";
+													String resultBelief = actionName + "_result";
+													String statusBelief = actionName + "_status";
+													boolean feedbackEnabled = true;
+
+													if(actionItem.get("cancelActionName") != null)
+														cancelActionName = actionItem.get("cancelActionName").toString();
+													if(actionItem.get("feedbackBelief") != null)
+														feedbackBelief = actionItem.get("feedbackBelief").toString();
+													if(actionItem.get("resultBelief") != null)
+														resultBelief = actionItem.get("resultBelief").toString();
+													if(actionItem.get("statusBelief") != null)
+														statusBelief = actionItem.get("statusBelief").toString();
+													if(actionItem.get("feedback") != null)
+														feedbackEnabled = Boolean.parseBoolean(actionItem.get("feedback").toString());
+
+													ServiceParameters parameters = new ServiceParameters();
+													if(actionItem.get("params") != null)
+														parameters = buildServiceParameters((ArrayList<Object>) actionItem.get("params"));
+
+													RosActionClientAction rosAction = new RosActionClientAction(
+															createAtom(actionName), rosActionName, actionType, parameters,
+															feedbackBelief, resultBelief, statusBelief, feedbackEnabled);
+													RosActionCancelAction cancelAction = new RosActionCancelAction(
+															createAtom(cancelActionName), rosAction);
+
+													embeddedActionList.add(rosAction);
+													embeddedActionList.add(cancelAction);
+												}
+											}
+
+										}
 									else
 										if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DemoDevice")) {
 											//do nothing (so far)

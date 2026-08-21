@@ -51,20 +51,27 @@ public class requestResponseEmbeddedInternalAction extends EmbeddedInternalActio
 			if(action!=null) { 	//Case 1. The device has an EmbeddedAction
 				if(args[2] instanceof ListTermImpl){ //if arguments in args[2] are a list
 					Object[] arguments  = null;
-					if(((ListTermImpl)args[2]).size()>0) {
+						if(((ListTermImpl)args[2]).size()>0) {
 
-						arguments = new Object[((ListTermImpl)args[2]).size()];			
-						for(int i=0;i<((ListTermImpl)args[2]).size();i++) {
-							if(((ListTermImpl)args[2]).get(i) instanceof ListTermImpl) { //if the i-th parameter is a nested list, handle it as an array
-								arguments[i] = ((ListTermImpl)(((ListTermImpl)args[2]).get(i))).toArray(); //turn the nested list in array
+							arguments = new Object[((ListTermImpl)args[2]).size()];			
+							for(int i=0;i<((ListTermImpl)args[2]).size();i++) {
+								Term parameter = ((ListTermImpl)args[2]).get(i);
+
+								if(parameter instanceof ListTermImpl) { //if the i-th parameter is a nested list, handle it as an array
+									arguments[i] = ((ListTermImpl)parameter).toArray(); //turn the nested list in array
+								}
+								else
+								if(parameter instanceof NumberTermImpl)
+									arguments[i] = parameter;
+								else
+									if(parameter instanceof StringTermImpl) {
+										arguments[i] = ((StringTermImpl)parameter).getString();
+									}
+									else {
+										arguments[i] = parameter.toString();
+									}
 							}
-							else
-							if(((ListTermImpl)args[2]).get(i) instanceof NumberTermImpl)
-								arguments[i] = ((ListTermImpl)args[2]).get(i);
-							else
-								arguments[i] = ((ListTermImpl)args[2]).get(i).toString().replaceAll("\"(.+)\"", "$1");
 						}
-					}
 					if(device instanceof RosMaster) {
 						return ((RosMaster)device).execEmbeddedAction(actionName.toString(), arguments, args[3], un);
 

@@ -22,10 +22,17 @@ public class ServiceArrayParam extends ServiceParam {
 	@Override
 	public void setParamValue(Object paramValue) {
 		if((paramValue instanceof Object[])) {
-			Object[] value = (Object[]) paramValue;
-			this.paramValue = new ArrayList<>(Arrays.asList(value));
+			this.paramValue = cloneArray((Object[])paramValue);
 		}
 
+	}
+
+	@Override
+	protected ServiceParam clone() {
+		Object[] clonedValue = null;
+		if(this.paramValue instanceof Object[])
+			clonedValue = cloneArray((Object[])this.paramValue);
+		return new ServiceArrayParam(this.paramName, clonedValue);
 	}
 
 	

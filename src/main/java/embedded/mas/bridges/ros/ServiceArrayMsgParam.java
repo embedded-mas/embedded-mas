@@ -93,4 +93,17 @@ public class ServiceArrayMsgParam extends ServiceArrayParam {
 		return  "\""+ paramName + "\":" +"[" + pValue + "]" ; 
 	}
 
+	@Override
+	protected ServiceParam clone() {
+		ServiceParameters clonedTemplate = null;
+		if(this.serviceParameters != null)
+			clonedTemplate = this.serviceParameters.clone();
+
+		ServiceArrayMsgParam clonedParam = new ServiceArrayMsgParam(
+				this.paramName, null, clonedTemplate);
+		if(this.paramValue instanceof Object[])
+			clonedParam.paramValue = cloneArray((Object[])this.paramValue);
+		return clonedParam;
+	}
+
 }

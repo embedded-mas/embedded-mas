@@ -22,8 +22,9 @@ public class InternalActionGenerator  {
 
 	private static void writeToFile(String deviceId, String actionName, String serviceName, List<String> params, boolean requestResponseServiceAction) {
 		Path filePath = Paths.get("src/java/jason/stdlib/" + actionName + ".java");		
-		if(Files.exists(filePath))
-			System.out.println("*** [information] internal action " + actionName + " already exists in src/java/jason/stdlib and will not be overwritten ***");
+		if(Files.exists(filePath)) {
+			return;
+		}
 		else {
 			String fileContent = "package jason.stdlib; \n\n";
 			if(requestResponseServiceAction)
@@ -142,6 +143,19 @@ public class InternalActionGenerator  {
 								String serviceName = (String) action.get("serviceName");
 								List<String> params = (List<String>) action.getOrDefault("params", List.of());						
 								InternalActionGenerator.writeToFile(deviceId, actionName, serviceName, params, false);
+							}
+						}
+
+						List<Map<String, Object>> rosActionClientActions = (List<Map<String, Object>>) actions.get("rosActionClientActions");
+						if(rosActionClientActions != null) {
+							for(Map<String, Object> action : rosActionClientActions) {
+								String actionName = action.get("actionName").toString();
+								String cancelActionName = "cancel_" + actionName;
+								if(action.get("cancelActionName") != null)
+									cancelActionName = action.get("cancelActionName").toString();
+
+								InternalActionGenerator.writeToFile(deviceId, actionName, "", null, true);
+								InternalActionGenerator.writeToFile(deviceId, cancelActionName, "", null, false);
 							}
 						}
 					}

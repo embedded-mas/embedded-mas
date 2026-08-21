@@ -1,5 +1,8 @@
 package embedded.mas.bridges.ros.ros;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import embedded.mas.bridges.ros.RosActionGoal;
+
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -66,6 +69,7 @@ public class RosBridge {
 	protected Map<String, RosBridgeSubscriber> listeners = new ConcurrentHashMap<String, RosBridge.RosBridgeSubscriber>();
 	protected Set<String> publishedTopics = new HashSet<String>();
 
+
 	protected Map<String, FragmentManager> fragementManagers = new HashMap<String, FragmentManager>();
 
 	protected boolean hasConnected = false;
@@ -75,6 +79,10 @@ public class RosBridge {
 	protected String bridgeId; //identifier of the current bridge to be used in message exchanges
 	protected int serviceRequestCount = 0; //counter of service requests
 	protected HashMap<String, JsonNode> serviceReplies = new HashMap<>();
+
+	private final ConcurrentHashMap<String, RosActionListener>
+        actionListeners =
+        new ConcurrentHashMap<String, RosActionListener>();
 
 
 	/**
@@ -100,6 +108,8 @@ public class RosBridge {
 	public void connect(String rosBridgeURI){
 		WebSocketClient client = new WebSocketClient();
 		try {
+		   client.getPolicy().setMaxTextMessageSize(10*1024*1024);
+		   client.getPolicy().setMaxBinaryMessageSize(10*1024*1024);
 			client.start();
 			URI echoUri = new URI(rosBridgeURI);
 			ClientUpgradeRequest request = new ClientUpgradeRequest();
@@ -220,7 +230,6 @@ public class RosBridge {
 
 	@OnWebSocketConnect
 	public void onConnect(Session session) {
-		System.out.printf("Got connect for ros: %s%n", session);
 		this.session = session;
 		this.hasConnected = true;
 		synchronized(this) {
@@ -251,13 +260,16 @@ public class RosBridge {
 				}
 				else if(op.equals("fragment")){
 					this.processFragment(node);
-				}else
-					if(op.equals("service_response")){
+				}else if(op.equals("service_response")){
 						synchronized (serviceReplies) {
 							serviceReplies.put(node.get("id").asText(), node);
 						}
 						
-					}
+				}else if (op.equals("action_feedback")) {
+					this.handleActionFeedback(node);
+				} else if (op.equals("action_result")) {
+					this.handleActionResult(node);
+				}
 			}
 		} catch(IOException e) {
 			System.out.println("Could not parse ROSBridge web socket message into JSON data");
@@ -785,6 +797,236 @@ public class RosBridge {
 
 		}
 
+	}
+
+	public boolean sendActionGoal(
+			String goalId,
+			String actionName,
+			String actionType,
+			JsonNode arguments,
+			boolean feedback,
+			RosActionListener listener) {
+
+		ObjectMapper mapper;
+		ObjectNode message;
+
+		if (goalId == null) {
+			throw new IllegalArgumentException(
+					"The goal ID cannot be null."
+			);
+		}
+
+		if (actionName == null) {
+			throw new IllegalArgumentException(
+					"The ROS action name cannot be null."
+			);
+		}
+
+		if (actionType == null) {
+			throw new IllegalArgumentException(
+					"The ROS action type cannot be null."
+			);
+		}
+
+		if (listener == null) {
+			throw new IllegalArgumentException(
+					"The ROS action listener cannot be null."
+			);
+		}
+
+		if (this.session == null) {
+			throw new IllegalStateException(
+					"The rosbridge connection is closed."
+			);
+		}
+
+		mapper = new ObjectMapper();
+		message = mapper.createObjectNode();
+
+		message.put("op", "send_action_goal");
+		message.put("id", goalId);
+		message.put("action", actionName);
+		message.put("action_type", actionType);
+		message.put("feedback", feedback);
+
+		if (arguments == null) {
+			message.set(
+					"args",
+					mapper.createObjectNode()
+			);
+		} else {
+			message.set(
+					"args",
+					arguments
+			);
+		}
+
+		this.actionListeners.put(
+				goalId,
+				listener
+		);
+
+		try {
+			this.sendRawMessage(
+					message.toString()
+			);
+		} catch (RuntimeException exception) {
+			this.actionListeners.remove(goalId);
+			throw exception;
+		}
+
+		return true;
+	}
+
+	public boolean cancelActionGoal(
+			String goalId,
+			String actionName) {
+
+		ObjectMapper mapper;
+		ObjectNode message;
+
+		if (goalId == null) {
+			throw new IllegalArgumentException(
+					"The goal ID cannot be null."
+			);
+		}
+
+		if (actionName == null) {
+			throw new IllegalArgumentException(
+					"The ROS action name cannot be null."
+			);
+		}
+
+		if (this.session == null) {
+			throw new IllegalStateException(
+					"The rosbridge connection is closed."
+			);
+		}
+
+		if (this.actionListeners.containsKey(goalId) == false) {
+			return false;
+		}
+
+		mapper = new ObjectMapper();
+		message = mapper.createObjectNode();
+
+		message.put("op", "cancel_action_goal");
+		message.put("id", goalId);
+		message.put("action", actionName);
+
+		this.sendRawMessage(
+				message.toString()
+		);
+
+		return true;
+	}
+
+	private void handleActionFeedback(JsonNode node) {
+		String goalId;
+		String actionName;
+		JsonNode values;
+		RosActionListener listener;
+
+		if (node.has("id") == false) {
+			System.err.println(
+					"Received action feedback without a goal ID."
+			);
+
+			return;
+		}
+
+		goalId = node.get("id").asText();
+		listener = this.actionListeners.get(goalId);
+
+		if (listener == null) {
+			System.err.println(
+					"No listener found for action goal "
+					+ goalId
+					+ "."
+			);
+
+			return;
+		}
+
+		if (node.has("action")) {
+			actionName = node.get("action").asText();
+		} else {
+			actionName = "";
+		}
+
+		if (node.has("values")) {
+			values = node.get("values");
+		} else {
+			values = null;
+		}
+
+		listener.onFeedback(
+				goalId,
+				actionName,
+				values
+		);
+	}
+
+	private void handleActionResult(JsonNode node) {
+		String goalId;
+		String actionName;
+		int status;
+		boolean success;
+		JsonNode values;
+		RosActionListener listener;
+
+		if (node.has("id") == false) {
+			System.err.println(
+					"Received an action result without a goal ID."
+			);
+
+			return;
+		}
+
+		goalId = node.get("id").asText();
+		listener = this.actionListeners.remove(goalId);
+
+		if (listener == null) {
+			System.err.println(
+					"No listener found for completed action goal "
+					+ goalId
+					+ "."
+			);
+
+			return;
+		}
+
+		if (node.has("action")) {
+			actionName = node.get("action").asText();
+		} else {
+			actionName = "";
+		}
+
+		if (node.has("status")) {
+			status = node.get("status").asInt();
+		} else {
+			status = RosActionGoal.STATUS_UNKNOWN;
+		}
+
+		if (node.has("result")) {
+			success = node.get("result").asBoolean();
+		} else {
+			success = false;
+		}
+
+		if (node.has("values")) {
+			values = node.get("values");
+		} else {
+			values = null;
+		}
+
+		listener.onResult(
+				goalId,
+				actionName,
+				status,
+				success,
+				values
+		);
 	}
 
 }

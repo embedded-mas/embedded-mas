@@ -55,6 +55,26 @@ public class TestServiceParam {
 		assertEquals(p3.getParamValue(), "off");
 		assertEquals(p3.toJsonValue(), "\"pOff\":0");
 	}
+
+	@Test
+	public void testEmptyStringConversionOnJson() {
+		ServiceParam parameter = createServiceParam("behavior_tree", "");
+
+		assertEquals(
+				"\"behavior_tree\":\"\"",
+				parameter.toJsonValue()
+		);
+	}
+
+	@Test
+	public void testQuotedStringConversionOnJson() {
+		ServiceParam parameter = createServiceParam("text", "say \"hello\"");
+
+		assertEquals(
+				"\"text\":\"say \\\"hello\\\"\"",
+				parameter.toJsonValue()
+		);
+	}
 	
 	
 

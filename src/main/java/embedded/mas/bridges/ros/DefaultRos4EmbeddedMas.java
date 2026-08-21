@@ -3,6 +3,9 @@
 
 package embedded.mas.bridges.ros;
 
+import java.util.concurrent.ConcurrentHashMap;
+import embedded.mas.bridges.ros.ros.RosActionListener;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -80,6 +83,349 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 	RosBridge bridge = new RosBridge4EmbeddedMas();
 	private String connection=null;
 
+	private final ConcurrentHashMap<String, RosActionGoal> actionGoals =
+			new ConcurrentHashMap<String, RosActionGoal>();
+
+	private final ConcurrentHashMap<String, Literal> actionValues =
+			new ConcurrentHashMap<String, Literal>();
+
+	private final RosActionListener actionListener =
+			new RosActionListener() {
+
+		@Override
+		public void onFeedback(
+				String goalId,
+				String actionName,
+				JsonNode values) {
+
+			RosActionGoal goal;
+
+			goal = actionGoals.get(goalId);
+
+			if (goal == null) {
+				return;
+			}
+
+			goal.setStatus(
+					RosActionGoal.STATUS_EXECUTING
+			);
+
+			goal.setLastFeedback(values);
+
+			updateStatusBelief(goal);
+			updateFeedbackBelief(goal, values);
+		}
+
+		@Override
+		public void onResult(
+				String goalId,
+				String actionName,
+				int status,
+				boolean success,
+				JsonNode values) {
+
+			RosActionGoal goal;
+
+			goal = actionGoals.get(goalId);
+
+			if (goal == null) {
+				return;
+			}
+
+			goal.setStatus(status);
+			goal.setResult(values);
+
+			actionValues.remove(
+					"feedback:" + goalId
+			);
+
+			updateStatusBelief(goal);
+			updateResultBelief(goal, values);
+
+			actionGoals.remove(goalId);
+		}
+	};
+
+	@Override
+	public String sendActionGoal(
+			RosActionClientAction action,
+			Object[] arguments) {
+
+		String goalId;
+		ServiceParameters parameters;
+		JsonNode goalArguments;
+		RosActionGoal goal;
+		boolean sent;
+
+		if (action == null) {
+			throw new IllegalArgumentException(
+					"The ROS action cannot be null."
+			);
+		}
+
+		goalId = UUID.randomUUID().toString();
+
+		parameters = action.buildGoalParameters(
+				arguments
+		);
+
+		goalArguments = parameters.toJson();
+
+		if (goalArguments == null) {
+			throw new IllegalStateException(
+					"Could not convert the action goal to JSON."
+			);
+		}
+
+		goal = new RosActionGoal(
+				goalId,
+				action
+		);
+
+		goal.setStatus(
+				RosActionGoal.STATUS_ACCEPTED
+		);
+
+		this.actionGoals.put(
+				goalId,
+				goal
+		);
+
+		updateStatusBelief(goal);
+
+		sent = this.bridge.sendActionGoal(
+				goalId,
+				action.getRosActionName(),
+				action.getActionType(),
+				goalArguments,
+				action.isFeedbackEnabled(),
+				this.actionListener
+		);
+
+		if (sent == false) {
+			this.actionGoals.remove(goalId);
+			this.actionValues.remove(
+					"status:" + goalId
+			);
+
+			throw new IllegalStateException(
+					"Could not send ROS action goal."
+			);
+		}
+
+		return goalId;
+	}
+
+	@Override
+	public boolean cancelActionGoal(
+			RosActionCancelAction cancelAction,
+			String goalId) {
+
+		RosActionGoal goal;
+		RosActionClientAction configuredAction;
+		boolean sent;
+
+		if (cancelAction == null) {
+			return false;
+		}
+
+		if (goalId == null) {
+			return false;
+		}
+
+		goal = this.actionGoals.get(goalId);
+
+		if (goal == null) {
+			return false;
+		}
+
+		configuredAction =
+				cancelAction.getTargetAction();
+
+		if (configuredAction.getRosActionName().equals(
+				goal.getAction().getRosActionName()
+		) == false) {
+
+			return false;
+		}
+
+		sent = this.bridge.cancelActionGoal(
+				goalId,
+				configuredAction.getRosActionName()
+		);
+
+		if (sent) {
+			goal.setStatus(
+					RosActionGoal.STATUS_CANCELING
+			);
+
+			updateStatusBelief(goal);
+		}
+
+		return sent;
+	}
+
+	private void updateStatusBelief(
+        RosActionGoal goal) {
+
+    String beliefName;
+    String literalText;
+    Literal literal;
+
+    beliefName =
+            goal.getAction().getStatusBelief();
+
+    if (beliefName == null) {
+        return;
+    }
+
+    if (beliefName.isBlank()) {
+        return;
+    }
+
+    literalText =
+            beliefName
+            + "(\""
+            + goal.getGoalId()
+            + "\","
+            + goal.getStatusName()
+            + ")";
+
+    try {
+        literal = parseLiteral(literalText);
+
+        this.actionValues.put(
+                "status:" + goal.getGoalId(),
+                literal
+        );
+    } catch (ParseException exception) {
+        exception.printStackTrace();
+    } catch (TokenMgrError error) {
+        error.printStackTrace();
+    }
+}
+
+private void updateFeedbackBelief(
+			RosActionGoal goal,
+			JsonNode values) {
+
+		String beliefName;
+		String arguments;
+		String literalText;
+		Literal literal;
+
+		beliefName =
+				goal.getAction().getFeedbackBelief();
+
+		if (beliefName == null) {
+			return;
+		}
+
+		if (beliefName.isBlank()) {
+			return;
+		}
+
+		arguments = "\""
+				+ goal.getGoalId()
+				+ "\"";
+
+		if (values != null) {
+			String convertedValues;
+
+			convertedValues =
+					jsonToPredArguments(values);
+
+			if (convertedValues != null) {
+				if (convertedValues.isBlank() == false) {
+					arguments =
+							arguments
+							+ ","
+							+ convertedValues;
+				}
+			}
+		}
+
+		literalText =
+				beliefName
+				+ "("
+				+ arguments
+				+ ")";
+
+		try {
+			literal = parseLiteral(literalText);
+
+			this.actionValues.put(
+					"feedback:" + goal.getGoalId(),
+					literal
+			);
+		} catch (ParseException exception) {
+			exception.printStackTrace();
+		} catch (TokenMgrError error) {
+			error.printStackTrace();
+		}
+	}
+
+	private void updateResultBelief(
+			RosActionGoal goal,
+			JsonNode values) {
+
+		String beliefName;
+		String arguments;
+		String literalText;
+		Literal literal;
+
+		beliefName =
+				goal.getAction().getResultBelief();
+
+		if (beliefName == null) {
+			return;
+		}
+
+		if (beliefName.isBlank()) {
+			return;
+		}
+
+		arguments = "\""
+				+ goal.getGoalId()
+				+ "\","
+				+ goal.getStatusName();
+
+		if (values != null) {
+			String convertedValues;
+
+			convertedValues =
+					jsonToPredArguments(values);
+
+			if (convertedValues != null) {
+				if (convertedValues.isBlank() == false) {
+					arguments =
+							arguments
+							+ ","
+							+ convertedValues;
+				}
+			}
+		}
+
+		literalText =
+				beliefName
+				+ "("
+				+ arguments
+				+ ")";
+
+		try {
+			literal = parseLiteral(literalText);
+
+			this.actionValues.put(
+					"result:" + goal.getGoalId(),
+					literal
+			);
+		} catch (ParseException exception) {
+			exception.printStackTrace();
+		} catch (TokenMgrError error) {
+			error.printStackTrace();
+		}
+	}
+
 
 	//TODO: throw exception when topics and types have different sizes	
 	public DefaultRos4EmbeddedMas(String connectionStr, ArrayList<String> topics, ArrayList<String> types) {
@@ -117,7 +463,7 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 			public void receive(JsonNode data, String stringRep) {
 				synchronized(mensagens){
 					try {						
-						Literal p = customizeBelief(data.get("topic").textValue(),data.get("msg"));
+							Literal p = customizeBelief(data.get("topic").textValue(),data.get("msg"));
 						if(p==null) {
 							Literal functor = beliefName.get(data.get("topic").textValue().replaceAll("/", "_"));
 							String terms;
@@ -155,19 +501,26 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 
 
 	@Override
-	public List<Literal> read() {		
+	public List<Literal> read() {
 		return rosRead();
 	}
 
-	public List<Literal> rosRead(){
-		ArrayList<Literal> list = new ArrayList<Literal>();
-		synchronized (topicValues) { 
-			//for(Literal l:topicValues.values())
-			//list.add(l);	
-			return new ArrayList<Literal>(topicValues.values());
+	public List<Literal> rosRead() {
+		ArrayList<Literal> result;
+
+		result = new ArrayList<Literal>();
+
+		synchronized (this.topicValues) {
+			result.addAll(
+					this.topicValues.values()
+			);
 		}
 
+		result.addAll(
+				this.actionValues.values()
+		);
 
+		return result;
 	}
 
 	@Override
@@ -234,5 +587,9 @@ public class DefaultRos4EmbeddedMas implements IRosInterface{
 				serviceRequest(((ServiceRequestAction)action).getServiceName(), ((ServiceRequestAction)action).getServiceParameters().toJson());
 			}
 	}
+
+
+
+
 
 }
