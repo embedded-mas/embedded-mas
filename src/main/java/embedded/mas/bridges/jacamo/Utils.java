@@ -1,7 +1,6 @@
 package embedded.mas.bridges.jacamo;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -42,16 +41,32 @@ public class Utils {
 	}
 
 
-	public static String jsonToPredArguments(JsonNode node, ArrayList<String> paramsToIgnore) {
+	public static String jsonToPredArguments(JsonNode node, ArrayList<String> paramsToIgnore) {	
 		if(paramsToIgnore!=null) {
-			ObjectNode object = (ObjectNode) node;
-			for(String s:paramsToIgnore)
-				object.remove(s);		
+			int i;
+			ObjectNode object = (ObjectNode) node;				
+			for(String s:paramsToIgnore) {
+				ObjectNode objectTemp = object;
+				String elements[] = s.split("\\.");				
+				i=0;
+				while(i<elements.length) { //traverse the elements (e.g. linear.x)
+					/* if the value of the current element is a nested node and is not the latest element, traverse the nested node
+					 *  the latest element must be ignored in nested nodes because it is the "value" of the node to be removed.
+					 *  for instance, to remove y.y2 from the node {x: 1, y: {y1:2, y2:{a:3,b:4}}}, 
+					 *  the objectTemp must be  {y1:2, y2:{a:3,b:4}}, which is the value of the key "y"
+					 */
+					if((objectTemp.get(elements[i]) instanceof ObjectNode)&& //
+							(i<elements.length-1)) 	//if this is not the latest element. This checking is necessary because the 
+						objectTemp = (ObjectNode) objectTemp.get(elements[i]);
+					i++;
+				}
+				objectTemp.remove(elements[i-1]);				
+			}
 		}
 		return  Utils.jsonToPredArguments(node);
 	}
 
-	
+
 	public static String jsonToPredArgumentsWithParamsToInclude(JsonNode node, ArrayList<String> paramsToInclude) {
 		ObjectNode object = (ObjectNode) node;
 		ArrayList<String> paramsToIgnore = new ArrayList<String>();

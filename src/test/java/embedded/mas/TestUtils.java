@@ -38,6 +38,33 @@ public class TestUtils {
 		assertTrue(true);
 	}
 	
+	
+	@Test
+	public void testjsonToPredArgumentsWithNestedIgnoreParams() {
+		String json = "{\"x\": {\"x1\": 5.544444561004639, \"x2\": 222},\"y\":{\"y1\":5.544444561004639,\"y2\":{\"a\":1,\"b\":2},\"y3\":{\"c\":1,\"d\":2},  \"y4\": {\"y41\":{\"test1\":111, \"test2\": 222}, \"y42\": 111}},\"theta\":0.0,\"linear_velocity\":0.0,\"angular_velocity\":0.0}";
+		ObjectMapper objectMapper = new ObjectMapper();
+	    try {	    	
+			JsonNode jsonNode = objectMapper.readTree(json);			
+			ArrayList<String> l = new ArrayList<>();
+			//test with an empty list - no param to ignore
+			//assertEquals(Utils.jsonToPredArguments(jsonNode, l), "x(5.544444561004639),y(5.544444561004639),theta(0.0),linear_velocity(0.0),angular_velocity(0.0)");
+			l.add("theta"); 
+			l.add("linear_velocity");
+			l.add("x.x1");
+			l.add("y.y2");
+			l.add("y.y3.c");
+			l.add("y.y4.y41");
+			System.out.println(Utils.jsonToPredArguments(jsonNode, l));
+			assertEquals(Utils.jsonToPredArguments(jsonNode, l), "x(x2(222)),y(y1(5.544444561004639),y3(d(2)),y4(y42(111))),angular_velocity(0.0)");
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	 
+		
+		assertTrue(true);
+	}
+	
 	@Test
 	public void testjsonToPredArgumentsInterestParams() {
 		String json = "{\"x\":5.544444561004639,\"y\":5.544444561004639,\"theta\":0.0,\"linear_velocity\":0.0,\"angular_velocity\":0.0}";
