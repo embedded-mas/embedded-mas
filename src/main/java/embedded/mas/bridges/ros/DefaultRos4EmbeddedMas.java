@@ -534,22 +534,33 @@ private void updateFeedbackBelief(
 	}
 
 
-	public void rosWrite(String topic, String type, String s){
-		Publisher pub = new Publisher(topic, type, bridge);
-		if(INTEGER_TYPES.contains(type))
-			pub.publish(new PrimitiveMsg<Integer>(Integer.parseInt(s)));
-		else
-			if(PRIMITIVE_TYPES.contains(type))
-				pub.publish(new PrimitiveMsg<String>(s));
-			else
-				try {
-					pub.publish(new ObjectMapper().readTree(s));
-				} catch (JsonMappingException e) {
-					e.printStackTrace();
-				} catch (JsonProcessingException e) {
-					e.printStackTrace();
-				}
-
+	public void rosWrite(String topic, String type, String s) {
+	    Publisher pub = new Publisher(topic, type, bridge);
+	
+	    if (type.equals("std_msgs/Bool") || type.equals("std_msgs/msg/Bool")) {
+	        pub.publish(new PrimitiveMsg<Boolean>(Boolean.parseBoolean(s)));
+	
+	    } else if (INTEGER_TYPES.contains(type)) {
+	        pub.publish(new PrimitiveMsg<Integer>(Integer.parseInt(s)));
+	
+	    } else if (type.equals("std_msgs/Float32") || type.equals("std_msgs/msg/Float32")) {
+	        pub.publish(new PrimitiveMsg<Float>(Float.parseFloat(s)));
+	
+	    } else if (type.equals("std_msgs/Float64") || type.equals("std_msgs/msg/Float64")) {
+	        pub.publish(new PrimitiveMsg<Double>(Double.parseDouble(s)));
+	
+	    } else if (type.equals("std_msgs/String") || type.equals("std_msgs/msg/String")) {
+	        pub.publish(new PrimitiveMsg<String>(s));
+	
+	    } else {
+	        try {
+	            pub.publish(new ObjectMapper().readTree(s));
+	        } catch (JsonMappingException e) {
+	            e.printStackTrace();
+	        } catch (JsonProcessingException e) {
+	            e.printStackTrace();
+	        }
+	    }
 	}
 
 	@Override
