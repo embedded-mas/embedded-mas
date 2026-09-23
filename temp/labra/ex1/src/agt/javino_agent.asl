@@ -1,5 +1,5 @@
 // Agent saying hello in Morse code using a blinking LED
-
+!hello.
 // H = ....
 +!hello
    <- .print("H");
