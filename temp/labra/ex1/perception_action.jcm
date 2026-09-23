@@ -14,7 +14,7 @@
 
 mas perception_action {
 
-    agent sample_agent2 : sample_agent2.asl {
+    agent javino_agent : javino_agent.asl {
       ag-class: embedded.mas.bridges.jacamo.ros.RosBdiAgent
       ag-arch: embedded.mas.bridges.jacamo.ros.RosBdiAgArch
     }
