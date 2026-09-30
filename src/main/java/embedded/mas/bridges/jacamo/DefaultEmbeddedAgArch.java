@@ -2,10 +2,16 @@ package embedded.mas.bridges.jacamo;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 
 import embedded.mas.exception.PerceivingException;
 import jason.architecture.AgArch;
+import jason.asSemantics.Unifier;
 import jason.asSyntax.Literal;
+import jason.asSyntax.Rule;
+import jason.asSyntax.Term;
+
 import static jason.asSyntax.ASSyntax.createLiteral;
 
 
@@ -13,6 +19,7 @@ public class DefaultEmbeddedAgArch extends AgArch{
 
 
 	protected Collection <DefaultDevice> devices = null;
+	protected Collection <Rule> perceptionRules = null;
 
 
 	public DefaultEmbeddedAgArch() {		
@@ -43,6 +50,9 @@ public class DefaultEmbeddedAgArch extends AgArch{
 		this.devices = devices;
 	}
 
+	public void setPerceptionRules(Collection<Rule> perceptionRules) {
+		this.perceptionRules = perceptionRules;		
+	}
 
 	public Collection<DefaultDevice> getDevices(){
 		return this.devices;
@@ -75,7 +85,34 @@ public class DefaultEmbeddedAgArch extends AgArch{
 				} catch (PerceivingException e) {} //if it fails, do nothing 			
 			}
 		}
+		if (perceptionRules != null && !perceptionRules.isEmpty()) 
+			percepts.addAll(getPerceptsFromPerceptionRules());		
 		if(percepts.size()==0) return null;
+		return percepts;
+	}
+
+	
+
+	/**
+	 * Evaluates perception-rule bodies against the current agent beliefs and
+	 * returns the unique literals produced by applying their unifiers to the heads.
+	 */
+	private Collection<Literal> getPerceptsFromPerceptionRules() {
+		HashSet<Literal> percepts = new HashSet<>();
+		if (perceptionRules == null) {
+			return percepts;
+		}
+
+		for (Rule rule : perceptionRules) {
+			// Find every unifier that makes this rule body true for the current agent.
+			Iterator<Unifier> unifiers = rule.getBody().logicalConsequence(this.getTS().getAg(), new Unifier());
+			while (unifiers.hasNext()) {
+				// Apply each satisfying unifier to the head; the set removes duplicates.
+				Term head = rule.getHead().capply(unifiers.next());
+				percepts.add((Literal) head);
+			}
+		}
+
 		return percepts;
 	}
 

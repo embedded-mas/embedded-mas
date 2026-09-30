@@ -69,6 +69,7 @@ import gnu.io.PortInUseException;
 import gnu.io.UnsupportedCommOperationException;
 import jason.asSyntax.Atom;
 import jason.asSyntax.Literal;
+import jason.asSyntax.Rule;
 import jason.asSyntax.parser.ParseException;
 import jason.asSyntax.parser.TokenMgrError;
 
@@ -250,9 +251,9 @@ public class DefaultConfig {
 	}
 
 
-	public List<Literal> getPerceptionRules(String fileName) {
+	public List<Rule> getPerceptionRules(String fileName) {
 		Yaml yaml = new Yaml();
-		ArrayList<Literal> rules = new ArrayList<>();
+		ArrayList<Rule> rules = new ArrayList<>();
 		try {
 			Iterable<Object> itr = yaml.loadAll(new FileInputStream(fileName));
 			for (Object o : itr) { 
@@ -260,8 +261,10 @@ public class DefaultConfig {
 				for(int i=0;i<l.size();i++) 
 					if(((LinkedHashMap) l.get(i)).containsKey("perception_rules")) {
 						ArrayList<String> sRules = (ArrayList) ((LinkedHashMap) l.get(i)).get("perception_rules");
-						for(String s:sRules)
-							rules.add(parseRule(s));							
+						for(String s:sRules) {
+							Rule rule = parseRule(s);
+							rules.add(rule);
+						}
 					}
 			}
 		} catch (FileNotFoundException e) {

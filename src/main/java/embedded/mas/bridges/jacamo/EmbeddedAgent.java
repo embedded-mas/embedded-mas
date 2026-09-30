@@ -61,7 +61,7 @@ public abstract class EmbeddedAgent extends Agent {
 		return this.actionMap;
 	}
 	
-	private DefaultEmbeddedAgArch getEmbeddedArch() {
+	protected DefaultEmbeddedAgArch getEmbeddedArch() {
         AgArch arch = getTS().getAgArch().getFirstAgArch();
         while (arch != null) {
             if (arch instanceof DefaultEmbeddedAgArch) {
