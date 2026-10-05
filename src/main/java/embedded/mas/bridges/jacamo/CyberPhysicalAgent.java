@@ -34,10 +34,7 @@ public class CyberPhysicalAgent extends EmbeddedAgent {
 				this.actionMap = conf.getActions(d,(Paths.get("").toAbsolutePath()+"/src/agt/"+getTS().getAgArch().getAgName() + ".yaml"));
 				Collection<Rule> perceptionRules = conf.getPerceptionRules((Paths.get("").toAbsolutePath()+"/src/agt/"+getTS().getAgArch().getAgName() + ".yaml"));
 				checkArch c = new checkArch();
-				c.setRules(perceptionRules);
-				if(perceptionRules!=null)
-					for(Literal s: perceptionRules)
-						this.getBB().add(s);
+				c.setRules(perceptionRules);				
 			} catch (InvalidDeviceException e) {
 				// TODO Auto-generated catch block
 				System.err.println(e.getMessage());
