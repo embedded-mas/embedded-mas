@@ -79,6 +79,8 @@ import static jason.asSyntax.ASSyntax.parseRule;
 import static embedded.mas.bridges.ros.ServiceParam.createServiceParam;
 
 public class DefaultConfig {
+	private enum ROS_SENSOR_KEY {perception, perceptionTopics, perception_topics, sensors};  //possible keys for ROS pereception configuration in the YAML file
+	private enum PERCEPTION_ID_KEY {beliefName, belief_name, perception_name};  //possible keys for ROS pereception configuration in the YAML file
 	private List<DefaultDevice> devices = new ArrayList<DefaultDevice>();
 
 
@@ -357,7 +359,15 @@ public class DefaultConfig {
 								if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4EmbeddedMas")|
 										((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4Bdi")) { //DefaultRos4Bdi is just an alias class for the names to make more sense in Jason-ROS applications
 									//ArrayList perceptionTopics = (ArrayList) ((LinkedHashMap)item.get("microcontroller")).get("perceptionTopics");
-									ArrayList perceptionTopics = (ArrayList) item.get("perceptionTopics");
+									//ArrayList perceptionTopics = (ArrayList) item.get("perceptionTopics");
+									ArrayList perceptionTopics = null;
+									for(ROS_SENSOR_KEY k: ROS_SENSOR_KEY.values()) //iterate over all the possible keys that gather perception topics
+										if(item.get(k.toString())!=null) {  
+											perceptionTopics = (ArrayList) item.get(k.toString());
+											break;
+										}
+									
+									
 									ArrayList<String> topics = new ArrayList<String>();
 									ArrayList<String> types = new ArrayList<String>();
 									ArrayList<String> beliefNames = new ArrayList<String>();
@@ -366,10 +376,18 @@ public class DefaultConfig {
 										for(int j=0;j<perceptionTopics.size();j++) {
 											topics.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicName").toString());
 											types.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicType").toString());
-											if(((LinkedHashMap)perceptionTopics.get(j)).get("beliefName")==null)
+											// if(((LinkedHashMap)perceptionTopics.get(j)).get("beliefName")==null)
+											// 	beliefNames.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicName").toString());
+											// else
+											// 	beliefNames.add(((LinkedHashMap)perceptionTopics.get(j)).get("beliefName").toString());	
+
+											for(PERCEPTION_ID_KEY k: PERCEPTION_ID_KEY.values()) //iterate over all the possible keys that gather perception belief names
+												if(((LinkedHashMap)perceptionTopics.get(j)).get(k.toString())!=null) {  
+													beliefNames.add(((LinkedHashMap)perceptionTopics.get(j)).get(k.toString()).toString());
+													break;
+												}
+											if(beliefNames.size()<j+1) //if no belief name was found, use the topic name as the belief name
 												beliefNames.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicName").toString());
-											else
-												beliefNames.add(((LinkedHashMap)perceptionTopics.get(j)).get("beliefName").toString());	
 											ArrayList tempParams =  (ArrayList) ((LinkedHashMap)perceptionTopics.get(j)).get("ignoreValues");
 											ignoreParams.put(((LinkedHashMap)perceptionTopics.get(j)).get("topicName").toString(), tempParams);
 										}
