@@ -1,0 +1,128 @@
+# The root item of the CyberPhysicalAgent configuration is the Device.
+# A cyber-physical agent can be composed of one to many devices. A device is any external element which sensors and actuators are connected to. A device that may be either physical (e.g. an Arduino board), or virtual (e.g. a ROS core).
+# In this example, the agent is composed of a single device, that is a ROS core identified as "sample_roscore".
+- device_id: sample_roscore #device identifier. It is up to the designer to choose this name.
+  #className: the class that implements the interface between the parception/action systems and the device.
+  #           This class provides means to convert (i) sensor values in perceptions and (ii) action of the agents and actuations performed by the physical actuators.
+  #           Different interfaces can be implemented for different types of devices.
+  className:  embedded.mas.bridges.ros.RosMaster
+  # A device contains a microcontroller, that is an interface that provides access to external devices to get percepts and perform actuations
+  # Different microcontrollers have different parameters depending on their nature. For example, serial devices like Arduino require to configure serial ports and baudrates.
+  # In this example, the microcontroller is a Java-ROS interface with parameters related to topics and services.
+  microcontroller:
+      id: ros1 #microcontroller identifier. It is up to the designer to choose this name.
+      #className: The class that implements the interface with the microcontroller.
+      #           This class provides means to read from and write to the microcontroller.
+      #           Different interfaces can be implemented for different types of microcontrollers.
+      className: DefaultRos4EmbeddedMas
+      connectionString: ws://localhost:9090 #connection with ROS
+      #perceptionTopics: List of topics whose values are converted into perceptions.
+      #                  Each topic requires to define its name and its type.
+      #                  By default, the belief name has the identifier as the topic identifier.
+      #                      It is also possible to customize the belief using the optional key beliefName`, whose value is the intended belief name.
+
+  perceptionTopics:
+
+      # Motor status
+      - topicName: /arduino/motor/status
+        topicType: std_msgs/msg/String
+        beliefName: motor_status
+
+      # Motor speed
+      - topicName: /arduino/motor/speed/status
+        topicType: std_msgs/msg/String
+        beliefName: motor_speed
+
+      # Buzzer status
+      - topicName: /arduino/buzzer/status
+        topicType: std_msgs/msg/String
+        beliefName: buzzer_status
+
+      # Headlight status
+      - topicName: /arduino/headlight/status
+        topicType: std_msgs/msg/String
+        beliefName: headlight_status
+
+      # Turn signal status
+      - topicName: /arduino/turn_signal/status
+        topicType: std_msgs/msg/String
+        beliefName: turn_signal_status
+
+      # Brake light status
+      - topicName: /arduino/brake_light/status
+        topicType: std_msgs/msg/Bool
+        beliefName: brake_light_status
+
+      # Ambient luminosity (LDR)
+      - topicName: /arduino/light_sensor/reading
+        topicType: std_msgs/msg/Float32
+        beliefName: luminosity
+
+      # Ultrasonic distance sensor
+      - topicName: /arduino/ultrasonic_sensor/distance
+        topicType: std_msgs/msg/Float32
+        beliefName: distance
+
+      # Left infrared line sensor
+      - topicName: /arduino/line_sensor/left
+        topicType: std_msgs/msg/Float32
+        beliefName: line_left
+
+      # Right infrared line sensor
+      - topicName: /arduino/line_sensor/right
+        topicType: std_msgs/msg/Float32
+        beliefName: line_right
+
+
+  #actions: An agent acts upon ROS by topic writings and service requests, configured in the items topicWritingActions and serviceRequestActions, respectively.
+  #           This example illustrate only topic writing actions.
+  actions:
+    #Each topic writing action requires to configure three parameters:
+    # 1. actionName: the name of the action performed by the agent
+    # 2. topicName: the name of the topic affected by the action
+    # 3. topicType: the type of the topic.
+    # For example, the first configured action defines that, when a agent executes the action update_value1, the corresponding atuation
+    #    is the writing of an integer value in the topic value1. The written value is the parameter of the action triggered by the agent.
+    topicWritingActions:
+
+      # Motor direction
+      - actionName: motor
+        topicName: /arduino/motor/command
+        topicType: std_msgs/msg/String
+        params:
+          - data
+
+      # Motor speed
+      - actionName: motorSpeed
+        topicName: /arduino/motor/speed/command
+        topicType: std_msgs/msg/String
+        params:
+          - data
+
+      # Buzzer
+      - actionName: buzzer
+        topicName: /arduino/buzzer/command
+        topicType: std_msgs/msg/String
+        params:
+          - data
+
+      # Headlight
+      - actionName: headlight
+        topicName: /arduino/headlight/command
+        topicType: std_msgs/msg/String
+        params:
+          - data
+
+      # Turn signal
+      - actionName: turnSignal
+        topicName: /arduino/turn_signal/command
+        topicType: std_msgs/msg/String
+        params:
+          - data
+
+      # Brake light
+      - actionName: brakeLight
+        topicName: /arduino/brake_light/command
+        topicType: std_msgs/msg/Bool
+        params:
+          - data
