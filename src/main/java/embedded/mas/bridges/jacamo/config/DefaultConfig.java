@@ -79,8 +79,17 @@ import static jason.asSyntax.ASSyntax.parseRule;
 import static embedded.mas.bridges.ros.ServiceParam.createServiceParam;
 
 public class DefaultConfig {
-	private enum ROS_SENSOR_KEY {perception, perceptionTopics, perception_topics, sensors};  //possible keys for ROS pereception configuration in the YAML file
-	private enum PERCEPTION_ID_KEY {beliefName, belief_name, perception_name};  //possible keys for ROS pereception configuration in the YAML file
+	private enum CLASS_NAME_KEY {className, class_name};  //possible keys for the class name
+	private enum ROS_CONNECTION_STRING_KEY {connectionString, connection_string};  //possible keys for ROS connection string
+	private enum ROS_SENSOR_KEY {perception, perceptionTopics, perception_topics, sensors};  //possible keys for ROS pereception configuration in the YAML file	
+	private enum PERCEPTION_ID_KEY {beliefName, belief_name, percept_name};  //possible keys for ROS pereception configuration in the YAML file
+	private enum TOPIC_NAME_KEY {topicName, topic_name};  //possible keys for ROS topic name in the YAML file
+	private enum TOPIC_TYPE_KEY {topicType, topic_type};  //possible keys for ROS topic type in the YAML file
+	private enum TOPIC_ACTION_KEY {topicWritingActions, topic_writing_actions};  //possible keys for ROS topic actions in the YAML file
+	private enum SERVICE_ACTION_KEY {serviceRequestActions, service_request_actions};  //possible keys for ROS serivce actions in the YAML file
+	private enum ACTION_NAME_KEY {actionName, action_name};  //possible keys for ROS action name in the YAML file
+	private enum SERVICE_NAME_KEY {serviceName, service_name};  //possible keys for ROS service name in the YAML file
+
 	private List<DefaultDevice> devices = new ArrayList<DefaultDevice>();
 
 
@@ -327,14 +336,29 @@ public class DefaultConfig {
 				for(int i=0;i<l.size();i++) {
 					if(((LinkedHashMap) l.get(i)).get("device_id")!=null) {
 						LinkedHashMap item = (LinkedHashMap) l.get(i);
+						String microcontrollerClassName = "";
+						for(CLASS_NAME_KEY k: CLASS_NAME_KEY.values()) //iterate over all the possible keys that gather the class name
+							if(((LinkedHashMap)item.get("microcontroller")).get(k.toString())!=null) {  
+								microcontrollerClassName = ((LinkedHashMap)item.get("microcontroller")).get(k.toString()).toString();
+								break;
+							}
+
+
 						//if the current device is a serial device
-						if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("Arduino4EmbeddedMas")|
-								((LinkedHashMap)item.get("microcontroller")).get("className").equals("SerialReader")) {
+						if(microcontrollerClassName.equals("Arduino4EmbeddedMas")|
+								microcontrollerClassName.equals("SerialReader")) {
 							microcontroller= createArduino4EmbeddedMas(((LinkedHashMap)item.get("microcontroller")).get("serial").toString(),
 									Integer.parseInt(((LinkedHashMap)item.get("microcontroller")).get("baudRate").toString()));
 							ArrayList actionsArray = (ArrayList) item.get("serialActions");
 							for(int j=0;j<actionsArray.size();j++) {
-								SerialEmbeddedAction action  = new SerialEmbeddedAction(createAtom(((LinkedHashMap)actionsArray.get(j)).get("actionName").toString() ), 
+								String actionNameStr = "";
+								for(ACTION_NAME_KEY k: ACTION_NAME_KEY.values()) //iterate over all the possible keys that refer to action name
+									if(((LinkedHashMap)actionsArray.get(j)).get(k.toString())!=null) {  
+										actionNameStr = ((LinkedHashMap)actionsArray.get(j)).get(k.toString()).toString();
+										break;
+									}
+
+								SerialEmbeddedAction action  = new SerialEmbeddedAction(createAtom(actionNameStr), 
 										createAtom(((LinkedHashMap)actionsArray.get(j)).get("actuationName").toString()));
 								embeddedActionList.add(action);
 
@@ -342,12 +366,19 @@ public class DefaultConfig {
 							}
 						}
 						else
-							if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("NRJ4EmbeddedMas")) {
+							if(microcontrollerClassName.equals("NRJ4EmbeddedMas")) {
 								microcontroller= createNRJ4EmbeddedMas(((LinkedHashMap)item.get("microcontroller")).get("serial").toString(),
 										Integer.parseInt(((LinkedHashMap)item.get("microcontroller")).get("baudRate").toString()));
 								ArrayList actionsArray = (ArrayList) item.get("serialActions");
 								for(int j=0;j<actionsArray.size();j++) {
-									SerialEmbeddedAction action  = new SerialEmbeddedAction(createAtom(((LinkedHashMap)actionsArray.get(j)).get("actionName").toString() ), 
+									String actionNameStr = "";
+								    for(ACTION_NAME_KEY k: ACTION_NAME_KEY.values()) //iterate over all the possible keys that refer to action name
+									   if(((LinkedHashMap)actionsArray.get(j)).get(k.toString())!=null) {  
+										  actionNameStr = ((LinkedHashMap)actionsArray.get(j)).get(k.toString()).toString();
+										   break;
+									   }
+
+									SerialEmbeddedAction action  = new SerialEmbeddedAction(createAtom(actionNameStr), 
 											createAtom(((LinkedHashMap)actionsArray.get(j)).get("actuationName").toString()));
 									embeddedActionList.add(action);
 
@@ -356,8 +387,8 @@ public class DefaultConfig {
 							}
 							else
 								//if the current device is a ros node
-								if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4EmbeddedMas")|
-										((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4Bdi")) { //DefaultRos4Bdi is just an alias class for the names to make more sense in Jason-ROS applications
+								if(microcontrollerClassName.equals("DefaultRos4EmbeddedMas")|
+										microcontrollerClassName.equals("DefaultRos4Bdi")) { //DefaultRos4Bdi is just an alias class for the names to make more sense in Jason-ROS applications
 									//ArrayList perceptionTopics = (ArrayList) ((LinkedHashMap)item.get("microcontroller")).get("perceptionTopics");
 									//ArrayList perceptionTopics = (ArrayList) item.get("perceptionTopics");
 									ArrayList perceptionTopics = null;
@@ -374,8 +405,22 @@ public class DefaultConfig {
 									HashMap<String, ArrayList<String>> ignoreParams = new HashMap<>();
 									if(perceptionTopics!=null)
 										for(int j=0;j<perceptionTopics.size();j++) {
-											topics.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicName").toString());
-											types.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicType").toString());
+											String topicName = "";	
+											for(TOPIC_NAME_KEY k: TOPIC_NAME_KEY.values()) //iterate over all the possible keys that gather perception topic names
+												if(((LinkedHashMap)perceptionTopics.get(j)).get(k.toString())!=null) {  
+													topicName = ((LinkedHashMap)perceptionTopics.get(j)).get(k.toString()).toString();
+													break;
+												}
+
+											topics.add(topicName);
+
+											String topicType = "";										
+											for(TOPIC_TYPE_KEY k: TOPIC_TYPE_KEY.values()) //iterate over all the possible keys that gather perception topic types
+												if(((LinkedHashMap)perceptionTopics.get(j)).get(k.toString())!=null) {  
+													topicType = ((LinkedHashMap)perceptionTopics.get(j)).get(k.toString()).toString();
+													break;
+												}
+											types.add(topicType	);
 											// if(((LinkedHashMap)perceptionTopics.get(j)).get("beliefName")==null)
 											// 	beliefNames.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicName").toString());
 											// else
@@ -387,44 +432,99 @@ public class DefaultConfig {
 													break;
 												}
 											if(beliefNames.size()<j+1) //if no belief name was found, use the topic name as the belief name
-												beliefNames.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicName").toString());
+												beliefNames.add(topicName);
 											ArrayList tempParams =  (ArrayList) ((LinkedHashMap)perceptionTopics.get(j)).get("ignoreValues");
-											ignoreParams.put(((LinkedHashMap)perceptionTopics.get(j)).get("topicName").toString(), tempParams);
+											ignoreParams.put(topicName, tempParams);
 										}
 
-									if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4EmbeddedMas"))
-										microcontroller= createRos4EmbeddedMas(((LinkedHashMap)item.get("microcontroller")).get("connectionString").toString(),topics,types,beliefNames, ignoreParams);
+									String connectionStr = "";
+									for(ROS_CONNECTION_STRING_KEY k: ROS_CONNECTION_STRING_KEY.values()) //iterate over all the possible keys that gather the connection string for ROS
+										if(((LinkedHashMap)item.get("microcontroller")).get(k.toString())!=null) {  
+											connectionStr = ((LinkedHashMap)item.get("microcontroller")).get(k.toString()).toString();
+											break;
+										}
+
+									if(microcontrollerClassName.equals("DefaultRos4EmbeddedMas"))
+										microcontroller= createRos4EmbeddedMas(connectionStr,topics,types,beliefNames, ignoreParams);
 									else
-										if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4Bdi"))
-											microcontroller = createRos4Bdi(((LinkedHashMap)item.get("microcontroller")).get("connectionString").toString(),topics,types,beliefNames, ignoreParams);
+										if(microcontrollerClassName.equals("DefaultRos4Bdi"))
+											microcontroller = createRos4Bdi(connectionStr,topics,types,beliefNames, ignoreParams);
 
 
 									//handle topic writing actions
 									if(item.get("actions")!=null) {
-										if(((LinkedHashMap)item.get("actions")).get("topicWritingActions")!=null) {
-											ArrayList topicWritingActions = (ArrayList) ((LinkedHashMap)item.get("actions")).get("topicWritingActions");
+										ArrayList topicWritingActions = null;
+										for(TOPIC_ACTION_KEY k: TOPIC_ACTION_KEY.values()) //iterate over all the possible keys that gather topic writing actions
+											if(((LinkedHashMap)item.get("actions")).get(k.toString())!=null) {  
+												topicWritingActions = (ArrayList) ((LinkedHashMap)item.get("actions")).get(k.toString());
+												break;
+											}
+
+										//if(((LinkedHashMap)item.get("actions")).get("topicWritingActions")!=null) {
+										if(topicWritingActions!=null) {
+											//ArrayList topicWritingActions = (ArrayList) ((LinkedHashMap)item.get("actions")).get("topicWritingActions");
 											for(int j=0;j<topicWritingActions.size();j++) {
 												ServiceParameters params = new ServiceParameters();
 												if(((LinkedHashMap)topicWritingActions.get(j)).get("params")!=null)
 													params = buildServiceParameters( (ArrayList<Object>) ((LinkedHashMap) topicWritingActions.get(j)).get("params"));
 
-												embeddedActionList.add(new TopicWritingAction(createAtom(((LinkedHashMap) topicWritingActions.get(j)).get("actionName").toString()),
-														((LinkedHashMap) topicWritingActions.get(j)).get("topicName").toString(),
-														((LinkedHashMap) topicWritingActions.get(j)).get("topicType").toString(),null,params));
+												String topicName = "";	
+												for(TOPIC_NAME_KEY k: TOPIC_NAME_KEY.values()) //iterate over all the possible keys that gather perception topic names
+													if(((LinkedHashMap)topicWritingActions.get(j)).get(k.toString())!=null) {  
+														topicName = ((LinkedHashMap)topicWritingActions.get(j)).get(k.toString()).toString();
+													break;
+												}
+												String topicType = "";										
+												for(TOPIC_TYPE_KEY k: TOPIC_TYPE_KEY.values()) //iterate over all the possible keys that gather perception topic types
+													if(((LinkedHashMap)topicWritingActions.get(j)).get(k.toString())!=null) {  
+														topicType = ((LinkedHashMap)topicWritingActions.get(j)).get(k.toString()).toString();
+													break;
+												}	
+
+												String actionNameStr = "";
+												for(ACTION_NAME_KEY k: ACTION_NAME_KEY.values()) //iterate over all the possible keys that refer to action name
+													if(((LinkedHashMap)topicWritingActions.get(j)).get(k.toString())!=null) {  
+											            actionNameStr = ((LinkedHashMap)topicWritingActions.get(j)).get(k.toString()).toString();
+										                break;
+									                }
+
+												embeddedActionList.add(new TopicWritingAction(createAtom(actionNameStr),
+														topicName,
+														topicType,null,params));
 											}
 										}
 
 										//handle service request actions
 										//if(((LinkedHashMap)((LinkedHashMap)item.get("microcontroller")).get("actions")).get("serviceRequestActions")!=null) {
-										if(((LinkedHashMap)item.get("actions")).get("serviceRequestActions")!=null) {
-											ArrayList serviceRequestActions = (ArrayList) ((LinkedHashMap)item.get("actions")).get("serviceRequestActions");
+										ArrayList serviceRequestActions = null;
+										for(SERVICE_ACTION_KEY k: SERVICE_ACTION_KEY.values()) //iterate over all the possible keys that gather service request actions
+											if(((LinkedHashMap)item.get("actions")).get(k.toString())!=null) {  
+												serviceRequestActions = (ArrayList) ((LinkedHashMap)item.get("actions")).get(k.toString());
+												break;
+											}
+
+										//if(((LinkedHashMap)item.get("actions")).get("serviceRequestActions")!=null) {
+										if(serviceRequestActions!=null) {
+											//ArrayList serviceRequestActions = (ArrayList) ((LinkedHashMap)item.get("actions")).get("serviceRequestActions");
 											for(int j=0;j<serviceRequestActions.size();j++) {
 												ServiceParameters params = new ServiceParameters();
 												if(((LinkedHashMap)serviceRequestActions.get(j)).get("params")!=null)
 													params = buildServiceParameters( (ArrayList<Object>) ((LinkedHashMap) serviceRequestActions.get(j)).get("params"));
-												ServiceRequestAction serviceAction = null; 
-												serviceAction = new ServiceRequestAction(createAtom(((LinkedHashMap)serviceRequestActions.get(j)).get("actionName").toString()), 
-														((LinkedHashMap)serviceRequestActions.get(j)).get("serviceName").toString(), params);
+												ServiceRequestAction serviceAction = null;
+												String actionNameStr = "";
+								                for(ACTION_NAME_KEY k: ACTION_NAME_KEY.values()) //iterate over all the possible keys that refer to action name
+									               if(((LinkedHashMap)serviceRequestActions.get(j)).get(k.toString())!=null) {  
+										              actionNameStr = ((LinkedHashMap)serviceRequestActions.get(j)).get(k.toString()).toString();
+										               break;
+									               }
+												String serviceNameStr = "";
+								                for(SERVICE_NAME_KEY k: SERVICE_NAME_KEY.values()) //iterate over all the possible keys that refer to service name
+									               if(((LinkedHashMap)serviceRequestActions.get(j)).get(k.toString())!=null) {  
+										              serviceNameStr = ((LinkedHashMap)serviceRequestActions.get(j)).get(k.toString()).toString();
+										               break;
+									               }
+												serviceAction = new ServiceRequestAction(createAtom(actionNameStr), 
+														serviceNameStr, params);
 												embeddedActionList.add(serviceAction);
 
 											}
@@ -432,16 +532,22 @@ public class DefaultConfig {
 
 									}
 									else
-										if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DemoDevice")) {
+										if(microcontrollerClassName.equals("DemoDevice")) {
 											//do nothing (so far)
 										}		
 								}
 
 						DefaultDevice device = null;
 						try {
-							Class c = Class.forName((String) item.get("className"));
+							String deviceClassName = "";
+							for(CLASS_NAME_KEY k: CLASS_NAME_KEY.values()) //iterate over all the possible keys that gather the class name
+								if(item.get(k.toString())!=null) {
+									deviceClassName = item.get(k.toString()).toString();
+									break;
+								}
+							Class c = Class.forName(deviceClassName);
 							Object obj = null;
-							if(item.get("className").equals("embedded.mas.bridges.jacamo.DemoDevice")) {
+							if(deviceClassName.equals("embedded.mas.bridges.jacamo.DemoDevice")) {
 								obj = new DemoDevice(createAtom(item.get("device_id").toString()));
 							}
 							else {
