@@ -89,40 +89,28 @@
       - actionName: motor
         topicName: /arduino/motor/command
         topicType: std_msgs/msg/String
-        params:
-          - data
 
       # Motor speed
       - actionName: motorSpeed
         topicName: /arduino/motor/speed/command
         topicType: std_msgs/msg/String
-        params:
-          - data
 
       # Buzzer
       - actionName: buzzer
         topicName: /arduino/buzzer/command
         topicType: std_msgs/msg/String
-        params:
-          - data
 
       # Headlight
       - actionName: headlight
         topicName: /arduino/headlight/command
         topicType: std_msgs/msg/String
-        params:
-          - data
 
       # Turn signal
       - actionName: turnSignal
         topicName: /arduino/turn_signal/command
         topicType: std_msgs/msg/String
-        params:
-          - data
 
       # Brake light
       - actionName: brakeLight
         topicName: /arduino/brake_light/command
         topicType: std_msgs/msg/Bool
-        params:
-          - data
