@@ -98,6 +98,12 @@ public class InternalActionGenerator  {
 	}
 
 	public static void main(String[] args) {
+		enum TOPIC_ACTION_KEY {topicWritingActions, topic_writing_actions};  //possible keys for ROS topic actions in the YAML file
+		enum SERVICE_ACTION_KEY {serviceRequestActions, service_request_actions};  //possible keys for ROS serivce actions in the YAML file
+		enum SERIAL_ACTION_KEY {serialActions, serial_actions};  //possible keys for ROS serial actions in the YAML file
+		enum ACTION_NAME_KEY {actionName, action_name};  //possible keys for ROS action name in the YAML file
+		enum SERVICE_NAME_KEY {serviceName, service_name};  //possible keys for ROS service name in the YAML file
+		
 		Path directoryPath = Paths.get("src/agt");
 
 		List<Path> yamlFiles = listYamlFiles(directoryPath);
@@ -117,36 +123,86 @@ public class InternalActionGenerator  {
 					String deviceId = (String) device.get("device_id");
 					Map<String, Object> actions = (Map<String, Object>) device.get("actions");
 					if(actions!=null) {
-						List<Map<String, Object>> serviceRequestActions = (List<Map<String, Object>>) actions.get("serviceRequestActions");
+						List<Map<String, Object>> serviceRequestActions = null;
+						for(SERVICE_ACTION_KEY key: SERVICE_ACTION_KEY.values()) {
+							if(actions.get(key.toString())!=null) {
+								serviceRequestActions = (List<Map<String, Object>>) actions.get(key.toString());
+								break;
+							}
+						}
+						
 
 						if(serviceRequestActions!=null){
 							for (Map<String, Object> action : serviceRequestActions) {
-								String actionName = (String) action.get("actionName");
-								String serviceName = (String) action.get("serviceName");
+								String actionName = "";
+								for(ACTION_NAME_KEY key: ACTION_NAME_KEY.values()) {
+									if(action.get(key.toString())!=null) {
+										actionName = (String) action.get(key.toString());
+										break;										
+									}
+								}
+
+								String serviceName = "";
+								for(SERVICE_NAME_KEY key: SERVICE_NAME_KEY.values()) {
+									if(action.get(key.toString())!=null) {
+										serviceName = (String) action.get(key.toString());
+										break;										
+									}
+								}
+
 								List<String> params = (List<String>) action.getOrDefault("params", List.of());		
 								boolean requestResponseServiceAction; 
 								if(action.get("hasReturn")!=null && action.get("hasReturn").toString().equals("true"))
 									requestResponseServiceAction = true;
 								else
 									requestResponseServiceAction = false;
+
 								InternalActionGenerator.writeToFile(deviceId, actionName, serviceName, params,requestResponseServiceAction);
 							}
 						}
 
 
-						List<Map<String, Object>> topicWritingActions = (List<Map<String, Object>>) actions.get("topicWritingActions");
+						//List<Map<String, Object>> topicWritingActions = (List<Map<String, Object>>) actions.get("topicWritingActions");
+						List<Map<String, Object>> topicWritingActions = null;
+						for(TOPIC_ACTION_KEY key: TOPIC_ACTION_KEY.values()) {
+							if(actions.get(key.toString())!=null) {
+								topicWritingActions = (List<Map<String, Object>>) actions.get(key.toString());
+								break;
+							}
+						}
 
 						if(topicWritingActions!=null){
 							for (Map<String, Object> action : topicWritingActions) {
-								String actionName = (String) action.get("actionName");
-								String serviceName = (String) action.get("serviceName");
+								//String actionName = (String) action.get("actionName");
+								String actionName = "";
+								for(ACTION_NAME_KEY key: ACTION_NAME_KEY.values()) {
+									if(action.get(key.toString())!=null) {
+										actionName = (String) action.get(key.toString());
+										break;										
+									}
+								}
+								//String serviceName = (String) action.get("serviceName");
+								String serviceName = "";
+								for(SERVICE_NAME_KEY key: SERVICE_NAME_KEY.values()) {
+									if(action.get(key.toString())!=null) {
+										serviceName = (String) action.get(key.toString());
+										break;										
+									}
+								}	
 								List<String> params = (List<String>) action.getOrDefault("params", List.of());						
 								InternalActionGenerator.writeToFile(deviceId, actionName, serviceName, params, false);
 							}
 						}
 					}
 
-					ArrayList<Map> serialActions = (ArrayList)device.get("serialActions");
+					//ArrayList<Map> serialActions = (ArrayList)device.get("serialActions");
+					ArrayList<Map> serialActions = null;
+					for(SERIAL_ACTION_KEY key: SERIAL_ACTION_KEY.values()) {
+						if(device.get(key.toString())!=null) {
+							serialActions = (ArrayList<Map>) device.get(key.toString());
+							break;
+						}
+					}	
 					if(serialActions!=null)
 						for(Map m: serialActions)
 							InternalActionGenerator.writeToFile(deviceId, m.get("actionName").toString(), "", null, false );

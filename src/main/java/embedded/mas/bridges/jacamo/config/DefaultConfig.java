@@ -89,6 +89,7 @@ public class DefaultConfig {
 	private enum SERVICE_ACTION_KEY {serviceRequestActions, service_request_actions};  //possible keys for ROS serivce actions in the YAML file
 	private enum ACTION_NAME_KEY {actionName, action_name};  //possible keys for ROS action name in the YAML file
 	private enum SERVICE_NAME_KEY {serviceName, service_name};  //possible keys for ROS service name in the YAML file
+	private enum IGNORE_VALUES_KEY {ignoreValues, ignore_values};  //possible keys for ingore values in the YAML file
 
 	private List<DefaultDevice> devices = new ArrayList<DefaultDevice>();
 
@@ -433,7 +434,12 @@ public class DefaultConfig {
 												}
 											if(beliefNames.size()<j+1) //if no belief name was found, use the topic name as the belief name
 												beliefNames.add(topicName);
-											ArrayList tempParams =  (ArrayList) ((LinkedHashMap)perceptionTopics.get(j)).get("ignoreValues");
+											ArrayList tempParams =  null;
+											for(IGNORE_VALUES_KEY k: IGNORE_VALUES_KEY.values()) //iterate over all the possible keys that gather perception belief names
+												if(((LinkedHashMap)perceptionTopics.get(j)).get(k.toString())!=null) {  
+													tempParams =  (ArrayList) ((LinkedHashMap)perceptionTopics.get(j)).get(k.toString());
+													break;
+												}
 											ignoreParams.put(topicName, tempParams);
 										}
 
