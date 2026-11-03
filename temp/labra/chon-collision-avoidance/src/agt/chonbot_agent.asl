@@ -1,12 +1,21 @@
+!start.
 !walk.
+
++!start : .my_name(Me)
+   <- .print("Hello from ", Me).
+
 
 +!walk : distance(D) & D <= 30
    <- .print("Obstacle...") ;
-      .motorSpeed("low"); 
+      .motorSpeed("default"); 
       .move("backward");
       .wait(1000);
-      .move("right");
+      .move("stop");
       .wait(500);
+      .motorSpeed("low");
+      .move("right");
+      .wait(2000);
+      .motorSpeed("default");
       .move("forward");
       !walk.   
       
