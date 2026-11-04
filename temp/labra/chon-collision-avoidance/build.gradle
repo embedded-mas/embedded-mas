@@ -57,7 +57,7 @@ task run (type: JavaExec, dependsOn: ['compileGeneratedInternalActions','classes
     group       ' JaCaMo'
     description 'runs the JaCaMo application'
     mainClass = 'jacamo.infra.JaCaMoLauncher'
-    args 'perception_action.jcm'
+    args 'obstacle_avoidance_vehicle.jcm'
     // jvmArgs '-Xss15m'
     classpath sourceSets.main.runtimeClasspath
 }
@@ -99,7 +99,7 @@ task compileGeneratedInternalActions(type: JavaCompile, dependsOn: ['generateInt
 }
 task buildJCMDeps (type: JavaExec, dependsOn: 'classes') {
     mainClass = 'jacamo.infra.RunJaCaMoProject'
-    args = ['perception_action.jcm', '--deps']
+    args = ['obstacle_avoidance_vehicle.jcm', '--deps']
     classpath sourceSets.main.runtimeClasspath
 }
 
@@ -151,8 +151,8 @@ task uberJar(type: Jar, dependsOn: 'classes') {
 
     doFirst {
         copy {
-            from 'perception_action.jcm'
-            rename 'perception_action.jcm','default.jcm'
+            from 'obstacle_avoidance_vehicle.jcm'
+            rename 'obstacle_avoidance_vehicle.jcm','default.jcm'
             into project.buildDir.absolutePath + '/jcm'
         }
     }

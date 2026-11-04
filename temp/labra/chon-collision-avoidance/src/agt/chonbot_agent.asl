@@ -1,29 +1,49 @@
 !start.
-!walk.
+!walk.           //move forward and avoid obstacles
+!alert_blink.    //blink alert lights when not moving forward
 
 +!start : .my_name(Me)
-   <- .print("Hello from ", Me).
+   <- //.move("forward");
+      .print("Hello from ", Me).
 
 
-+!walk : distance(D) & D <= 30
-   <- .print("Obstacle...") ;
-      .motorSpeed("default"); 
-      .move("backward");
++!walk : distance(D) & D <= 50
+   <- .print("Obstacle...") ;      
+      .brakeLight(true);           //brakeLight on
+      .motorSpeed("low");          //slow down
+      //!!alert_blink;                //blink alert lights
+      .move("backward");           //move backward for 1 second
       .wait(1000);
-      .move("stop");
+      .move("stop");               //stop for 500 milliseconds
       .wait(500);
-      .motorSpeed("low");
-      .move("right");
-      .wait(2000);
+      .move("right");              //move right for 2 seconds
+      .wait(2000);   
+      !walk.   
+
+
+
++!walk 
+   <- .turnSignal("off");
+      .brakeLight(false);
       .motorSpeed("default");
       .move("forward");
-      !walk.   
+      .print("Moving forward");
+      .wait(distance(D) & D <= 50);
+      //.wait(2000);
+      !walk;
+      .
       
-+!walk 
-   <- .motorSpeed("default");
-      .move("forward");
-      .wait(distance(D)&D<=30);
-      !walk.         
+
++!alert_blink : not motor_status("running")
+   <- .turnSignal("alert");           //alert light on 
+      .wait(300);
+      .turnSignal("off");            //alert light off
+      .wait(200);
+      !alert_blink.
+
++!alert_blink
+   <- .wait( motor_status(S)&S\=="running");
+      !alert_blink.
 
 +distance(D)
    <- .print("Distance: ", D).
