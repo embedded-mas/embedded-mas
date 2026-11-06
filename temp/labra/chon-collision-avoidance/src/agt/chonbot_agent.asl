@@ -11,13 +11,13 @@
    <- .print("Obstacle...") ;      
       .brakeLight(true);           //brakeLight on
       .motorSpeed("low");          //slow down
-      //!!alert_blink;                //blink alert lights
       .move("backward");           //move backward for 1 second
       .wait(1000);
       .move("stop");               //stop for 500 milliseconds
       .wait(500);
       .move("right");              //move right for 2 seconds
       .wait(2000);   
+      .move(stop);
       !walk.   
 
 
@@ -27,10 +27,10 @@
       //.brakeLight(false);
       //.motorSpeed("default");
       //.wait(500);
-      .move("forward"); //não aciona os motores, apesar de escrever no tópico 
-      .turnSignal("off");
-      .brakeLight(false);
-      .motorSpeed("default"); 
+      .move("forward");         .wait(300); //não aciona os motores, apesar de escrever no tópico 
+      .turnSignal("off");       .wait(300);
+      .brakeLight(false);       .wait(300);
+      .motorSpeed("default");   .wait(300);
       .print("Moving forward");
       .wait(distance(D) & D <= 50);
       //.wait(2000);
