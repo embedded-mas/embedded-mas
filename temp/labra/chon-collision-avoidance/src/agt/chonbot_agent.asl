@@ -23,10 +23,14 @@
 
 
 +!walk 
-   <- .turnSignal("off");
+   <- //.turnSignal("off");
+      //.brakeLight(false);
+      //.motorSpeed("default");
+      //.wait(500);
+      .move("forward"); //não aciona os motores, apesar de escrever no tópico 
+      .turnSignal("off");
       .brakeLight(false);
-      .motorSpeed("default");
-      .move("forward");
+      .motorSpeed("default"); 
       .print("Moving forward");
       .wait(distance(D) & D <= 50);
       //.wait(2000);
