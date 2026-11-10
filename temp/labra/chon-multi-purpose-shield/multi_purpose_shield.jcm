@@ -1,0 +1,10 @@
+mas multi_purpose_shield {
+
+    agent chonbot_agent : chonbot_agent.asl {
+      ag-class: embedded.mas.bridges.jacamo.ros.RosBdiAgent
+      ag-arch: embedded.mas.bridges.jacamo.ros.RosBdiAgArch
+    }
+
+
+
+}
